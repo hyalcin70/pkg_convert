@@ -40,3 +40,4 @@ Danach erscheint **Paket Converter** im KDE-Menü (Kategorie: Utility / Paketver
 
 Die vollständige Dokumentation (Warum? / Benutzung / Hinweise / Abhängigkeiten)
 findest du in der für dich passenden Sprach-README oben.
+# pkg_convert
