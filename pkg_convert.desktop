@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Paket Converter
+GenericName=Debian/RPM zu Arch-Konverter
+Comment=Konvertiert .deb/.rpm-Pakete in installierbare Arch-Linux-Pakete
+Exec=pkg_convert_gui
+Icon=pkg_convert
+Terminal=false
+Categories=Qt;KDE;Utility;PackageManager;
+Keywords=deb;rpm;arch;paket;konverter;pkgbuild;

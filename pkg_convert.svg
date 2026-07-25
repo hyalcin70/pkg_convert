@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <rect x="6" y="10" width="52" height="44" rx="6" fill="#1793d1"/>
+  <rect x="6" y="10" width="52" height="14" rx="6" fill="#0b6e9e"/>
+  <rect x="14" y="30" width="36" height="6" rx="3" fill="#ffffff" opacity="0.9"/>
+  <rect x="14" y="40" width="26" height="5" rx="2.5" fill="#ffffff" opacity="0.7"/>
+  <text x="32" y="22" font-family="sans-serif" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="middle">PKG</text>
+  <rect x="20" y="46" width="24" height="11" rx="5.5" fill="#ff8c00"/>
+  <text x="32" y="54" font-family="sans-serif" font-size="8" font-weight="bold" fill="#ffffff" text-anchor="middle">deb+rpm</text>
+</svg>
