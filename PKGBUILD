@@ -10,7 +10,7 @@ depends=('qt6-base' 'pacman' 'file' 'binutils' 'cpio' 'libarchive')
 optdepends=(
   'rpmextract: für RPM-Quellen (oder rpmtools)'
 )
-makedepends=('qt6-base' 'qmake6')
+makedepends=('qt6-base')
 source=("pkg_convert_gui.cpp"
         "pkg_convert_gui.pro"
         "pkg_convert.desktop"

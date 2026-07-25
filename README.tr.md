@@ -49,5 +49,4 @@ Ardından **Paket Converter** KDE menüsünde görünür
 
 ## Bağımlılıklar
 
-`qt6-base`, `pacman`, `file`, `binutils`, `cpio`, `libarchive`
-(derlemek için `qmake6` dahil).
+`qt6-base` (`qmake6` derlemek için dahil), `pacman`, `file`, `binutils`, `cpio`, `libarchive`

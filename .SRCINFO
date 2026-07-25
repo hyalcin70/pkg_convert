@@ -6,7 +6,6 @@ pkgbase = pkg_convert
 	arch = x86_64
 	license = GPL3
 	makedepends = qt6-base
-	makedepends = qmake6
 	depends = qt6-base
 	depends = pacman
 	depends = file

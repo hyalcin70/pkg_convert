@@ -49,5 +49,4 @@ Danach erscheint **Paket Converter** im KDE-Menü (Kategorie: Utility / Paketver
 
 ## Abhängigkeiten
 
-`qt6-base`, `pacman`, `file`, `binutils`, `cpio`, `libarchive`
-(sowie `qmake6` zum Bauen).
+`qt6-base` (bietet `qmake6` zum Bauen), `pacman`, `file`, `binutils`, `cpio`, `libarchive`
