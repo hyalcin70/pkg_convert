@@ -31,7 +31,7 @@ der Bibliotheken und persistentem Installationsverlauf.
 ## Bauen & Installieren (aus Quelle, ohne AUR)
 
 ```bash
-git clone <dein-repo-url>
+git clone https://github.com/hyalcin70/pkg_convert
 cd pkg_convert
 makepkg -si
 ```
