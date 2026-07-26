@@ -38,8 +38,9 @@ pkg_convert für die meisten Anwender die bessere Wahl ist:
    Paketliste (≈1,1 GB Cache, mit Root-Rechten). pkg_convert nutzt
    `pkgfile`, das deine **lokale** Arch-Repo-Datenbank abfragt — kein
    großer Download, kein separater Update-Schritt.
-3. **Vollständigere Abhängigkeitserkennung.** In einem echten Test
-   (webos-dev-manager) löste pkg_convert **11** Bibliotheken auf
+3. **Vollständigere Abhängigkeitserkennung.** In Tests mit
+   unterschiedlichen Programmen, die sowohl als `.deb` als auch als
+   `.rpm` vorlagen, löste pkg_convert **11** Bibliotheken auf
    (gtk3, webkit2gtk-4.1, cairo, pango, glib2, libsoup, zlib, glibc,
    gcc-libs, gdk-pixbuf2, libx11) statt **4** bei debtap. Mehr
    soname-Treffer bedeuten ein saubereres Paket.
@@ -60,7 +61,7 @@ pkg_convert für die meisten Anwender die bessere Wahl ist:
   Menü-Icons erscheinen evtl. erst nach manuellem Cache-Update.
 - `makepkg` strippt das Binary standardmäßig (≈12 % kleiner als debtaps
   1:1-Kopie); funktional identisch.
-- `pkgname` trägt einen Versions-Suffix (z.B. `webos-dev-manager-1.99.16`)
+- `pkgname` trägt einen Versions-Suffix (z.B. `program-1.99.16`)
   statt eines sauberen Namens.
 - `pkgfile` verlässt sich auf eine aktuelle lokale Sync-DB; bei
   veralteten Mappings `pacman -Sy` ausführen.
@@ -84,7 +85,7 @@ Danach erscheint **Paket Converter** im KDE-Menü
 
 ## Hinweise
 
-- Manche Upstreams splitten Spiele in Programm + `-data`-Paket.
+- Manche Upstreams splitten Programme/Spiele in Programm + `-data`-Paket.
   Fehlen nach dem Start Grafik/Ton, auch das passende Datenpaket
   konvertieren.
 - Bibliotheken, die nur im **AUR** existieren (z.B. `glc-lib`), können

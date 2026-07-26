@@ -38,8 +38,9 @@ pkg_convert convient mieux à la plupart des utilisateurs :
    de paquets Debian/Ubuntu (≈1,1 Go de cache, avec root). pkg_convert
    utilise `pkgfile`, qui interroge votre base **locale** Arch — pas de
    gros téléchargement, pas d'étape de mise à jour séparée.
-3. **Détection des dépendances plus complète.** Sur un test réel
-   (webos-dev-manager), pkg_convert a résolu **11** bibliothèques
+3. **Détection des dépendances plus complète.** Lors de tests avec
+   différents programmes fournis à la fois en `.deb` et en `.rpm`,
+   pkg_convert a résolu **11** bibliothèques
    (gtk3, webkit2gtk-4.1, cairo, pango, glib2, libsoup, zlib, glibc,
    gcc-libs, gdk-pixbuf2, libx11) contre **4** pour debtap.
 4. **C++/Qt6 natif, sans exécution Python.** `debtap` est bash + Python
@@ -56,7 +57,7 @@ pkg_convert convient mieux à la plupart des utilisateurs :
   génère un avec `gtk-update-icon-cache` + `update-desktop-database`).
 - `makepkg` retire les symboles du binaire par défaut (≈12 % plus
   petit que la copie 1:1 de debtap) ; fonctionnellement identique.
-- `pkgname` comporte un suffixe de version (ex. `webos-dev-manager-1.99.16`).
+- `pkgname` comporte un suffixe de version (ex. `program-1.99.16`).
 - `pkgfile` s'appuie sur une base locale à jour ; lancez `pacman -Sy`
   si les correspondances semblent obsolètes.
 

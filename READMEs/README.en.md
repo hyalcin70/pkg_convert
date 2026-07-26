@@ -37,8 +37,9 @@ pkg_convert is a better fit for most users:
    package list (≈1.1 GB cache, fetched with root). pkg_convert uses
    `pkgfile`, which queries your **local** Arch repo database — no
    large download, no separate update step.
-3. **More complete dependency detection.** On a real test
-   (webos-dev-manager), pkg_convert resolved **11** libraries
+3. **More complete dependency detection.** In tests with
+   different programs provided as both `.deb` and `.rpm`, pkg_convert
+   resolved **11** libraries
    (gtk3, webkit2gtk-4.1, cairo, pango, glib2, libsoup, zlib, glibc,
    gcc-libs, gdk-pixbuf2, libx11) vs **4** from debtap. More
    soname-based matches mean a cleaner package.
@@ -58,7 +59,7 @@ pkg_convert is a better fit for most users:
   icons may appear only after a manual cache refresh.
 - `makepkg` strips the binary by default (≈12 % smaller than debtap's
   1:1 copy); functionally identical.
-- `pkgname` carries a version suffix (e.g. `webos-dev-manager-1.99.16`)
+- `pkgname` carries a version suffix (e.g. `program-1.99.16`)
   rather than a clean name.
 - `pkgfile` relies on an up-to-date local sync db; run `pacman -Sy`
   if mappings look stale.
@@ -82,7 +83,7 @@ Afterwards **Paket Converter** appears in the KDE menu
 
 ## Notes
 
-- Some upstreams split games into program + `-data` package.
+- Some upstreams split programs/games into program + `-data` package.
   If graphics/sound are missing after launch, also convert the
   corresponding data package.
 - Libraries that exist only in **AUR** (e.g. `glc-lib`) cannot be

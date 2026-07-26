@@ -38,8 +38,9 @@ pkg_convert es mejor para la mayoría:
    paquetes Debian/Ubuntu (≈1,1 GB de caché, con root). pkg_convert usa
    `pkgfile`, que consulta tu base **local** de Arch — sin gran
    descarga, sin paso de actualización separado.
-3. **Detección de dependencias más completa.** En una prueba real
-   (webos-dev-manager), pkg_convert resolvió **11** bibliotecas
+3. **Detección de dependencias más completa.** En pruebas con
+   diferentes programas disponibles tanto en `.deb` como en `.rpm`,
+   pkg_convert resolvió **11** bibliotecas
    (gtk3, webkit2gtk-4.1, cairo, pango, glib2, libsoup, zlib, glibc,
    gcc-libs, gdk-pixbuf2, libx11) frente a **4** de debtap.
 4. **C++/Qt6 nativo, sin runtime Python.** `debtap` es bash + Python
@@ -56,7 +57,7 @@ pkg_convert es mejor para la mayoría:
   con `gtk-update-icon-cache` + `update-desktop-database`).
 - `makepkg` quita símbolos del binario por defecto (≈12 % más pequeño
   que la copia 1:1 de debtap) ; funcionalmente idéntico.
-- `pkgname` lleva sufijo de versión (ej. `webos-dev-manager-1.99.16`).
+- `pkgname` lleva sufijo de versión (ej. `program-1.99.16`).
 - `pkgfile` depende de una base local actualizada ; ejecuta
   `pacman -Sy` si las correspondencias parecen obsoletas.
 
@@ -79,7 +80,7 @@ Después **Paket Converter** aparece en el menú KDE
 
 ## Notas
 
-- Algunos proyectos dividen juegos en programa + paquete `-data`. Si
+- Algunos proyectos dividen programas/juegos en programa + paquete `-data`. Si
   faltan gráficos/sonido, convierte también el paquete de datos.
 - Bibliotecas solo en **AUR** no se instalan automáticamente — la
   herramienta avisa.

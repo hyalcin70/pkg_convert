@@ -38,10 +38,11 @@ Başka dönüştürücüler de var (debtap, rpmtoarch). İşte pkg_convert'in
    indirir (≈1,1 GB önbellek, root ile). pkg_convert `pkgfile` kullanır
    ve **yerel** Arch repo veritabanını sorgular — büyük indirme yok,
    ayrı güncelleme adımı yok.
-3. **Daha eksiksiz bağımlılık tespiti.** Gerçek bir testte
-   (webos-dev-manager) pkg_convert **11** kütüphane çözdü
+3. **Daha eksiksiz bağımlılık tespiti.** Hem `.deb` hem de `.rpm`
+   olarak verilen farklı programlarla yapılan testlerde pkg_convert
+   **11** kütüphane çözdü
    (gtk3, webkit2gtk-4.1, cairo, pango, glib2, libsoup, zlib, glibc,
-   gcc-libs, gdk-pixbuf2, libx11), debtap ise **4**. Daha fazla
+   gcc-libs, gdk-pixbuf2, libx11) debtap'ın **4**'üne karşı.
    soname eşleşmesi = daha temiz paket.
 4. **Yerel C++/Qt6, Python çalışma ortamı yok.** `debtap` bash + Python'dır
    (Python ile `namcap` çağırır bile). pkg_convert tek bir ~130 KB ELF'e
@@ -57,7 +58,7 @@ Başka dönüştürücüler de var (debtap, rpmtoarch). İşte pkg_convert'in
   `gtk-update-icon-cache` + `update-desktop-database` ile üretir).
 - `makepkg` binary'den sembolleri varsayılan olarak çıkarır (debtap'ın
   1:1 kopyasından ≈12 % küçük) ; işlevsel olarak aynı.
-- `pkgname` sürüm son eki taşır (ör. `webos-dev-manager-1.99.16`).
+- `pkgname` sürüm son eki taşır (ör. `program-1.99.16`).
 - `pkgfile` güncel yerel sync db'ye dayanır ; eşleşmeler eskiyse
   `pacman -Sy` çalıştırın.
 
