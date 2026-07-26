@@ -5,6 +5,12 @@ Yerel C++/Qt6 aracıdır; `.deb`, `.rpm` ve `.AppImage` paketlerini kurulabilir
 bağımlılık tespiti, kütüphanelerin repo'dan otomatik kurulumu ve
 kalıcı kurulum geçmişi ile.
 
+> ⚠️ **Yalnızca Arch tabanlı dağıtımlar.** Bu proje yalnızca **Arch
+> Linux tabanlı** dağıtımlar (Arch, Manjaro, EndeavourOS, …) içindir.
+> Diğer dağıtımlarla (Debian/Ubuntu, Fedora, openSUSE, …) ilgili
+> istekler veya sorunlar **yanıtlanmaz** — araç yalnızca Arch tabanlı
+> sistemlerde çalışan `.pkg.tar.zst` paketleri üretir.
+
 ## Neden?
 
 Bazı programlar (oyunlar, özel araçlar) yalnızca `.deb`

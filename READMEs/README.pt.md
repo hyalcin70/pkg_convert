@@ -5,6 +5,13 @@ em pacotes **Arch Linux** instaláveis (`.pkg.tar.zst`) — com
 detecção real de dependências, instalação automática de bibliotecas
 dos repositórios e um histórico de instalação persistente.
 
+> ⚠️ **Apenas para distribuições baseadas em Arch.** Este projeto é
+> exclusivamente para distribuições **baseadas em Arch Linux**
+> (Arch, Manjaro, EndeavourOS, …). Solicitações ou problemas sobre
+> outras distribuições (Debian/Ubuntu, Fedora, openSUSE, …) **não**
+> serão respondidos — a ferramenta gera pacotes `.pkg.tar.zst`, que
+> só funcionam em sistemas baseados em Arch.
+
 ## Por quê?
 
 Alguns programas (jogos, ferramentas especiais) só estão disponíveis

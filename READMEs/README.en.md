@@ -5,6 +5,12 @@ packages into installable **Arch Linux** packages (`.pkg.tar.zst`) — with
 real dependency detection, automatic repo installation of libraries, and
 a persistent installation history.
 
+> ⚠️ **Arch-based distributions only.** This project is exclusively for
+> **Arch-Linux-based** distributions (Arch, Manjaro, EndeavourOS, …).
+> Requests or issues concerning other distributions (Debian/Ubuntu,
+> Fedora, openSUSE, …) will **not** be answered — the tool produces
+> `.pkg.tar.zst` packages, which only work on Arch-based systems.
+
 ## Why?
 
 Some programs (games, specialty tools) are only available as `.deb`

@@ -5,6 +5,13 @@ in installierbare **Arch-Linux**-Pakete (`.pkg.tar.zst`) umwandelt — mit
 echter Abhängigkeitserkennung, automatischer Repo-Installation der
 Bibliotheken und persistenter Installationshistorie.
 
+> ⚠️ **Ausschließlich für Arch-basierte Distributionen.** Dieses Projekt
+> ist ausschließlich für **Arch-Linux-basierte** Distributionen
+> (Arch, Manjaro, EndeavourOS, …) gedacht. Anfragen oder Probleme zu
+> anderen Distributionen (Debian/Ubuntu, Fedora, openSUSE, …) werden
+> **nicht** beantwortet — das Werkzeug erzeugt `.pkg.tar.zst`-Pakete,
+> die nur auf Arch-basierten Systemen funktionieren.
+
 ## Warum?
 
 Manche Programme (Spiele, Spezialwerkzeuge) gibt es nur als `.deb`

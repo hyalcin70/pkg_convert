@@ -5,6 +5,13 @@ Una herramienta nativa de C++/Qt6 que convierte paquetes `.deb` y
 detección real de dependencias, instalación automática de bibliotecas
 desde los repos y un historial de instalación persistente.
 
+> ⚠️ **Solo para distribuciones basadas en Arch.** Este proyecto es
+> exclusivamente para distribuciones **basadas en Arch Linux**
+> (Arch, Manjaro, EndeavourOS, …). Las solicitudes o problemas sobre
+> otras distribuciones (Debian/Ubuntu, Fedora, openSUSE, …) **no**
+> serán respondidos — la herramienta genera paquetes `.pkg.tar.zst`,
+> que solo funcionan en sistemas basados en Arch.
+
 ## ¿Por qué?
 
 Algunos programas (juegos, herramientas especiales) solo están
