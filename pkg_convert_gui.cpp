@@ -340,6 +340,13 @@ private slots:
         const bool isDeb = path.endsWith(".deb");
         const bool isRpm = path.endsWith(".rpm");
         QMap<QString, QString> meta = parseMeta(path, staging, isDeb, isRpm, isAppImage);
+        if (meta.value("ExtractError") == "1") {
+            status->setText("❌ AppImage konnte nicht entpackt werden "
+                            "(--appimage-extract fehlgeschlagen). Eventuell ein "
+                            "inkompatibles/verschlüsseltes AppImage.");
+            btnBuild->setEnabled(false);
+            return;
+        }
         metaLbl->setText(QString("Name: %1   Version: %2   Arch: %3   Format: %4")
             .arg(sanitizeName(meta.value("Package", "?")),
                  sanitizeVer(meta.value("Version", "?")),
@@ -628,10 +635,14 @@ private:
             // eigene --appimage-extract nutzen (funktioniert fuer beide Typen).
             QProcess us;
             us.start("bash", QStringList() << "-c"
-                << QString("cd '%1' && '%2' --appimage-extract >/dev/null 2>&1 && "
+                << QString("cd '%1' && chmod u+x '%2' 2>/dev/null ; '%2' --appimage-extract >/dev/null 2>&1 && "
                            "mv squashfs-root/* . 2>/dev/null ; rmdir squashfs-root 2>/dev/null")
                        .arg(staging, path));
             us.waitForFinished(-1);
+            if (!QFile::exists(staging + "/AppRun") && !QFile::exists(staging + "/usr")) {
+                // Extraktion fehlgeschlagen -> Hinweis, damit es nicht still scheitert
+                meta["ExtractError"] = "1";
+            }
             // Name + Version aus Dateiname ableiten (Format: Name-x.y.z[-arch].AppImage)
             QString base = QFileInfo(path).completeBaseName(); // ohne .AppImage
             // arch-Suffix (x86_64 / aarch64 / i386) am Ende entfernen
