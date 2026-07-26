@@ -967,6 +967,30 @@ private:
         status->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
         status->setCursor(Qt::IBeamCursor);
         v->addWidget(status);
+
+        // Branding: "created by SattNEK" (ganz unten, mittig)
+        auto *brand = new QLabel();
+        brand->setObjectName("brand");
+        brand->setAlignment(Qt::AlignCenter);
+        // Logo aus mehreren moeglichen Pfaden laden (Build-Ordner + installiert)
+        QString brandPath;
+        QStringList brandCandidates{
+            QCoreApplication::applicationDirPath() + "/created_by_sattnek.png",
+            "/usr/share/icons/hicolor/scalable/apps/created_by_sattnek.png",
+            "/usr/share/pkg_convert/created_by_sattnek.png"
+        };
+        for (const QString &c : brandCandidates) {
+            if (QFile::exists(c)) { brandPath = c; break; }
+        }
+        if (!brandPath.isEmpty()) {
+            QPixmap bm(brandPath);
+            // auf max 360px Breite skalieren
+            if (bm.width() > 360) bm = bm.scaledToWidth(360, Qt::SmoothTransformation);
+            brand->setPixmap(bm);
+        } else {
+            brand->setText("created by SattNEK");  // Fallback-Text
+        }
+        v->addWidget(brand);
     }
 
     DropLine *drop = nullptr;

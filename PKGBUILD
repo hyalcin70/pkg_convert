@@ -15,16 +15,18 @@ source=("pkg_convert_gui.cpp"
         "pkg_convert_gui.pro"
         "pkg_convert.desktop"
         "pkg_convert.svg"
+        "created_by_sattnek.png"
         "lang_de.cpp"
         "lang_en.cpp"
         "lang_fr.cpp"
         "lang_es.cpp"
         "lang_tr.cpp"
         "lang_pt.cpp")
-sha256sums=('50e2292d0c7f9a6d5df0e7a8ab0eea147685f99a43ce13a7e2b8f98cf18a94a6'
+sha256sums=('449db5006d8c0f6c8d2b0af00a1bad196e820738bb1d45a07a991d323ed14074'
             'f4eab89ccafa55fbf3a72bcaed4ce5b262200b92403c6a4595dee7bbb2873358'
             'bd8f98bdc2ee2748520d4df9099678898aabed9d800d691eba307479bc274b1c'
             '1c35318b13f7f32e5921bd4e0de0669202e8ec618075312e1eb60de41bcf294d'
+            '54010755becb9f8ee1401574f85f7dcf1735cf32845339291307d83cced20949'
             'e2f6daf8a484ff887fb0cdf0e7f373ddf41df89f75e0e16f638c9e3141b41882'
             '69e4a02359c6c49b1cbf5eaa710171f3cb35de07823103bb28d37c5e9a952757'
             '3024c3cc35e2c6232734858293d463fbb9cc03e334a4bbfc931d5d78afaa46be'
@@ -42,6 +44,8 @@ package() {
   cd "$srcdir"
   # Binary
   install -Dm755 pkg_convert_gui "$pkgdir/usr/bin/pkg_convert_gui"
+  # Branding image (created by SattNEK)
+  install -Dm644 created_by_sattnek.png "$pkgdir/usr/share/pkg_convert/created_by_sattnek.png"
   # .desktop for KDE menu
   install -Dm644 pkg_convert.desktop "$pkgdir/usr/share/applications/pkg_convert.desktop"
   # Icon (hicolor theme, as expected by KDE)
