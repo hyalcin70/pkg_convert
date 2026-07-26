@@ -7,12 +7,12 @@ repos, and a persistent installation history.
 
 ## 🌐 Language
 
-- 🇬🇧 English — [README.en.md](README.en.md)
-- 🇩🇪 Deutsch — [README.de.md](README.de.md)
-- 🇫🇷 Français — [README.fr.md](README.fr.md)
-- 🇪🇸 Español — [README.es.md](README.es.md)
-- 🇹🇷 Türkçe — [README.tr.md](README.tr.md)
-- 🇵🇹 Português — [README.pt.md](README.pt.md)
+- 🇬🇧 English — [README.en.md](READMEs/README.en.md)
+- 🇩🇪 Deutsch — [README.de.md](READMEs/README.de.md)
+- 🇫🇷 Français — [README.fr.md](READMEs/README.fr.md)
+- 🇪🇸 Español — [README.es.md](READMEs/README.es.md)
+- 🇹🇷 Türkçe — [README.tr.md](READMEs/README.tr.md)
+- 🇵🇹 Português — [README.pt.md](READMEs/README.pt.md)
 
 ---
 
