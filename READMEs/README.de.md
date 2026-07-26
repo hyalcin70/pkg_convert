@@ -64,6 +64,15 @@ pkg_convert für die meisten Anwender die bessere Wahl ist:
    separates GTK-Hilfsfenster neben einer Konsole.
 6. **Kein AUR nötig.** `debtap`/`rpmtoarch` kommen aus dem AUR.
    pkg_convert baut aus eigenem Quellcode via `makepkg -si`.
+7. **AppImage richtig gemacht — keine veralteten Bündel-Libs.**
+   Ein rohes AppImage bringt eigene (oft veraltete) Bibliotheken mit
+   und nutzt diese statt deiner System-Libs, bekommt also nie
+   Sicherheitsupdates. pkg_convert **entfernt jede mitgelieferte
+   `.so`, die Arch ohnehin anbietet**, und trägt die echten Arch-Pakete
+   als `depends` ein. Das Programm nutzt dann die aktuellen
+   System-Libs (mit automatischen `pacman`-Updates). Nur Bibliotheken
+   ohne Arch-Paket bleiben als Fallback gebündelt. Andere Konverter
+   behandeln AppImage gar nicht.
 
 ### Ehrliche Einschränkungen
 

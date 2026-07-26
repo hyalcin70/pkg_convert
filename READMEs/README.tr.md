@@ -62,6 +62,15 @@ Başka dönüştürücüler de var (debtap, rpmtoarch). İşte pkg_convert'in
    kurulum geçmişi, kopyalanabilir günlük.
 6. **AUR gerekmez.** `debtap`/`rpmtoarch` AUR'dan gelir. pkg_convert
    kendi kaynağınızdan `makepkg -si` ile derlenir.
+7. **AppImage doğru yapılır — eski gömülü kütüphaneler yok.** Çıplak
+   bir AppImage kendi (genellikle eski) paylaşılan kütüphanelerini
+   getirir ve sistem kütüphaneleri yerine bunları kullanır, böylece
+   hiç güvenlik güncellemesi almaz. pkg_convert **Arch'ın zaten
+   sunduğu her gömülü `.so`'yu çıkarır** ve gerçek Arch paketlerini
+   `depends` olarak yazar. Program böylece güncel sistem
+   kütüphanelerini (otomatik `pacman` güncellemeleriyle) kullanır.
+   Yalnızca Arch paketi olmayan kütüphaneler yedek olarak gömülü
+   kalır. Diğer dönüştürücüler AppImage'ı hiç işlemez.
 
 ### Dürüst sınırlamalar
 

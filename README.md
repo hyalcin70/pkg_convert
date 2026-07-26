@@ -66,6 +66,14 @@ pkg_convert is a better fit for most users:
    helper window next to a CLI.
 6. **No AUR needed.** `debtap`/`rpmtoarch` come from the AUR.
    pkg_convert builds from your own source via `makepkg -si`.
+7. **AppImage done right — no stale bundled libraries.** A raw AppImage
+   ships its own (often outdated) shared libraries and runs them
+   instead of your system libs, so it never receives security updates.
+   pkg_convert **strips every bundled `.so` that Arch already ships**
+   and records the real Arch packages as `depends`. The program then
+   uses the up-to-date system libraries (with automatic `pacman`
+   updates). Only libraries with no Arch package stay bundled as a
+   fallback. Other converters do not handle AppImage at all.
 
 ### Honest limitations
 

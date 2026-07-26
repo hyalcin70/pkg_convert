@@ -62,6 +62,15 @@ pkg_convert é melhor para a maioria:
    escuro, histórico, log copiável.
 6. **Sem AUR.** `debtap`/`rpmtoarch` vêm do AUR. pkg_convert é
    construído do seu código-fonte via `makepkg -si`.
+7. **AppImage feito corretamente — sem bibliotecas embutidas
+   obsoletas.** Uma AppImage crua traz suas próprias bibliotecas
+   (geralmente obsoletas) e as usa em vez das do sistema, nunca
+   recebendo atualizações de segurança. pkg_convert **remove cada
+   `.so` embutido que o Arch já fornece** e registra os pacotes Arch
+   reais como `depends`. O programa então usa as bibliotecas do
+   sistema atualizadas (com atualizações `pacman` automáticas). Apenas
+   bibliotecas sem pacote Arch ficam embutidas como reserva. Outros
+   conversores não tratam AppImage.
 
 ### Limitações honestas
 
