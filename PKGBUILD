@@ -22,7 +22,7 @@ source=("pkg_convert_gui.cpp"
         "lang_es.cpp"
         "lang_tr.cpp"
         "lang_pt.cpp")
-sha256sums=('dbc8f987b91cb8101d6b592a2d79b1812d1a72f54d855130471587d09d10e6d3'
+sha256sums=('3e9d0a595e366871916b9f7a0ec61c26dd8dcc2c954f2b57edb5cdc078e94b4f'
             'f4eab89ccafa55fbf3a72bcaed4ce5b262200b92403c6a4595dee7bbb2873358'
             'bd8f98bdc2ee2748520d4df9099678898aabed9d800d691eba307479bc274b1c'
             '1c35318b13f7f32e5921bd4e0de0669202e8ec618075312e1eb60de41bcf294d'
@@ -42,12 +42,8 @@ build() {
 
 package() {
   cd "$srcdir"
-  # Binary
   install -Dm755 pkg_convert_gui "$pkgdir/usr/bin/pkg_convert_gui"
-  # Branding image (created by SattNEK)
   install -Dm644 created_by_sattnek.png "$pkgdir/usr/share/pkg_convert/created_by_sattnek.png"
-  # .desktop for KDE menu
   install -Dm644 pkg_convert.desktop "$pkgdir/usr/share/applications/pkg_convert.desktop"
-  # Icon (hicolor theme, as expected by KDE)
   install -Dm644 pkg_convert.svg "$pkgdir/usr/share/icons/hicolor/scalable/apps/pkg_convert.svg"
 }

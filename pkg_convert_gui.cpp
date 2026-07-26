@@ -787,34 +787,46 @@ private:
     // veralteten Mitliefer-Libs mehr). Nur Libs OHNE Arch-Paket bleiben.
     void stripShippedLibs(const QString &stagingDir, const QStringList &mapped) {
         Q_UNUSED(mapped);
-        // Alle mitgelieferten .so* einsammeln
+        // Alle mitgelieferten Dateien einsammeln, die Arch bereits im System
+        // mitliefert (Shared Libs, GSettings-Schemas, pkg-config, Header, ...).
+        // Wuerden wir sie im Paket belassen, kaeme es bei 'pacman -U' zum
+        // Dateikonflikt mit dem System-Paket (z.B. gtk3 liefert
+        // org.gtk.Settings.*.gschema.xml). Daher weg damit -> System-Datei nutzen.
         QProcess own;
         own.start("bash", QStringList() << "-c" << QString(
-            "cd %1 && find . -type f -name '*.so*' -printf '%p\\t%f\\n'").arg(stagingDir));
+            "cd %1 && find . -type f \\( -name '*.so*' -o -name '*.gschema.xml' "
+            "-o -name 'gschemas.compiled' -o -name '*.pc' -o -name '*.h' "
+            "-o -name '*.schema' \\) -printf '%p\\t%f\\n'").arg(stagingDir));
         own.waitForFinished(15000);
         const QString out = QString::fromUtf8(own.readAllStandardOutput());
+        int removed = 0;
         for (const QString &line : out.split('\n', Qt::SkipEmptyParts)) {
             const QString path = line.section('\t', 0, 0).trimmed();
             const QString base = line.section('\t', 1, 1).trimmed();
             if (path.isEmpty() || base.isEmpty()) continue;
-            // gehoert diese Lib zu einem offiziellen Arch-Repo-Paket?
+            // pfad ist relativ zum stagingDir (wegen 'cd %1' im find) ->
+            // absolut machen, sonst schlaegt QFile::remove im falschen CWD fehl
+            const QString absPath = QDir(stagingDir).absoluteFilePath(path);
+            // gehoert diese Datei zu einem offiziellen Arch-Repo-Paket?
+            // (pkgfile ohne -v liefert das Paket zur Basename; das ist
+            //  zuverlaessig auch fuer gschema.xml / .pc / .so*)
             QProcess pf;
             pf.start("pkgfile", QStringList() << base);
-            pf.waitForFinished(20000);
+            pf.waitForFinished(30000);
             const QStringList hits = QString::fromUtf8(pf.readAllStandardOutput())
                                          .split('\n', Qt::SkipEmptyParts);
             bool repoHas = false;
             for (const QString &h : hits) {
-                const QString cand = h.section('/', 1, 1).section('\t', 0, 0).trimmed();
+                const QString cand = h.trimmed();
                 if (cand.startsWith("lib32-")) continue;
                 if (!cand.isEmpty()) { repoHas = true; break; }
             }
             if (repoHas) {
-                // Lib loeschen -> System-Lib wird genutzt
-                QFile::remove(path);
-                // ggf. leeres Verzeichnis aufraeumen (eine Ebene)
-                QFileInfo fi(path);
-                QDir(fi.absolutePath()).rmdir(".");
+                // Datei loeschen -> System-Datei wird genutzt
+                if (QFile::remove(absPath)) {
+                    ++removed;
+                    QDir(QFileInfo(absPath).absolutePath()).rmdir(".");
+                }
             }
         }
     }
