@@ -4,3 +4,8 @@ src/
 _build/
 *.pkg.tar.zst
 *.tar.zst
+*.o
+Makefile
+.qmake.stash
+*.moc
+moc_predefs.h

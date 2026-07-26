@@ -1,14 +1,14 @@
 # Paket Converter
 
-Ein natives C++/Qt6-Werkzeug, das `.deb`- und `.rpm`-Pakete in
-installierbare **Arch-Linux**-Pakete (`.pkg.tar.zst`) umwandelt —
-mit echter Abhängigkeitserkennung, automatischer Repo-Installation
-der Bibliotheken und persistentem Installationsverlauf.
+A native C++/Qt6 tool that converts `.deb` and `.rpm` packages into
+installable **Arch-Linux** packages (`.pkg.tar.zst`) — with real
+dependency detection, automatic installation of libraries from the
+repos, and a persistent installation history.
 
-## 🌐 Sprache / Language / Langue / Idioma / Dil / Dil
+## 🌐 Language
 
-- 🇩🇪 Deutsch — [README.de.md](README.de.md)
 - 🇬🇧 English — [README.en.md](README.en.md)
+- 🇩🇪 Deutsch — [README.de.md](README.de.md)
 - 🇫🇷 Français — [README.fr.md](README.fr.md)
 - 🇪🇸 Español — [README.es.md](README.es.md)
 - 🇹🇷 Türkçe — [README.tr.md](README.tr.md)
@@ -16,19 +16,19 @@ der Bibliotheken und persistentem Installationsverlauf.
 
 ---
 
-## Funktionen (Kurzfassung)
+## Features (short)
 
-- **deb/rpm → Arch**: extrahiert, erkennt benötigte Bibliotheken über
-  `readelf` + `pkgfile` (soname-exakt)
-- **Auto-Install** der Repo-Abhängigkeiten via `pacman -S --asdeps`
-- **Binary-Pfad**: `/usr/games/` wird nach `/usr/bin/` verschoben
-- **Warnung** bei reinen Datenpaketen (ohne ausführbares Programm)
-- **Hinweis-Popup** beim Installieren, falls zusätzliche Datenpakete
-  (`-data`, `-common`) fehlen könnten
-- **Kopierbarer Log**, persistente Installations-Historie
-- **Hell/Dunkel**-Umschalter (Standard: hell), Sprachauswahl (DE/EN/FR/ES/TR/PT)
+- **deb/rpm → Arch**: extracts, detects required libraries via
+  `readelf` + `pkgfile` (exact soname)
+- **Auto-install** of repo dependencies via `pacman -S --asdeps`
+- **Binary path**: `/usr/games/` is relocated to `/usr/bin/`
+- **Warning** for pure data packages (no executable program)
+- **Hint popup** on install if additional data packages
+  (`-data`, `-common`) might be missing
+- **Copyable log**, persistent installation history
+- **Light/Dark** toggle (default: light), language selection (DE/EN/FR/ES/TR/PT)
 
-## Bauen & Installieren (aus Quelle, ohne AUR)
+## Build & Install (from source, no AUR)
 
 ```bash
 git clone https://github.com/hyalcin70/pkg_convert
@@ -36,8 +36,8 @@ cd pkg_convert
 makepkg -si
 ```
 
-Danach erscheint **Paket Converter** im KDE-Menü (Kategorie: Utility / Paketverwaltung).
+Afterwards **Paket Converter** appears in the KDE menu
+(category: Utility / Package Management).
 
-Die vollständige Dokumentation (Warum? / Benutzung / Hinweise / Abhängigkeiten)
-findest du in der für dich passenden Sprach-README oben.
-# pkg_convert
+Full documentation (Why? / Usage / Notes / Dependencies) is in the
+language-specific README linked above.
