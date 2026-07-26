@@ -21,7 +21,11 @@ This tool converts them without AUR — using only official Arch sources.
 ## Features
 
 - **deb/rpm/AppImage → Arch**: extracts, detects required libraries via
-  `readelf` + `pkgfile` (exact soname, no guessed tables)
+  `readelf` + `pkgfile` (exact soname)
+- **AppImage uses system libraries**: bundled shared libraries that
+  Arch already ships are stripped from the package, so the program
+  uses the up-to-date system libs (with automatic updates) instead of
+  stale bundled ones. Only libs with no Arch package stay as fallback.
 - **Auto-install** of repo dependencies via `pacman -S --asdeps`
 - **Binary path**: `/usr/games/` is moved to `/usr/bin/`
 - **Warning** for pure data packages (no executable program)

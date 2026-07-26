@@ -23,7 +23,12 @@ fontes oficiais do Arch.
 
 - **deb/rpm/AppImage → Arch** : extrai, detecta bibliotecas necessárias via
   `readelf` + `pkgfile` (soname exato, sem tabelas adivinhadas)
-- **Instalação automática** de dependências via `pacman -S --asdeps`
+- **AppImage usa bibliotecas do sistema** : as bibliotecas embutidas
+  que o Arch já fornece são removidas do pacote, assim o programa usa
+  as **bibliotecas do sistema atualizadas** (com atualizações
+  automáticas) em vez de bibliotecas embutidas obsoletas. Apenas
+  bibliotecas sem pacote Arch ficam como reserva.
+- **Instalação auto** de dependências via `pacman -S --asdeps`
 - **Caminho do binário** : `/usr/games/` é movido para `/usr/bin/`
 - **Aviso** para pacotes de dados puros (sem executável)
 - **Popup de dica** na instalação se faltarem pacotes de dados

@@ -23,6 +23,10 @@ offiziellen Arch-Quellen.
 
 - **deb/rpm/AppImage → Arch**: extrahiert, erkennt benötigte Bibliotheken über
   `readelf` + `pkgfile` (exakte soname, keine geratenen Tabellen)
+- **AppImage nutzt System-Bibliotheken**: mitgelieferte Libs, die Arch
+  ohnehin anbietet, werden aus dem Paket entfernt — das Programm nutzt
+  die **aktuellen System-Libs** (mit automatischen Updates) statt
+  veralteter Bündel-Libs. Nur Libs ohne Arch-Paket bleiben als Fallback.
 - **Auto-Install** der Repo-Abhängigkeiten via `pacman -S --asdeps`
 - **Binary-Pfad**: `/usr/games/` wird nach `/usr/bin/` verschoben
 - **Warnung** bei reinen Datenpaketen (ohne ausführbares Programm)

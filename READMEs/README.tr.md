@@ -22,6 +22,11 @@ Arch kaynaklarını kullanarak.
 
 - **deb/rpm/AppImage → Arch** : çıkarır, gereken kütüphaneleri `readelf` +
   `pkgfile` ile bulur (tam soname, tahmin edilen tablolar yok)
+- **AppImage sistem kütüphanelerini kullanır** : Arch'ın zaten sunduğu
+  gömülü kütüphaneler paketten çıkarılır, böylece program **güncel
+  sistem kütüphanelerini** (otomatik güncellemelerle) kullanır, eski
+  gömülü kütüphaneleri değil. Yalnızca Arch paketi olmayan kütüphaneler
+  yedek olarak kalır.
 - **Otomatik kurulum** : repo bağımlılıkları `pacman -S --asdeps` ile
 - **Binary yolu** : `/usr/games/` → `/usr/bin/` taşınır
 - **Uyarı** : yalnızca veri paketlerinde (çalıştırılabilir yok)

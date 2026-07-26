@@ -21,8 +21,13 @@ les sources officielles d'Arch.
 
 ## Fonctionnalités
 
-- **deb/rpm → Arch** : extrait, détecte les bibliothèques requises via
+- **deb/rpm/AppImage → Arch** : extrait, détecte les bibliothèques requises via
   `readelf` + `pkgfile` (soname exact, pas de tables devinées)
+- **AppImage utilise les bibliothèques système** : les bibliothèques
+  fournies intégrées que Arch livre déjà sont retirées du paquet, ainsi
+  le programme utilise les **bibliothèques système à jour** (avec mises
+  à jour automatiques) au lieu de bibliothèques intégrées obsolètes.
+  Seules les bibliothèques sans paquet Arch restent en repli.
 - **Installation auto** des dépendances via `pacman -S --asdeps`
 - **Chemin binaire** : `/usr/games/` est déplacé vers `/usr/bin/`
 - **Avertissement** pour les paquets de données purs (sans exécutable)
