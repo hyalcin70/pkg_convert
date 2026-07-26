@@ -1,5 +1,5 @@
 // pkg_convert_gui - native Qt6 GUI (kein Python)
-// Wandelt .deb/.rpm -> Arch PKGBUILD + makepkg, alles ueber QProcess.
+// Wandelt .deb/.rpm/.AppImage -> Arch PKGBUILD + makepkg, alles ueber QProcess.
 #include <QApplication>
 #include <QMainWindow>
 #include <QVBoxLayout>
@@ -45,7 +45,7 @@ public:
         setAcceptDrops(true);
         setReadOnly(true);
         setPlaceholderText(QStringLiteral(
-            "Datei hierher ziehen (.deb / .rpm)  oder  'Durchsuchen' klicken"));
+            "Datei hierher ziehen (.deb / .rpm / .AppImage)  oder  'Durchsuchen' klicken"));
     }
 signals:
     void fileDropped(const QString &path);
@@ -67,7 +67,7 @@ class MainWindow : public QMainWindow {
     Q_OBJECT
 public:
     explicit MainWindow(QWidget *p = nullptr) : QMainWindow(p) {
-        setWindowTitle(QStringLiteral("Paket Converter – Debian/RedHat zu ArchLinux"));
+        setWindowTitle(QStringLiteral("Paket Converter – Debian/RedHat/AppImage zu ArchLinux"));
         resize(760, 580);
         m_dark = m_settings.value("theme", "light").toString() == "dark";
         applyTheme();
@@ -317,7 +317,8 @@ private slots:
         m_path = path;
         // Ordner der Quelldatei merken, damit "Durchsuchen" dort startet
         m_settings.setValue("lastSrcDir", QFileInfo(path).absolutePath());
-        if (!(path.endsWith(".deb") || path.endsWith(".rpm"))) {
+        const bool isAppImage = path.endsWith(".AppImage", Qt::CaseInsensitive);
+        if (!(path.endsWith(".deb") || path.endsWith(".rpm") || isAppImage)) {
             status->setText(i18n("errNoDebRpm"));
             return;
         }
@@ -337,12 +338,13 @@ private slots:
         const QString staging = tmp.filePath("staging");
         QDir().mkpath(staging);
         const bool isDeb = path.endsWith(".deb");
-        QMap<QString, QString> meta = parseMeta(path, staging, isDeb);
+        const bool isRpm = path.endsWith(".rpm");
+        QMap<QString, QString> meta = parseMeta(path, staging, isDeb, isRpm, isAppImage);
         metaLbl->setText(QString("Name: %1   Version: %2   Arch: %3   Format: %4")
             .arg(sanitizeName(meta.value("Package", "?")),
                  sanitizeVer(meta.value("Version", "?")),
                  meta.value("Architecture", "?"),
-                 isDeb ? "DEB" : "RPM"));
+                 isAppImage ? "AppImage" : (isDeb ? "DEB" : "RPM")));
     }
     void runConvert(bool build) {
         if (m_path.isEmpty()) return;
@@ -355,7 +357,9 @@ private slots:
         const QString staging = tmp.filePath("staging");
         QDir().mkpath(staging);
         const bool isDeb = m_path.endsWith(".deb");
-        QMap<QString, QString> meta = parseMeta(m_path, staging, isDeb);
+        const bool isRpm = m_path.endsWith(".rpm");
+        const bool isAppImage = m_path.endsWith(".AppImage", Qt::CaseInsensitive);
+        QMap<QString, QString> meta = parseMeta(m_path, staging, isDeb, isRpm, isAppImage);
         const QString name = sanitizeName(meta.value("Package", "converted"));
         const QString ver = sanitizeVer(meta.value("Version", "1.0"));
         QString pkgrel = meta.value("Release", "1");
@@ -449,20 +453,28 @@ private slots:
         // PKGBUILD schreiben
         const QString arch = mapArch(meta.value("Architecture", "x86_64"));
         QStringList mapped, unknown, aurDeps;
-        // debtap-Methode: echte Binaries scannen (readelf NEEDED) und jede
-        // Library via pkgfile zum ECHTEN Arch-Repo-Paketnamen aufloesen.
-        // Keine geratene Namenstabelle mehr.
-        depsFromBinaries(src, mapped, unknown, aurDeps);
-        // Fallback/Ergaenzung: Metadaten-Mapping (falls Binaries nichts liefern)
-        if (mapped.isEmpty() && aurDeps.isEmpty())
-            mapDeps(meta, isDeb, mapped, unknown, aurDeps);
+        if (isAppImage) {
+            // AppImage ist self-contained: keine echten Arch-Abhaengigkeiten
+            // noetig. (Die mitgelieferten Libs sind im Paket enthalten.)
+            mapped.clear();
+            unknown.clear();
+            aurDeps.clear();
+        } else {
+            // debtap-Methode: echte Binaries scannen (readelf NEEDED) und jede
+            // Library via pkgfile zum ECHTEN Arch-Repo-Paketnamen aufloesen.
+            // Keine geratene Namenstabelle mehr.
+            depsFromBinaries(src, mapped, unknown, aurDeps);
+            // Fallback/Ergaenzung: Metadaten-Mapping (falls Binaries nichts liefern)
+            if (mapped.isEmpty() && aurDeps.isEmpty())
+                mapDeps(meta, isDeb, mapped, unknown, aurDeps);
+        }
         // Deps fuer spaetere Installation merken
         m_lastDeps = mapped;
         m_lastAurDeps = aurDeps;
         const QString desc = meta.value("Summary", meta.value("Description", "konvertiertes Paket")).split('\n').first().left(200);
         QString pb;
-        pb += "# Generiert von Paket Converter (deb/rpm -> Arch)\n";
-        pb += QString("# Quelle: %1 (%2)\n").arg(meta.value("Package", name), isDeb ? "deb" : "rpm");
+        pb += QString("# Generiert von Paket Converter (%1 -> Arch)\n").arg(isAppImage ? "AppImage" : (isDeb ? "deb" : "rpm"));
+        pb += QString("# Quelle: %1 (%2)\n").arg(meta.value("Package", name), isAppImage ? "AppImage" : (isDeb ? "deb" : "rpm"));
         pb += QString("pkgname=%1\n").arg(name);
         pb += QString("pkgver=%1\n").arg(ver);
         pb += QString("pkgrel=%1\n").arg(pkgrel);
@@ -472,8 +484,12 @@ private slots:
         pb += QString("license=('%1')\n").arg(meta.value("License", "custom"));
         pb += "depends=(\n";
         for (const auto &d : mapped) pb += "  '" + d + "'\n";
-        if (mapped.isEmpty()) pb += "  # keine gemappt\n";
+        if (mapped.isEmpty()) pb += "  # keine (AppImage ist self-contained)\n";
         pb += ")\n";
+        if (isAppImage) {
+            pb += "# AppImage enthaelt eigene Libs -> keine Arch-Abhaengigkeiten noetig.\n";
+            pb += "# Achtung: mitgelieferte Libs koennen veraltet sein (kein System-Update).\n";
+        }
         pb += QString("# --- nicht gemappte Fremd-Abhaengigkeiten (manuell pruefen) ---\n");
         pb += QString("# TODO: %1\n").arg(unknown.isEmpty() ? "keine" : unknown.join(", "));
         if (!aurDeps.isEmpty()) {
@@ -600,8 +616,53 @@ private slots:
 
 private:
     // ---- helpers ----
-    QMap<QString, QString> parseMeta(const QString &path, const QString &staging, bool isDeb) {
+    QMap<QString, QString> parseMeta(const QString &path, const QString &staging, bool isDeb, bool isRpm, bool isAppImage) {
         QMap<QString, QString> meta;
+        if (isAppImage) {
+            // AppImage entpacken. Typ-2-AppImages haben einen ELF-Loader vor
+            // dem squashfs, den unsquashfs nicht direkt liest -> daher das
+            // eigene --appimage-extract nutzen (funktioniert fuer beide Typen).
+            QProcess us;
+            us.start("bash", QStringList() << "-c"
+                << QString("cd '%1' && '%2' --appimage-extract >/dev/null 2>&1 && "
+                           "mv squashfs-root/* . 2>/dev/null ; rmdir squashfs-root 2>/dev/null")
+                       .arg(staging, path));
+            us.waitForFinished(-1);
+            // Name + Version aus Dateiname ableiten (Format: Name-x.y.z[-arch].AppImage)
+            QString base = QFileInfo(path).completeBaseName(); // ohne .AppImage
+            // arch-Suffix (x86_64 / aarch64 / i386) am Ende entfernen
+            base.replace(QRegularExpression("-(x86_64|aarch64|arm64|i386|i686)$"), "");
+            // Versions-Suffix (x.y.z oder vX.Y.Z) am Ende abtrennen
+            QRegularExpression verRe("-(v?[0-9][0-9.]*)$");
+            QString ver;
+            QRegularExpressionMatch m = verRe.match(base);
+            if (m.hasMatch()) {
+                ver = m.captured(1);
+                base.chop(m.captured(1).length() + 1); // + '-'
+            }
+            meta["Package"] = base;
+            meta["Version"] = ver.isEmpty() ? "1.0" : ver;
+            meta["Architecture"] = "x86_64";
+            meta["Release"] = "1";
+            // Versuche .desktop im entpackten Image zu finden (fuer Summary/Icon)
+            QDirIterator it(staging, QStringList() << "*.desktop", QDir::Files, QDirIterator::Subdirectories);
+            if (it.hasNext()) {
+                const QString desk = it.next();
+                QFile df(desk);
+                if (df.open(QIODevice::ReadOnly)) {
+                    const QString txt = df.readAll();
+                    for (const QString &line : txt.split('\n')) {
+                        QString k, v;
+                        int idx = line.indexOf('=');
+                        if (idx > 0) { k = line.left(idx).trimmed(); v = line.mid(idx + 1).trimmed(); }
+                        if (k == "Name") meta["Summary"] = v;
+                        else if (k == "Comment") { if (!meta.contains("Summary")) meta["Summary"] = v; }
+                        else if (k == "Icon") meta["Icon"] = v;
+                    }
+                }
+            }
+            return meta;
+        }
         if (isDeb) {
             QTemporaryDir work;
             QString ctrlDir = work.filePath("ctrl");
@@ -875,7 +936,7 @@ private:
         // Header mit Titel + Theme-Toggle + Sprachauswahl
         auto *header = new QHBoxLayout();
         titleLbl = new QLabel("Paket Converter"); titleLbl->setObjectName("title");
-        auto *sub = new QLabel("Wandelt Debian (.deb) / RedHat (.rpm) zu ArchLinux um");
+        auto *sub = new QLabel("Wandelt Debian (.deb) / RedHat (.rpm) / AppImage zu ArchLinux um");
         sub->setObjectName("sub");
         subLbl = sub;
         auto *leftHead = new QVBoxLayout();

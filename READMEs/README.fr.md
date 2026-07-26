@@ -1,6 +1,6 @@
 # Paket Converter
 
-Un outil natif C++/Qt6 qui convertit les paquets `.deb` et `.rpm` en
+Un outil natif C++/Qt6 qui convertit les paquets `.deb`, `.rpm` et `.AppImage` en
 paquets **Arch Linux** installables (`.pkg.tar.zst`) — avec détection
 réelle des dépendances, installation automatique des bibliothèques
 depuis les dépôts et un historique d'installation persistant.
@@ -8,7 +8,7 @@ depuis les dépôts et un historique d'installation persistant.
 ## Pourquoi ?
 
 Certains programmes (jeux, outils spécialisés) ne sont disponibles
-qu'en `.deb` (Debian/Ubuntu) ou `.rpm` (Fedora/openSUSE), pas dans
+qu'en `.deb` (Debian/Ubuntu), `.rpm` (Fedora/openSUSE) ou `.AppImage`, pas dans
 les dépôts Arch. Cet outil les convertit sans AUR — uniquement avec
 les sources officielles d'Arch.
 
@@ -29,17 +29,18 @@ les sources officielles d'Arch.
 Il existe d'autres convertisseurs (debtap, rpmtoarch). Voici pourquoi
 pkg_convert convient mieux à la plupart des utilisateurs :
 
-1. **Un outil pour les deux formats.** `debtap` ne gère que `.deb`
+1. **Un outil pour les trois formats.** `debtap` ne gère que `.deb`
    (échec brutal sur `.rpm` : *"not a valid deb package"*), tandis que
-   `rpmtoarch` ne gère que `.rpm`. pkg_convert gère **les deux** depuis
-   la même interface avec des résultats identiques (vérifié : même
-   empreinte binaire, même taille de paquet).
+   `rpmtoarch` ne gère que `.rpm`. pkg_convert gère **les trois**
+   (`.deb`, `.rpm`, `.AppImage`) depuis la même interface avec des
+   résultats identiques (vérifié : même empreinte binaire, même taille
+   pour deb/rpm).
 2. **Pas de base de données de 1,1 Go.** `debtap` télécharge une liste
    de paquets Debian/Ubuntu (≈1,1 Go de cache, avec root). pkg_convert
    utilise `pkgfile`, qui interroge votre base **locale** Arch — pas de
    gros téléchargement, pas d'étape de mise à jour séparée.
 3. **Détection des dépendances plus complète.** Lors de tests avec
-   différents programmes fournis à la fois en `.deb` et en `.rpm`,
+   différents programmes fournis à la fois en `.deb`, `.rpm` ou `.AppImage`,
    pkg_convert a résolu **11** bibliothèques
    (gtk3, webkit2gtk-4.1, cairo, pango, glib2, libsoup, zlib, glibc,
    gcc-libs, gdk-pixbuf2, libx11) contre **4** pour debtap.
@@ -74,7 +75,7 @@ Ensuite **Paket Converter** apparaît dans le menu KDE
 
 ## Utilisation
 
-1. **Parcourir** → sélectionner un fichier `.deb` ou `.rpm`
+1. **Parcourir** → sélectionner un fichier `.deb`, `.rpm` ou `.AppImage`
 2. **Construire le paquet** (ou « Paquet + Sources »)
 3. **Installer le paquet** → saisir le mot de passe, terminé
 

@@ -5,11 +5,11 @@
 QMap<QString, QString> lang_tr() {
     return QMap<QString, QString> {
                 {"title", "Paket Converter"},
-                {"subtitle", "Debian (.deb) / RedHat (.rpm) paketlerini ArchLinux'e çevirir"},
-                {"dropHint", "Dosyayı buraya sürükle (.deb / .rpm)  veya  'Gözat' tıkla"},
+                {"subtitle", "Debian (.deb) / RedHat (.rpm) / AppImage paketlerini ArchLinux'e çevirir"},
+                {"dropHint", "Dosyayı buraya sürükle (.deb / .rpm / .AppImage)  veya  'Gözat' tıkla"},
                 {"browse", "Gözat"},
                 {"choosePkg", "Paket seç"},
-                {"pkgsFilter", "Paketler (*.deb *.rpm)"},
+                {"pkgsFilter", "Paketler (*.deb *.rpm *.AppImage)"},
                 {"noFile", "Henüz dosya seçilmedi."},
                 {"deps", "Bağımlılıklar"},
                 {"build", "Paket oluştur"},
@@ -41,7 +41,7 @@ QMap<QString, QString> lang_tr() {
                 {"buildSrc", "Paket + Kaynaklar"},
                 {"targetDir", "Hedef klasör: "},
                 {"errNoBuiltPkg", "❌ Kurulacak oluşturulmuş paket yok."},
-                {"errNoDebRpm", "❌ Sadece .deb veya .rpm desteklenir."},
+                {"errNoDebRpm", "❌ Yalnızca .deb, .rpm veya .AppImage desteklenir."},
                 {"errNoTarget", "❌ İptal – hedef klasör seçilmedi."},
                 {"errPkgbuild", "❌ PKGBUILD yazılamıyor: "},
                 {"msgBuildFail", "❌ Oluşturma başarısız."},
@@ -63,7 +63,7 @@ QMap<QString, QString> lang_tr() {
                 {"unknown", "Bilinmeyen"},
                 {"allOk", "— (hepsi tamam !)"},
                 {"noMapped", "— eşlenen yok"},
-                {"extraDeps", "📦 Ayrıca dönüştür (Debian/RPM bağımlılıkları): "},
+                {"extraDeps", "📦 Ayrıca dönüştür (Debian/RPM/AppImage bağımlılıkları): "},
                 {"extraDepsNote", "   Bu paketler program tarafından referans gösterilir (genelde veri/"
                     "yerelleştirme). Olmadan başlangıçta dosyalar eksik kalabilir.\n\n"},
                 {"notSatisfiable", "⚠ Arch repo'larından KARŞILANAMAZ (tam kütüphane sürümü eksik): "},

@@ -1,6 +1,6 @@
 # Paket Converter
 
-Yerel C++/Qt6 aracıdır; `.deb` ve `.rpm` paketlerini kurulabilir
+Yerel C++/Qt6 aracıdır; `.deb`, `.rpm` ve `.AppImage` paketlerini kurulabilir
 **Arch Linux** paketlerine (`.pkg.tar.zst`) çevirir — gerçek
 bağımlılık tespiti, kütüphanelerin repo'dan otomatik kurulumu ve
 kalıcı kurulum geçmişi ile.
@@ -8,13 +8,13 @@ kalıcı kurulum geçmişi ile.
 ## Neden?
 
 Bazı programlar (oyunlar, özel araçlar) yalnızca `.deb`
-(Debian/Ubuntu) veya `.rpm` (Fedora/openSUSE) olarak mevcuttur, Arch
+(Debian/Ubuntu), `.rpm` (Fedora/openSUSE) veya `.AppImage` olarak mevcuttur, Arch
 depolarında yoktur. Bu araç onları AUR'suz çevirir — yalnızca resmi
 Arch kaynaklarını kullanarak.
 
 ## Özellikler
 
-- **deb/rpm → Arch** : çıkarır, gereken kütüphaneleri `readelf` +
+- **deb/rpm/AppImage → Arch** : çıkarır, gereken kütüphaneleri `readelf` +
   `pkgfile` ile bulur (tam soname, tahmin edilen tablolar yok)
 - **Otomatik kurulum** : repo bağımlılıkları `pacman -S --asdeps` ile
 - **Binary yolu** : `/usr/games/` → `/usr/bin/` taşınır
@@ -29,16 +29,16 @@ Arch kaynaklarını kullanarak.
 Başka dönüştürücüler de var (debtap, rpmtoarch). İşte pkg_convert'in
 çoğu kullanıcı için neden daha iyi olduğu:
 
-1. **Her iki biçim için tek araç.** `debtap` yalnızca `.deb` ile
+1. **Üç biçim için tek araç.** `debtap` yalnızca `.deb` ile
    çalışır (`.rpm`'de sert şekilde *"not a valid deb package"* der),
-   `rpmtoarch` yalnızca `.rpm`. pkg_convert **her ikisini de** aynı
-   arayüzden, aynı sonuçla yapar (doğrulandı: aynı binary hash, aynı
-   paket boyutu).
+   `rpmtoarch` yalnızca `.rpm`. pkg_convert **üçünü de** (`.deb`,
+   `.rpm`, `.AppImage`) aynı arayüzden, aynı sonuçla yapar (doğrulandı:
+   aynı binary hash, aynı paket boyutu deb/rpm için).
 2. **1,1 GB veritabanı yok.** `debtap`, Debian/Ubuntu paket listesi
    indirir (≈1,1 GB önbellek, root ile). pkg_convert `pkgfile` kullanır
    ve **yerel** Arch repo veritabanını sorgular — büyük indirme yok,
    ayrı güncelleme adımı yok.
-3. **Daha eksiksiz bağımlılık tespiti.** Hem `.deb` hem de `.rpm`
+3. **Daha eksiksiz bağımlılık tespiti.** Hem `.deb`, `.rpm` hem de `.AppImage`
    olarak verilen farklı programlarla yapılan testlerde pkg_convert
    **11** kütüphane çözdü
    (gtk3, webkit2gtk-4.1, cairo, pango, glib2, libsoup, zlib, glibc,
@@ -75,7 +75,7 @@ Ardından **Paket Converter** KDE menüsünde görünür
 
 ## Kullanım
 
-1. **Gözat** → bir `.deb` veya `.rpm` dosyası seç
+1. **Gözat** → bir `.deb`, `.rpm` veya `.AppImage` dosyası seç
 2. **Paket oluştur** (veya "Paket + Kaynaklar")
 3. **Paketi kur** → parolayı gir, tamam
 

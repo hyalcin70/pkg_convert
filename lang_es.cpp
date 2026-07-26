@@ -5,11 +5,11 @@
 QMap<QString, QString> lang_es() {
     return QMap<QString, QString> {
                 {"title", "Paket Converter"},
-                {"subtitle", "Convierte Debian (.deb) / RedHat (.rpm) a ArchLinux"},
-                {"dropHint", "Arrastra un archivo aquí (.deb / .rpm)  o  haz clic en 'Examinar'"},
+                {"subtitle", "Convierte Debian (.deb) / RedHat (.rpm) / AppImage a ArchLinux"},
+                {"dropHint", "Arrastra un archivo aquí (.deb / .rpm / .AppImage)  o  haz clic en 'Examinar'"},
                 {"browse", "Examinar"},
                 {"choosePkg", "Elegir paquete"},
-                {"pkgsFilter", "Paquetes (*.deb *.rpm)"},
+                {"pkgsFilter", "Paquetes (*.deb *.rpm *.AppImage)"},
                 {"noFile", "Ningún archivo seleccionado."},
                 {"deps", "Dependencias"},
                 {"build", "Construir paquete"},
@@ -42,7 +42,7 @@ QMap<QString, QString> lang_es() {
                 {"buildSrc", "Paquete + Fuentes"},
                 {"targetDir", "Carpeta destino para "},
                 {"errNoBuiltPkg", "❌ Ningún paquete construido para instalar."},
-                {"errNoDebRpm", "❌ Solo se admiten .deb o .rpm."},
+                {"errNoDebRpm", "❌ Solo se admiten .deb, .rpm o .AppImage."},
                 {"errNoTarget", "❌ Cancelado – ninguna carpeta destino elegida."},
                 {"errPkgbuild", "❌ No se puede escribir el PKGBUILD : "},
                 {"msgBuildFail", "❌ Fallo al construir."},
@@ -64,7 +64,7 @@ QMap<QString, QString> lang_es() {
                 {"unknown", "Desconocido"},
                 {"allOk", "— (¡todo ok !)"},
                 {"noMapped", "— ninguno mapeado"},
-                {"extraDeps", "📦 Convertir también (dependencias Debian/RPM) : "},
+                {"extraDeps", "📦 Convertir también (dependencias Debian/RPM/AppImage) : "},
                 {"extraDepsNote", "   Estos paquetes son referenciados por el programa (datos/"
                     "localización). Sin ellos, faltarán archivos al iniciar.\n\n"},
                 {"notSatisfiable", "⚠ NO SATISFACIBLE desde los repos de Arch (falta versión exacta de biblioteca) : "},

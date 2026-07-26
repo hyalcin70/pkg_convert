@@ -1,9 +1,15 @@
 # Paket Converter
 
-A native C++/Qt6 tool that converts `.deb` and `.rpm` packages into
-installable **Arch-Linux** packages (`.pkg.tar.zst`) — with real
-dependency detection, automatic installation of libraries from the
+A native C++/Qt6 tool that converts `.deb`, `.rpm` and `.AppImage`
+packages into installable **Arch-Linux** packages (`.pkg.tar.zst`) — with
+real dependency detection, automatic installation of libraries from the
 repos, and a persistent installation history.
+
+> ⚠️ **Arch-based distributions only.** This project is exclusively for
+> **Arch-Linux-based** distributions (Arch, Manjaro, EndeavourOS, …).
+> Requests or issues concerning other distributions (Debian/Ubuntu,
+> Fedora, openSUSE, …) will **not** be answered — the tool produces
+> `.pkg.tar.zst` packages, which only work on Arch-based systems.
 
 ## 🌐 Language
 
@@ -18,7 +24,7 @@ repos, and a persistent installation history.
 
 ## Features (short)
 
-- **deb/rpm → Arch**: extracts, detects required libraries via
+- **deb/rpm/AppImage → Arch**: extracts, detects required libraries via
   `readelf` + `pkgfile` (exact soname)
 - **Auto-install** of repo dependencies via `pacman -S --asdeps`
 - **Binary path**: `/usr/games/` is relocated to `/usr/bin/`
@@ -33,11 +39,11 @@ repos, and a persistent installation history.
 There are other converters (debtap, rpmtoarch). Here is why
 pkg_convert is a better fit for most users:
 
-1. **One tool for both formats.** `debtap` only handles `.deb`
+1. **One tool for all three formats.** `debtap` only handles `.deb`
    (it hard-fails on `.rpm` with *"not a valid deb package"*), while
-   `rpmtoarch` only handles `.rpm`. pkg_convert handles **both** from
-   the same GUI with identical results (verified: same binary hash,
-   same package size).
+   `rpmtoarch` only handles `.rpm`. pkg_convert handles **all three**
+   (`.deb`, `.rpm`, `.AppImage`) from the same GUI with identical
+   results (verified: same binary hash, same package size for deb/rpm).
 2. **No 1.1 GB database download.** `debtap` needs a Debian/Ubuntu
    package list (≈1.1 GB cache, fetched with root). pkg_convert uses
    `pkgfile`, which queries your **local** Arch repo database — no

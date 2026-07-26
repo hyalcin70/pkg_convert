@@ -5,11 +5,11 @@
 QMap<QString, QString> lang_en() {
     return QMap<QString, QString> {
                 {"title", "Paket Converter"},
-                {"subtitle", "Converts Debian (.deb) / RedHat (.rpm) to ArchLinux"},
-                {"dropHint", "Drag file here (.deb / .rpm)  or  click 'Browse'"},
+                {"subtitle", "Converts Debian (.deb) / RedHat (.rpm) / AppImage to ArchLinux"},
+                {"dropHint", "Drag file here (.deb / .rpm / .AppImage)  or  click 'Browse'"},
                 {"browse", "Browse"},
                 {"choosePkg", "Choose package"},
-                {"pkgsFilter", "Packages (*.deb *.rpm)"},
+                {"pkgsFilter", "Packages (*.deb *.rpm *.AppImage)"},
                 {"noFile", "No file selected."},
                 {"deps", "Dependencies"},
                 {"build", "Build package"},
@@ -41,7 +41,7 @@ QMap<QString, QString> lang_en() {
                 {"buildSrc", "Package + Sources"},
                 {"targetDir", "Target folder for "},
                 {"errNoBuiltPkg", "❌ No built package available to install."},
-                {"errNoDebRpm", "❌ Only .deb or .rpm are supported."},
+                {"errNoDebRpm", "❌ Only .deb, .rpm or .AppImage are supported."},
                 {"errNoTarget", "❌ Aborted – no target folder chosen."},
                 {"errPkgbuild", "❌ Cannot write PKGBUILD: "},
                 {"msgBuildFail", "❌ Build failed."},
@@ -63,7 +63,7 @@ QMap<QString, QString> lang_en() {
                 {"unknown", "Unknown"},
                 {"allOk", "— (all ok!)"},
                 {"noMapped", "— none mapped"},
-                {"extraDeps", "📦 Also convert (Debian/RPM depends): "},
+                {"extraDeps", "📦 Also convert (Debian/RPM/AppImage depends): "},
                 {"extraDepsNote", "   These packages are referenced by the program (usually data/"
                     "localization). Without them, files may be missing at startup.\n\n"},
                 {"notSatisfiable", "⚠ NOT SATISFIABLE from Arch repos (exact library version missing): "},

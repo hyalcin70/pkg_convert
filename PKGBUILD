@@ -2,7 +2,7 @@
 pkgname=pkg_convert
 pkgver=1.0.0
 pkgrel=1
-pkgdesc="Converts .deb/.rpm packages into installable Arch-Linux packages (native Qt6 GUI)"
+pkgdesc="Converts .deb/.rpm/.AppImage packages into installable Arch-Linux packages (native Qt6 GUI)"
 arch=('x86_64')
 url="https://github.com/hyalcin70/pkg_convert"
 license=('GPL3')
@@ -22,17 +22,17 @@ source=("pkg_convert_gui.cpp"
         "lang_es.cpp"
         "lang_tr.cpp"
         "lang_pt.cpp")
-sha256sums=('449db5006d8c0f6c8d2b0af00a1bad196e820738bb1d45a07a991d323ed14074'
+sha256sums=('940445ccea8d51da7a6fe780abac223a4ba5df09f2996be941cc272f9576b4c6'
             'f4eab89ccafa55fbf3a72bcaed4ce5b262200b92403c6a4595dee7bbb2873358'
             'bd8f98bdc2ee2748520d4df9099678898aabed9d800d691eba307479bc274b1c'
             '1c35318b13f7f32e5921bd4e0de0669202e8ec618075312e1eb60de41bcf294d'
             'f9f56f750c0da701623ea8a1f28b5c3e7f836ee5f178e4d7ec484f95cf0b4996'
-            'e2f6daf8a484ff887fb0cdf0e7f373ddf41df89f75e0e16f638c9e3141b41882'
-            '69e4a02359c6c49b1cbf5eaa710171f3cb35de07823103bb28d37c5e9a952757'
-            '3024c3cc35e2c6232734858293d463fbb9cc03e334a4bbfc931d5d78afaa46be'
-            'db11facbcf8a0a3a14423bf5bbe9a24e852a023425c9cc8d1f2bae2aa46f7155'
-            '9690192d8189ab4eeb3e18c31a7223da2e5b0cbc7fb20c79533044e1cde9b8a4'
-            '57912fc00d74ab275550927bfe7b50c6fab574ba359786c6d8a4de6f4ad459f0')
+            '431f6969f81795bfe7234c16e73e0a606e6eaa68ce9ec1d30fe66da8fad36d40'
+            '391b19d257dd1f80920854001b68afc3904d6f4b31f6423dbf2dd46d997270b9'
+            '1076fc657e56f0545a5598ea5f304487b1f73f81b987b2656ee395b2988b57d4'
+            '8aea02825d678076cc2f24d4df3b0ad4dee0ab7f9b76ca96f958f71fc783c70a'
+            'f1e7a1bcef38ef06197497e226f76d0ce57694a68d4e92ec52e02392c1d53e09'
+            'a9f69337ff86bf4ba0bfd2c3073e10939e645fd12f76300d984e0a1f85d95dc2')
 
 build() {
   cd "$srcdir"
