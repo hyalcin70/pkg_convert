@@ -454,11 +454,14 @@ private slots:
         const QString arch = mapArch(meta.value("Architecture", "x86_64"));
         QStringList mapped, unknown, aurDeps;
         if (isAppImage) {
-            // AppImage ist self-contained: keine echten Arch-Abhaengigkeiten
-            // noetig. (Die mitgelieferten Libs sind im Paket enthalten.)
-            mapped.clear();
-            unknown.clear();
-            aurDeps.clear();
+            // Option A: AppImage enthaelt eigene Libs. Wir scannen wie bei
+            // deb/rpm, loesen sie via pkgfile zu echten Arch-Paketen auf und
+            // LOESCHEN danach jede mitgelieferte .so, die Arch ohnehin
+            // anbietet. Das Programm nutzt dann die frischen System-Libs
+            // (automatische Updates, kleineres Paket). Nur Libs, die Arch
+            // NICHT hat, bleiben als Fallback im Paket.
+            depsFromBinaries(src, mapped, unknown, aurDeps);
+            stripShippedLibs(src, mapped);
         } else {
             // debtap-Methode: echte Binaries scannen (readelf NEEDED) und jede
             // Library via pkgfile zum ECHTEN Arch-Repo-Paketnamen aufloesen.
@@ -487,8 +490,9 @@ private slots:
         if (mapped.isEmpty()) pb += "  # keine (AppImage ist self-contained)\n";
         pb += ")\n";
         if (isAppImage) {
-            pb += "# AppImage enthaelt eigene Libs -> keine Arch-Abhaengigkeiten noetig.\n";
-            pb += "# Achtung: mitgelieferte Libs koennen veraltet sein (kein System-Update).\n";
+            pb += "# AppImage: mitgelieferte Libs, die Arch ohnehin anbietet, wurden\n";
+            pb += "# entfernt -> das Programm nutzt die frischen System-Libs (Updates).\n";
+            pb += "# Nur exotische Libs (ohne Arch-Paket) bleiben als Fallback im Paket.\n";
         }
         pb += QString("# --- nicht gemappte Fremd-Abhaengigkeiten (manuell pruefen) ---\n");
         pb += QString("# TODO: %1\n").arg(unknown.isEmpty() ? "keine" : unknown.join(", "));
@@ -739,6 +743,43 @@ private:
         return m.value(a, a);
     }
     // debtap-Methode: alle ELF-Binaries im Staging scannen, benoetigte
+    // AppImage-Hilfe: jede mitgelieferte .so, die zu einem der genannten
+    // Arch-Repo-Pakete gehoert, aus dem staging-Verzeichnis loeschen, damit
+    // das Programm zur Laufzeit die frische System-Lib nutzt (keine
+    // veralteten Mitliefer-Libs mehr). Nur Libs OHNE Arch-Paket bleiben.
+    void stripShippedLibs(const QString &stagingDir, const QStringList &mapped) {
+        Q_UNUSED(mapped);
+        // Alle mitgelieferten .so* einsammeln
+        QProcess own;
+        own.start("bash", QStringList() << "-c" << QString(
+            "cd %1 && find . -type f -name '*.so*' -printf '%p\\t%f\\n'").arg(stagingDir));
+        own.waitForFinished(15000);
+        const QString out = QString::fromUtf8(own.readAllStandardOutput());
+        for (const QString &line : out.split('\n', Qt::SkipEmptyParts)) {
+            const QString path = line.section('\t', 0, 0).trimmed();
+            const QString base = line.section('\t', 1, 1).trimmed();
+            if (path.isEmpty() || base.isEmpty()) continue;
+            // gehoert diese Lib zu einem offiziellen Arch-Repo-Paket?
+            QProcess pf;
+            pf.start("pkgfile", QStringList() << base);
+            pf.waitForFinished(20000);
+            const QStringList hits = QString::fromUtf8(pf.readAllStandardOutput())
+                                         .split('\n', Qt::SkipEmptyParts);
+            bool repoHas = false;
+            for (const QString &h : hits) {
+                const QString cand = h.section('/', 1, 1).section('\t', 0, 0).trimmed();
+                if (cand.startsWith("lib32-")) continue;
+                if (!cand.isEmpty()) { repoHas = true; break; }
+            }
+            if (repoHas) {
+                // Lib loeschen -> System-Lib wird genutzt
+                QFile::remove(path);
+                // ggf. leeres Verzeichnis aufraeumen (eine Ebene)
+                QFileInfo fi(path);
+                QDir(fi.absolutePath()).rmdir(".");
+            }
+        }
+    }
     // Libraries (readelf NEEDED) sammeln und via pkgfile zum echten
     // Arch-Repo-Paket aufloesen. core/extra/multilib bevorzugt (kein AUR).
     void depsFromBinaries(const QString &stagingDir, QStringList &mapped, QStringList &unknown, QStringList &aurDeps) {

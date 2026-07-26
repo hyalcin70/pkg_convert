@@ -22,7 +22,7 @@ source=("pkg_convert_gui.cpp"
         "lang_es.cpp"
         "lang_tr.cpp"
         "lang_pt.cpp")
-sha256sums=('940445ccea8d51da7a6fe780abac223a4ba5df09f2996be941cc272f9576b4c6'
+sha256sums=('07162198be988650eb9c73834a0ca9820cc18f9d6fa6104dd66ef53ed25c3a20'
             'f4eab89ccafa55fbf3a72bcaed4ce5b262200b92403c6a4595dee7bbb2873358'
             'bd8f98bdc2ee2748520d4df9099678898aabed9d800d691eba307479bc274b1c'
             '1c35318b13f7f32e5921bd4e0de0669202e8ec618075312e1eb60de41bcf294d'
