@@ -15,14 +15,14 @@ source=("pkg_convert_gui.cpp"
         "pkg_convert_gui.pro"
         "pkg_convert.desktop"
         "pkg_convert.svg"
-        "lang/lang_de.cpp"
-        "lang/lang_en.cpp"
-        "lang/lang_fr.cpp"
-        "lang/lang_es.cpp"
-        "lang/lang_tr.cpp"
-        "lang/lang_pt.cpp")
+        "lang_de.cpp"
+        "lang_en.cpp"
+        "lang_fr.cpp"
+        "lang_es.cpp"
+        "lang_tr.cpp"
+        "lang_pt.cpp")
 sha256sums=('50e2292d0c7f9a6d5df0e7a8ab0eea147685f99a43ce13a7e2b8f98cf18a94a6'
-            '0eeb19ddb3e008110951eca6bd11224386d6b1920fb30e82d9404774d8662bdb'
+            'f4eab89ccafa55fbf3a72bcaed4ce5b262200b92403c6a4595dee7bbb2873358'
             'bd8f98bdc2ee2748520d4df9099678898aabed9d800d691eba307479bc274b1c'
             '1c35318b13f7f32e5921bd4e0de0669202e8ec618075312e1eb60de41bcf294d'
             'e2f6daf8a484ff887fb0cdf0e7f373ddf41df89f75e0e16f638c9e3141b41882'
