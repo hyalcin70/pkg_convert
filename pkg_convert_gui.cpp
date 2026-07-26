@@ -323,7 +323,7 @@ private slots:
             return;
         }
         // Gewaehlte Datei gross anzeigen, damit kein Zweifel besteht,
-        // WELCHES Paket gerade geladen ist (z.B. circuslinux vs. circuslinux-data).
+        // WELCHES Paket gerade geladen ist (z.B. Programm vs. -data-Paket).
         fileLbl->setText(i18n("chosen") + QFileInfo(path).fileName());
         btnBuild->setEnabled(true);
         m_lastName.clear();   // bei neuer Datei: alte Install/Remove-Ziele vergessen
@@ -436,7 +436,7 @@ private slots:
         }
 
         // Warnung, wenn dieses Paket KEIN ausfuehrbares Programm enthaelt
-        // (z.B. circuslinux-data). Dann ist es allein nicht startbar.
+        // (z.B. ein reines Daten-Paket). Dann ist es allein nicht startbar.
         QString warnNoBinary;
         {
             bool foundBin = false;
@@ -445,9 +445,24 @@ private slots:
                 it.next();
                 const QFileInfo fi = it.fileInfo();
                 if (!fi.isFile()) continue;
-                // Datei in bin/ oder games/ mit Groesse > 0 gilt als Binary-Kandidat
-                if ((it.filePath().contains("/bin/") || it.filePath().contains("/games/"))
-                    && fi.size() > 0) {
+                const QString fp = it.filePath();
+                // Binary-Kandidat:
+                // - Datei in bin/ oder games/ (deb/rpm)
+                // - AppImage: AppRun am Staging-Root (oder in /bin, /usr/bin)
+                // - allgemein: ausfuehrbare ELF-Binares groesser 0
+                bool isPathBin = fp.contains("/bin/") || fp.contains("/games/");
+                bool isAppRun = (fi.fileName() == "AppRun");
+                bool isElf = false;
+                if (fi.size() > 0) {
+                    QFile f(fp);
+                    if (f.open(QIODevice::ReadOnly)) {
+                        const QByteArray head = f.read(4);
+                        isElf = (head == QByteArray("\x7f""ELF"));
+                        f.close();
+                    }
+                }
+                if ((isPathBin && fi.size() > 0) || isAppRun || (isElf && fi.size() > 0
+                        && (fp.contains("/bin/") || fp.contains("/usr/bin/") || fp.contains("/opt/")))) {
                     foundBin = true;
                     break;
                 }
@@ -534,7 +549,7 @@ private slots:
                       + i18n("notSatisfiableNote");
         // --- Debian/RPM-Depends auswerten: welche ZUSATZPAKETE fehlen? ---
         // (Library-Deps werden bereits ueber readelf/pkgfile erkannt; hier geht
-        //  es um reine Paket-Deps wie circuslinux-data, fonts-foo, -common ...)
+        // (z.B. reine Daten-Pakete, Fonts, -common ...)
         QStringList extraPkgs;
         {
             QString raw = meta.value(isDeb ? "Depends" : "Requires", "");
@@ -563,7 +578,7 @@ private slots:
                 for (const QString &p : knownLibPrefix)
                     if (it.startsWith(p) || it.contains(".so")) { looksLib = true; break; }
                 if (looksLib) continue;
-                // eigene Paketnamen (circuslinux-data) nicht doppelt listen
+                // eigene Paketnamen (z.B. -data) nicht doppelt listen
                 if (it == name) continue;
                 if (!extraPkgs.contains(it)) extraPkgs << it;
             }
@@ -645,15 +660,27 @@ private:
             }
             // Name + Version aus Dateiname ableiten (Format: Name-x.y.z[-arch].AppImage)
             QString base = QFileInfo(path).completeBaseName(); // ohne .AppImage
-            // arch-Suffix (x86_64 / aarch64 / i386) am Ende entfernen
-            base.replace(QRegularExpression("-(x86_64|aarch64|arm64|i386|i686)$"), "");
-            // Versions-Suffix (x.y.z oder vX.Y.Z) am Ende abtrennen
-            QRegularExpression verRe("-(v?[0-9][0-9.]*)$");
+            // Version zuerst aus dem VOLLEN Namen extrahieren (bevor Arch/Build-
+            // Suffixe entfernt werden), damit z.B. LM-Studio-0.4.20-1-x64 die
+            // Version 0.4.20 (nicht die Build-Nummer 1) liefert.
             QString ver;
-            QRegularExpressionMatch m = verRe.match(base);
-            if (m.hasMatch()) {
-                ver = m.captured(1);
-                base.chop(m.captured(1).length() + 1); // + '-'
+            {
+                QRegularExpression verRe("v?[0-9]+(?:\\.[0-9]+)+"); // min. eine Punkt-Version
+                QRegularExpressionMatch vm = verRe.match(base);
+                if (vm.hasMatch()) {
+                    ver = vm.captured(0);
+                } else {
+                    // fallback: einzelne Zahl am Ende (z.B. -1)
+                    QRegularExpression single("-(v?[0-9]+)$");
+                    QRegularExpressionMatch sm = single.match(base);
+                    if (sm.hasMatch()) ver = sm.captured(1);
+                }
+            }
+            // Name = alles vor der Versionsgruppe bereinigen (Arch-Suffix etc.)
+            if (!ver.isEmpty()) {
+                // letztes '-' + Version + evtl. Arch-Suffix abschneiden
+                base.replace(QRegularExpression("[-_]?" + QRegularExpression::escape(ver) + "[-_](x86_64|aarch64|arm64|x64|amd64|i386|i686)$"), "");
+                base.replace(QRegularExpression("[-_]" + QRegularExpression::escape(ver) + "$"), "");
             }
             meta["Package"] = base;
             meta["Version"] = ver.isEmpty() ? "1.0" : ver;
@@ -918,7 +945,6 @@ private:
             // Debian-spezifische Pakete, die auf Arch nicht existieren -> ignorieren
             // (Daten sind bereits im umgewandelten Paket enthalten, oder es gibt
             // kein Arch-Aequivalent, das als depends sinnvoll waere)
-            {"chromium-bsu-data", ""}, {"fonts-uralic", ""}, {"ttf-uralic", ""},
             {"libc6", ""}, {"libgcc1", ""}, {"libstdc++6", ""}, {"dpkg", ""},
             {"fonts-dejavu", ""}, {"ttf-dejavu", ""}};
         QStringList raw = isDeb
