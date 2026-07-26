@@ -39,5 +39,6 @@ makepkg -si
 Afterwards **Paket Converter** appears in the KDE menu
 (category: Utility / Package Management).
 
-Full documentation (Why? / Usage / Notes / Dependencies) is in the
-language-specific README linked above.
+Full documentation (Why? / Why pkg_convert vs debtap & rpmtoarch? /
+Usage / Notes / Dependencies) is in the language-specific README
+linked above.
