@@ -1,5 +1,9 @@
 # Paket Converter
 
+> 🧪 **Beta status.** This project is still in **beta**. Features may change,
+> break, or behave unexpectedly. Use at your own risk and report issues on
+> the issue tracker.
+
 A native C++/Qt6 tool that converts `.deb` and `.rpm`
 packages into installable **Arch-Linux** packages (`.pkg.tar.zst`) — with
 real dependency detection, automatic installation of libraries from the
