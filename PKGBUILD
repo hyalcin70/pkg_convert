@@ -1,4 +1,4 @@
-# Maintainer: Hakan Yalcin
+# Maintainer: Hakan Yalçın
 pkgname=pkg_convert
 pkgver=1.0.0
 pkgrel=1
