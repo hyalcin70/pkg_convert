@@ -5,11 +5,11 @@
 QMap<QString, QString> lang_fr() {
     return QMap<QString, QString> {
                 {"title", "Paket Converter"},
-                {"subtitle", "Convertit Debian (.deb) / RedHat (.rpm) / AppImage en ArchLinux"},
-                {"dropHint", "Glissez un fichier ici (.deb / .rpm / .AppImage)  ou  cliquez sur 'Parcourir'"},
+                {"subtitle", "Convertit Debian (.deb) / RedHat (.rpm) en ArchLinux"},
+                {"dropHint", "Glissez un fichier ici (.deb / .rpm)  ou  cliquez sur 'Parcourir'"},
                 {"browse", "Parcourir"},
                 {"choosePkg", "Choisir un paquet"},
-                {"pkgsFilter", "Paquets (*.deb *.rpm *.AppImage)"},
+                {"pkgsFilter", "Paquets (*.deb *.rpm)"},
                 {"noFile", "Aucun fichier sélectionné."},
                 {"deps", "Dépendances"},
                 {"build", "Construire le paquet"},
@@ -41,7 +41,7 @@ QMap<QString, QString> lang_fr() {
                 {"buildSrc", "Paquet + Sources"},
                 {"targetDir", "Dossier cible pour "},
                 {"errNoBuiltPkg", "❌ Aucun paquet construit à installer."},
-                {"errNoDebRpm", "❌ Seuls .deb, .rpm ou .AppImage sont pris en charge."},
+                {"errNoDebRpm", "❌ Seuls .deb, .rpm sont pris en charge."},
                 {"errNoTarget", "❌ Annulé – aucun dossier cible choisi."},
                 {"errPkgbuild", "❌ Impossible d'écrire le PKGBUILD : "},
                 {"msgBuildFail", "❌ Échec de la construction."},
@@ -63,7 +63,7 @@ QMap<QString, QString> lang_fr() {
                 {"unknown", "Inconnu"},
                 {"allOk", "— (tout ok !)"},
                 {"noMapped", "— aucun associé"},
-                {"extraDeps", "📦 Convertir aussi (dépendances Debian/RPM/AppImage) : "},
+                {"extraDeps", "📦 Convertir aussi (dépendances Debian/RPM) : "},
                 {"extraDepsNote", "   Ces paquets sont référencés par le programme (données/"
                     "localisation). Sans eux, des fichiers manqueront au démarrage.\n\n"},
                 {"notSatisfiable", "⚠ NON SATISFAISABLE depuis les dépôts Arch (version exacte de bibliothèque manquante) : "},

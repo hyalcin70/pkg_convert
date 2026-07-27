@@ -1,6 +1,6 @@
 # Paket Converter
 
-Yerel C++/Qt6 aracıdır; `.deb`, `.rpm` ve `.AppImage` paketlerini kurulabilir
+Yerel C++/Qt6 aracıdır; `.deb` ve `.rpm` paketlerini kurulabilir
 **Arch Linux** paketlerine (`.pkg.tar.zst`) çevirir — gerçek
 bağımlılık tespiti, kütüphanelerin repo'dan otomatik kurulumu ve
 kalıcı kurulum geçmişi ile.
@@ -14,19 +14,14 @@ kalıcı kurulum geçmişi ile.
 ## Neden?
 
 Bazı programlar (oyunlar, özel araçlar) yalnızca `.deb`
-(Debian/Ubuntu), `.rpm` (Fedora/openSUSE) veya `.AppImage` olarak mevcuttur, Arch
+(Debian/Ubuntu) veya `.rpm` (Fedora/openSUSE) olarak mevcuttur, Arch
 depolarında yoktur. Bu araç onları AUR'suz çevirir — yalnızca resmi
 Arch kaynaklarını kullanarak.
 
 ## Özellikler
 
-- **deb/rpm/AppImage → Arch** : çıkarır, gereken kütüphaneleri `readelf` +
+- **deb/rpm → Arch** : çıkarır, gereken kütüphaneleri `readelf` +
   `pkgfile` ile bulur (tam soname, tahmin edilen tablolar yok)
-- **AppImage sistem kütüphanelerini kullanır** : Arch'ın zaten sunduğu
-  gömülü kütüphaneler paketten çıkarılır, böylece program **güncel
-  sistem kütüphanelerini** (otomatik güncellemelerle) kullanır, eski
-  gömülü kütüphaneleri değil. Yalnızca Arch paketi olmayan kütüphaneler
-  yedek olarak kalır.
 - **Otomatik kurulum** : repo bağımlılıkları `pacman -S --asdeps` ile
 - **Binary yolu** : `/usr/games/` → `/usr/bin/` taşınır
 - **Uyarı** : yalnızca veri paketlerinde (çalıştırılabilir yok)
@@ -40,16 +35,16 @@ Arch kaynaklarını kullanarak.
 Başka dönüştürücüler de var (debtap, rpmtoarch). İşte pkg_convert'in
 çoğu kullanıcı için neden daha iyi olduğu:
 
-1. **Üç biçim için tek araç.** `debtap` yalnızca `.deb` ile
+1. **İki biçim için tek araç.** `debtap` yalnızca `.deb` ile
    çalışır (`.rpm`'de sert şekilde *"not a valid deb package"* der),
-   `rpmtoarch` yalnızca `.rpm`. pkg_convert **üçünü de** (`.deb`,
-   `.rpm`, `.AppImage`) aynı arayüzden, aynı sonuçla yapar (doğrulandı:
+   `rpmtoarch` yalnızca `.rpm`. pkg_convert **ikisini de** (`.deb`,
+   `.rpm`) aynı arayüzden, aynı sonuçla yapar (doğrulandı:
    aynı binary hash, aynı paket boyutu deb/rpm için).
 2. **1,1 GB veritabanı yok.** `debtap`, Debian/Ubuntu paket listesi
    indirir (≈1,1 GB önbellek, root ile). pkg_convert `pkgfile` kullanır
    ve **yerel** Arch repo veritabanını sorgular — büyük indirme yok,
    ayrı güncelleme adımı yok.
-3. **Daha eksiksiz bağımlılık tespiti.** Hem `.deb`, `.rpm` hem de `.AppImage`
+3. **Daha eksiksiz bağımlılık tespiti.** Hem `.deb` hem de `.rpm`
    olarak verilen farklı programlarla yapılan testlerde pkg_convert
    **11** kütüphane çözdü
    (gtk3, webkit2gtk-4.1, cairo, pango, glib2, libsoup, zlib, glibc,
@@ -62,15 +57,6 @@ Başka dönüştürücüler de var (debtap, rpmtoarch). İşte pkg_convert'in
    kurulum geçmişi, kopyalanabilir günlük.
 6. **AUR gerekmez.** `debtap`/`rpmtoarch` AUR'dan gelir. pkg_convert
    kendi kaynağınızdan `makepkg -si` ile derlenir.
-7. **AppImage doğru yapılır — eski gömülü kütüphaneler yok.** Çıplak
-   bir AppImage kendi (genellikle eski) paylaşılan kütüphanelerini
-   getirir ve sistem kütüphaneleri yerine bunları kullanır, böylece
-   hiç güvenlik güncellemesi almaz. pkg_convert **Arch'ın zaten
-   sunduğu her gömülü `.so`'yu çıkarır** ve gerçek Arch paketlerini
-   `depends` olarak yazar. Program böylece güncel sistem
-   kütüphanelerini (otomatik `pacman` güncellemeleriyle) kullanır.
-   Yalnızca Arch paketi olmayan kütüphaneler yedek olarak gömülü
-   kalır. Diğer dönüştürücüler AppImage'ı hiç işlemez.
 
 ### Dürüst sınırlamalar
 
@@ -95,7 +81,7 @@ Ardından **Paket Converter** KDE menüsünde görünür
 
 ## Kullanım
 
-1. **Gözat** → bir `.deb`, `.rpm` veya `.AppImage` dosyası seç
+1. **Gözat** → bir `.deb` veya `.rpm` dosyası seç
 2. **Paket oluştur** (veya "Paket + Kaynaklar")
 3. **Paketi kur** → parolayı gir, tamam
 

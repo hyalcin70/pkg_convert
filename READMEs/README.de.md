@@ -1,6 +1,6 @@
 # Paket Converter
 
-Ein nativer C++/Qt6-Konverter, der `.deb`-, `.rpm`- und `.AppImage`-Pakete
+Ein nativer C++/Qt6-Konverter, der `.deb`- und `.rpm`-Pakete
 in installierbare **Arch-Linux**-Pakete (`.pkg.tar.zst`) umwandelt — mit
 echter Abhängigkeitserkennung, automatischer Repo-Installation der
 Bibliotheken und persistenter Installationshistorie.
@@ -15,18 +15,14 @@ Bibliotheken und persistenter Installationshistorie.
 ## Warum?
 
 Manche Programme (Spiele, Spezialwerkzeuge) gibt es nur als `.deb`
-(Debian/Ubuntu), `.rpm` (Fedora/openSUSE) oder `.AppImage`, nicht in den
+(Debian/Ubuntu) oder `.rpm` (Fedora/openSUSE), nicht in den
 Arch-Repos. Dieses Werkzeug konvertiert sie ohne AUR — nur mit
 offiziellen Arch-Quellen.
 
 ## Funktionen
 
-- **deb/rpm/AppImage → Arch**: extrahiert, erkennt benötigte Bibliotheken über
+- **deb/rpm → Arch**: extrahiert, erkennt benötigte Bibliotheken über
   `readelf` + `pkgfile` (exakte soname, keine geratenen Tabellen)
-- **AppImage nutzt System-Bibliotheken**: mitgelieferte Libs, die Arch
-  ohnehin anbietet, werden aus dem Paket entfernt — das Programm nutzt
-  die **aktuellen System-Libs** (mit automatischen Updates) statt
-  veralteter Bündel-Libs. Nur Libs ohne Arch-Paket bleiben als Fallback.
 - **Auto-Install** der Repo-Abhängigkeiten via `pacman -S --asdeps`
 - **Binary-Pfad**: `/usr/games/` wird nach `/usr/bin/` verschoben
 - **Warnung** bei reinen Datenpaketen (ohne ausführbares Programm)
@@ -40,17 +36,17 @@ offiziellen Arch-Quellen.
 Es gibt andere Konverter (debtap, rpmtoarch). Hier ist, warum
 pkg_convert für die meisten Anwender die bessere Wahl ist:
 
-1. **Ein Tool für alle drei Formate.** `debtap` kann nur `.deb`
+1. **Ein Tool für beide Formate.** `debtap` kann nur `.deb`
    (bricht bei `.rpm` hart ab mit *"not a valid deb package"*),
-   `rpmtoarch` nur `.rpm`. pkg_convert beherrscht **alle drei**
-   (`.deb`, `.rpm`, `.AppImage`) aus derselben GUI mit identischen
+   `rpmtoarch` nur `.rpm`. pkg_convert beherrscht **beide**
+   (`.deb`, `.rpm`) aus derselben GUI mit identischen
    Ergebnissen (verifiziert: gleiche Binary-Hash, gleiche Paketgröße bei deb/rpm).
 2. **Keine 1,1-GB-Datenbank.** `debtap` lädt eine Debian/Ubuntu-
    Paketliste (≈1,1 GB Cache, mit Root-Rechten). pkg_convert nutzt
    `pkgfile`, das deine **lokale** Arch-Repo-Datenbank abfragt — kein
    großer Download, kein separater Update-Schritt.
 3. **Vollständigere Abhängigkeitserkennung.** In Tests mit
-   unterschiedlichen Programmen, die als `.deb`, `.rpm` oder `.AppImage`
+   unterschiedlichen Programmen, die als `.deb` oder `.rpm`
    vorlagen, löste pkg_convert **11** Bibliotheken auf
    (gtk3, webkit2gtk-4.1, cairo, pango, glib2, libsoup, zlib, glibc,
    gcc-libs, gdk-pixbuf2, libx11) statt **4** bei debtap. Mehr
@@ -64,15 +60,6 @@ pkg_convert für die meisten Anwender die bessere Wahl ist:
    separates GTK-Hilfsfenster neben einer Konsole.
 6. **Kein AUR nötig.** `debtap`/`rpmtoarch` kommen aus dem AUR.
    pkg_convert baut aus eigenem Quellcode via `makepkg -si`.
-7. **AppImage richtig gemacht — keine veralteten Bündel-Libs.**
-   Ein rohes AppImage bringt eigene (oft veraltete) Bibliotheken mit
-   und nutzt diese statt deiner System-Libs, bekommt also nie
-   Sicherheitsupdates. pkg_convert **entfernt jede mitgelieferte
-   `.so`, die Arch ohnehin anbietet**, und trägt die echten Arch-Pakete
-   als `depends` ein. Das Programm nutzt dann die aktuellen
-   System-Libs (mit automatischen `pacman`-Updates). Nur Bibliotheken
-   ohne Arch-Paket bleiben als Fallback gebündelt. Andere Konverter
-   behandeln AppImage gar nicht.
 
 ### Ehrliche Einschränkungen
 

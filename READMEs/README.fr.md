@@ -1,6 +1,6 @@
 # Paket Converter
 
-Un outil natif C++/Qt6 qui convertit les paquets `.deb`, `.rpm` et `.AppImage` en
+Un outil natif C++/Qt6 qui convertit les paquets `.deb` et `.rpm` en
 paquets **Arch Linux** installables (`.pkg.tar.zst`) — avec détection
 réelle des dépendances, installation automatique des bibliothèques
 depuis les dépôts et un historique d'installation persistant.
@@ -15,19 +15,14 @@ depuis les dépôts et un historique d'installation persistant.
 ## Pourquoi ?
 
 Certains programmes (jeux, outils spécialisés) ne sont disponibles
-qu'en `.deb` (Debian/Ubuntu), `.rpm` (Fedora/openSUSE) ou `.AppImage`, pas dans
+qu'en `.deb` (Debian/Ubuntu) ou `.rpm` (Fedora/openSUSE), pas dans
 les dépôts Arch. Cet outil les convertit sans AUR — uniquement avec
 les sources officielles d'Arch.
 
 ## Fonctionnalités
 
-- **deb/rpm/AppImage → Arch** : extrait, détecte les bibliothèques requises via
+- **deb/rpm → Arch** : extrait, détecte les bibliothèques requises via
   `readelf` + `pkgfile` (soname exact, pas de tables devinées)
-- **AppImage utilise les bibliothèques système** : les bibliothèques
-  fournies intégrées que Arch livre déjà sont retirées du paquet, ainsi
-  le programme utilise les **bibliothèques système à jour** (avec mises
-  à jour automatiques) au lieu de bibliothèques intégrées obsolètes.
-  Seules les bibliothèques sans paquet Arch restent en repli.
 - **Installation auto** des dépendances via `pacman -S --asdeps`
 - **Chemin binaire** : `/usr/games/` est déplacé vers `/usr/bin/`
 - **Avertissement** pour les paquets de données purs (sans exécutable)
@@ -41,10 +36,10 @@ les sources officielles d'Arch.
 Il existe d'autres convertisseurs (debtap, rpmtoarch). Voici pourquoi
 pkg_convert convient mieux à la plupart des utilisateurs :
 
-1. **Un outil pour les trois formats.** `debtap` ne gère que `.deb`
+1. **Un outil pour les deux formats.** `debtap` ne gère que `.deb`
    (échec brutal sur `.rpm` : *"not a valid deb package"*), tandis que
-   `rpmtoarch` ne gère que `.rpm`. pkg_convert gère **les trois**
-   (`.deb`, `.rpm`, `.AppImage`) depuis la même interface avec des
+   `rpmtoarch` ne gère que `.rpm`. pkg_convert gère **les deux**
+   (`.deb`, `.rpm`) depuis la même interface avec des
    résultats identiques (vérifié : même empreinte binaire, même taille
    pour deb/rpm).
 2. **Pas de base de données de 1,1 Go.** `debtap` télécharge une liste
@@ -52,7 +47,7 @@ pkg_convert convient mieux à la plupart des utilisateurs :
    utilise `pkgfile`, qui interroge votre base **locale** Arch — pas de
    gros téléchargement, pas d'étape de mise à jour séparée.
 3. **Détection des dépendances plus complète.** Lors de tests avec
-   différents programmes fournis à la fois en `.deb`, `.rpm` ou `.AppImage`,
+   différents programmes fournis à la fois en `.deb` ou `.rpm`,
    pkg_convert a résolu **11** bibliothèques
    (gtk3, webkit2gtk-4.1, cairo, pango, glib2, libsoup, zlib, glibc,
    gcc-libs, gdk-pixbuf2, libx11) contre **4** pour debtap.
@@ -63,16 +58,6 @@ pkg_convert convient mieux à la plupart des utilisateurs :
    clair/sombre, historique, journal copiable.
 6. **Pas besoin d'AUR.** `debtap`/`rpmtoarch` viennent de l'AUR.
    pkg_convert se construit depuis vos sources via `makepkg -si`.
-7. **AppImage fait correctement — pas de bibliothèques intégrées
-   obsolètes.** Une AppImage brute embarque ses propres bibliothèques
-   (souvent obsolètes) et les utilise au lieu des libs système, ne
-   recevant ainsi jamais de mises à jour de sécurité. pkg_convert
-   **retire chaque `.so` intégré que Arch livre déjà** et inscrit les
-   vrais paquets Arch en `depends`. Le programme utilise alors les
-   bibliothèques système à jour (avec mises à jour `pacman`
-   automatiques). Seules les bibliothèques sans paquet Arch restent
-   intégrées en repli. Les autres convertisseurs ne gèrent pas du tout
-   AppImage.
 
 ### Limites honnêtes
 
@@ -97,7 +82,7 @@ Ensuite **Paket Converter** apparaît dans le menu KDE
 
 ## Utilisation
 
-1. **Parcourir** → sélectionner un fichier `.deb`, `.rpm` ou `.AppImage`
+1. **Parcourir** → sélectionner un fichier `.deb` ou `.rpm`
 2. **Construire le paquet** (ou « Paquet + Sources »)
 3. **Installer le paquet** → saisir le mot de passe, terminé
 

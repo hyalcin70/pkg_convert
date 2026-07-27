@@ -15,19 +15,14 @@ desde los repos y un historial de instalación persistente.
 ## ¿Por qué?
 
 Algunos programas (juegos, herramientas especiales) solo están
-disponibles como `.deb` (Debian/Ubuntu), `.rpm` (Fedora/openSUSE) o `.AppImage`, no
+disponibles como `.deb` (Debian/Ubuntu) o `.rpm` (Fedora/openSUSE), no
 en los repos de Arch. Esta herramienta los convierte sin AUR — usando
 solo fuentes oficiales de Arch.
 
 ## Características
 
-- **deb/rpm/AppImage → Arch** : extrae, detecta bibliotecas necesarias vía
+- **deb/rpm → Arch** : extrae, detecta bibliotecas necesarias vía
   `readelf` + `pkgfile` (soname exacto, sin tablas adivinadas)
-- **AppImage usa bibliotecas del sistema** : las bibliotecas incluidas
-  que Arch ya proporciona se eliminan del paquete, así el programa usa
-  las **bibliotecas del sistema actualizadas** (con actualizaciones
-  automáticas) en lugar de bibliotecas incluidas obsoletas. Solo las
-  bibliotecas sin paquete Arch permanecen como respaldo.
 - **Instalación auto** de dependencias vía `pacman -S --asdeps`
 - **Ruta del binario** : `/usr/games/` se mueve a `/usr/bin/`
 - **Aviso** para paquetes de solo datos (sin ejecutable)
@@ -41,17 +36,17 @@ solo fuentes oficiales de Arch.
 Existen otros convertidores (debtap, rpmtoarch). Esto es por qué
 pkg_convert es mejor para la mayoría:
 
-1. **Una herramienta para los tres formatos.** `debtap` solo maneja
+1. **Una herramienta para los dos formatos.** `debtap` solo maneja
    `.deb` (falla en `.rpm` con *"not a valid deb package"*), mientras
-   `rpmtoarch` solo `.rpm`. pkg_convert maneja **los tres**
-   (`.deb`, `.rpm`, `.AppImage`) desde la misma GUI con resultados
+   `rpmtoarch` solo `.rpm`. pkg_convert maneja **los dos**
+   (`.deb`, `.rpm`) desde la misma GUI con resultados
    idénticos (verificado: mismo hash binario, mismo tamaño para deb/rpm).
 2. **Sin base de datos de 1,1 GB.** `debtap` descarga una lista de
    paquetes Debian/Ubuntu (≈1,1 GB de caché, con root). pkg_convert usa
    `pkgfile`, que consulta tu base **local** de Arch — sin gran
    descarga, sin paso de actualización separado.
 3. **Detección de dependencias más completa.** En pruebas con
-   diferentes programas disponibles tanto en `.deb`, `.rpm` como en `.AppImage`,
+   diferentes programas disponibles tanto en `.deb` o `.rpm`,
    pkg_convert resolvió **11** bibliotecas
    (gtk3, webkit2gtk-4.1, cairo, pango, glib2, libsoup, zlib, glibc,
    gcc-libs, gdk-pixbuf2, libx11) frente a **4** de debtap.
@@ -62,15 +57,6 @@ pkg_convert es mejor para la mayoría:
    oscuro, historial, registro copiable.
 6. **Sin AUR.** `debtap`/`rpmtoarch` vienen de AUR. pkg_convert se
    construye desde tu código fuente vía `makepkg -si`.
-7. **AppImage hecho correctamente — sin bibliotecas incluidas
-   obsoletas.** Una AppImage cruda trae sus propias bibliotecas (a
-   menudo obsoletas) y las usa en lugar de las del sistema, por lo que
-   nunca recibe actualizaciones de seguridad. pkg_convert **elimina
-   cada `.so` incluido que Arch ya proporciona** y registra los
-   verdaderos paquetes Arch como `depends`. El programa usa entonces
-   las bibliotecas del sistema actualizadas (con actualizaciones
-   `pacman` automáticas). Solo las bibliotecas sin paquete Arch quedan
-   incluidas como respaldo. Otros convertidores no manejan AppImage.
 
 ### Limitaciones honestas
 
@@ -95,7 +81,7 @@ Después **Paket Converter** aparece en el menú KDE
 
 ## Uso
 
-1. **Examinar** → seleccionar un archivo `.deb`, `.rpm` o `.AppImage`
+1. **Examinar** → seleccionar un archivo `.deb` o `.rpm`
 2. **Construir paquete** (o «Paquete + Fuentes»)
 3. **Instalar paquete** → introducir contraseña, listo
 

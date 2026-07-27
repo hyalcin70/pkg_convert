@@ -9,3 +9,4 @@ Makefile
 .qmake.stash
 *.moc
 moc_predefs.h
+pkg_convert_gui

@@ -1,5 +1,5 @@
 // pkg_convert_gui - native Qt6 GUI (kein Python)
-// Wandelt .deb/.rpm/.AppImage -> Arch PKGBUILD + makepkg, alles ueber QProcess.
+// Wandelt .deb/.rpm -> Arch PKGBUILD + makepkg, alles ueber QProcess.
 #include <QApplication>
 #include <QMainWindow>
 #include <QVBoxLayout>
@@ -45,7 +45,7 @@ public:
         setAcceptDrops(true);
         setReadOnly(true);
         setPlaceholderText(QStringLiteral(
-            "Datei hierher ziehen (.deb / .rpm / .AppImage)  oder  'Durchsuchen' klicken"));
+            "Datei hierher ziehen (.deb / .rpm)  oder  'Durchsuchen' klicken"));
     }
 signals:
     void fileDropped(const QString &path);
@@ -67,7 +67,7 @@ class MainWindow : public QMainWindow {
     Q_OBJECT
 public:
     explicit MainWindow(QWidget *p = nullptr) : QMainWindow(p) {
-        setWindowTitle(QStringLiteral("Paket Converter – Debian/RedHat/AppImage zu ArchLinux"));
+        setWindowTitle(QStringLiteral("Paket Converter – Debian/RedHat zu ArchLinux"));
         resize(760, 580);
         m_dark = m_settings.value("theme", "light").toString() == "dark";
         applyTheme();
@@ -317,13 +317,14 @@ private slots:
         m_path = path;
         // Ordner der Quelldatei merken, damit "Durchsuchen" dort startet
         m_settings.setValue("lastSrcDir", QFileInfo(path).absolutePath());
-        const bool isAppImage = path.endsWith(".AppImage", Qt::CaseInsensitive);
-        if (!(path.endsWith(".deb") || path.endsWith(".rpm") || isAppImage)) {
+        const bool isDeb = path.endsWith(".deb");
+        const bool isRpm = path.endsWith(".rpm");
+        if (!(isDeb || isRpm)) {
             status->setText(i18n("errNoDebRpm"));
             return;
         }
         // Gewaehlte Datei gross anzeigen, damit kein Zweifel besteht,
-        // WELCHES Paket gerade geladen ist (z.B. Programm vs. -data-Paket).
+        // WELCHES Paket gerade geladen ist (z.B. circuslinux vs. circuslinux-data).
         fileLbl->setText(i18n("chosen") + QFileInfo(path).fileName());
         btnBuild->setEnabled(true);
         m_lastName.clear();   // bei neuer Datei: alte Install/Remove-Ziele vergessen
@@ -337,21 +338,12 @@ private slots:
         if (!tmp.isValid()) return;
         const QString staging = tmp.filePath("staging");
         QDir().mkpath(staging);
-        const bool isDeb = path.endsWith(".deb");
-        const bool isRpm = path.endsWith(".rpm");
-        QMap<QString, QString> meta = parseMeta(path, staging, isDeb, isRpm, isAppImage);
-        if (meta.value("ExtractError") == "1") {
-            status->setText("❌ AppImage konnte nicht entpackt werden "
-                            "(--appimage-extract fehlgeschlagen). Eventuell ein "
-                            "inkompatibles/verschlüsseltes AppImage.");
-            btnBuild->setEnabled(false);
-            return;
-        }
+        QMap<QString, QString> meta = parseMeta(path, staging, isDeb, isRpm);
         metaLbl->setText(QString("Name: %1   Version: %2   Arch: %3   Format: %4")
             .arg(sanitizeName(meta.value("Package", "?")),
                  sanitizeVer(meta.value("Version", "?")),
                  meta.value("Architecture", "?"),
-                 isAppImage ? "AppImage" : (isDeb ? "DEB" : "RPM")));
+                 isDeb ? "DEB" : "RPM"));
     }
     void runConvert(bool build) {
         if (m_path.isEmpty()) return;
@@ -365,8 +357,7 @@ private slots:
         QDir().mkpath(staging);
         const bool isDeb = m_path.endsWith(".deb");
         const bool isRpm = m_path.endsWith(".rpm");
-        const bool isAppImage = m_path.endsWith(".AppImage", Qt::CaseInsensitive);
-        QMap<QString, QString> meta = parseMeta(m_path, staging, isDeb, isRpm, isAppImage);
+        QMap<QString, QString> meta = parseMeta(m_path, staging, isDeb, isRpm);
         const QString name = sanitizeName(meta.value("Package", "converted"));
         const QString ver = sanitizeVer(meta.value("Version", "1.0"));
         QString pkgrel = meta.value("Release", "1");
@@ -436,7 +427,7 @@ private slots:
         }
 
         // Warnung, wenn dieses Paket KEIN ausfuehrbares Programm enthaelt
-        // (z.B. ein reines Daten-Paket). Dann ist es allein nicht startbar.
+        // (z.B. circuslinux-data). Dann ist es allein nicht startbar.
         QString warnNoBinary;
         {
             bool foundBin = false;
@@ -445,24 +436,9 @@ private slots:
                 it.next();
                 const QFileInfo fi = it.fileInfo();
                 if (!fi.isFile()) continue;
-                const QString fp = it.filePath();
-                // Binary-Kandidat:
-                // - Datei in bin/ oder games/ (deb/rpm)
-                // - AppImage: AppRun am Staging-Root (oder in /bin, /usr/bin)
-                // - allgemein: ausfuehrbare ELF-Binares groesser 0
-                bool isPathBin = fp.contains("/bin/") || fp.contains("/games/");
-                bool isAppRun = (fi.fileName() == "AppRun");
-                bool isElf = false;
-                if (fi.size() > 0) {
-                    QFile f(fp);
-                    if (f.open(QIODevice::ReadOnly)) {
-                        const QByteArray head = f.read(4);
-                        isElf = (head == QByteArray("\x7f""ELF"));
-                        f.close();
-                    }
-                }
-                if ((isPathBin && fi.size() > 0) || isAppRun || (isElf && fi.size() > 0
-                        && (fp.contains("/bin/") || fp.contains("/usr/bin/") || fp.contains("/opt/")))) {
+                // Datei in bin/ oder games/ mit Groesse > 0 gilt als Binary-Kandidat
+                if ((it.filePath().contains("/bin/") || it.filePath().contains("/games/"))
+                    && fi.size() > 0) {
                     foundBin = true;
                     break;
                 }
@@ -475,16 +451,7 @@ private slots:
         // PKGBUILD schreiben
         const QString arch = mapArch(meta.value("Architecture", "x86_64"));
         QStringList mapped, unknown, aurDeps;
-        if (isAppImage) {
-            // Option A: AppImage enthaelt eigene Libs. Wir scannen wie bei
-            // deb/rpm, loesen sie via pkgfile zu echten Arch-Paketen auf und
-            // LOESCHEN danach jede mitgelieferte .so, die Arch ohnehin
-            // anbietet. Das Programm nutzt dann die frischen System-Libs
-            // (automatische Updates, kleineres Paket). Nur Libs, die Arch
-            // NICHT hat, bleiben als Fallback im Paket.
-            depsFromBinaries(src, mapped, unknown, aurDeps);
-            stripShippedLibs(src, mapped);
-        } else {
+        {
             // debtap-Methode: echte Binaries scannen (readelf NEEDED) und jede
             // Library via pkgfile zum ECHTEN Arch-Repo-Paketnamen aufloesen.
             // Keine geratene Namenstabelle mehr.
@@ -498,8 +465,8 @@ private slots:
         m_lastAurDeps = aurDeps;
         const QString desc = meta.value("Summary", meta.value("Description", "konvertiertes Paket")).split('\n').first().left(200);
         QString pb;
-        pb += QString("# Generiert von Paket Converter (%1 -> Arch)\n").arg(isAppImage ? "AppImage" : (isDeb ? "deb" : "rpm"));
-        pb += QString("# Quelle: %1 (%2)\n").arg(meta.value("Package", name), isAppImage ? "AppImage" : (isDeb ? "deb" : "rpm"));
+        pb += QString("# Generiert von Paket Converter (%1 -> Arch)\n").arg(isDeb ? "deb" : "rpm");
+        pb += QString("# Quelle: %1 (%2)\n").arg(meta.value("Package", name), isDeb ? "deb" : "rpm");
         pb += QString("pkgname=%1\n").arg(name);
         pb += QString("pkgver=%1\n").arg(ver);
         pb += QString("pkgrel=%1\n").arg(pkgrel);
@@ -509,13 +476,8 @@ private slots:
         pb += QString("license=('%1')\n").arg(meta.value("License", "custom"));
         pb += "depends=(\n";
         for (const auto &d : mapped) pb += "  '" + d + "'\n";
-        if (mapped.isEmpty()) pb += "  # keine (AppImage ist self-contained)\n";
+        if (mapped.isEmpty()) pb += "  # keine\n";
         pb += ")\n";
-        if (isAppImage) {
-            pb += "# AppImage: mitgelieferte Libs, die Arch ohnehin anbietet, wurden\n";
-            pb += "# entfernt -> das Programm nutzt die frischen System-Libs (Updates).\n";
-            pb += "# Nur exotische Libs (ohne Arch-Paket) bleiben als Fallback im Paket.\n";
-        }
         pb += QString("# --- nicht gemappte Fremd-Abhaengigkeiten (manuell pruefen) ---\n");
         pb += QString("# TODO: %1\n").arg(unknown.isEmpty() ? "keine" : unknown.join(", "));
         if (!aurDeps.isEmpty()) {
@@ -549,7 +511,7 @@ private slots:
                       + i18n("notSatisfiableNote");
         // --- Debian/RPM-Depends auswerten: welche ZUSATZPAKETE fehlen? ---
         // (Library-Deps werden bereits ueber readelf/pkgfile erkannt; hier geht
-        // (z.B. reine Daten-Pakete, Fonts, -common ...)
+        //  es um reine Paket-Deps wie circuslinux-data, fonts-foo, -common ...)
         QStringList extraPkgs;
         {
             QString raw = meta.value(isDeb ? "Depends" : "Requires", "");
@@ -578,7 +540,7 @@ private slots:
                 for (const QString &p : knownLibPrefix)
                     if (it.startsWith(p) || it.contains(".so")) { looksLib = true; break; }
                 if (looksLib) continue;
-                // eigene Paketnamen (z.B. -data) nicht doppelt listen
+                // eigene Paketnamen (circuslinux-data) nicht doppelt listen
                 if (it == name) continue;
                 if (!extraPkgs.contains(it)) extraPkgs << it;
             }
@@ -642,69 +604,8 @@ private slots:
 
 private:
     // ---- helpers ----
-    QMap<QString, QString> parseMeta(const QString &path, const QString &staging, bool isDeb, bool isRpm, bool isAppImage) {
+    QMap<QString, QString> parseMeta(const QString &path, const QString &staging, bool isDeb, bool isRpm) {
         QMap<QString, QString> meta;
-        if (isAppImage) {
-            // AppImage entpacken. Typ-2-AppImages haben einen ELF-Loader vor
-            // dem squashfs, den unsquashfs nicht direkt liest -> daher das
-            // eigene --appimage-extract nutzen (funktioniert fuer beide Typen).
-            QProcess us;
-            us.start("bash", QStringList() << "-c"
-                << QString("cd '%1' && chmod u+x '%2' 2>/dev/null ; '%2' --appimage-extract >/dev/null 2>&1 && "
-                           "mv squashfs-root/* . 2>/dev/null ; rmdir squashfs-root 2>/dev/null")
-                       .arg(staging, path));
-            us.waitForFinished(-1);
-            if (!QFile::exists(staging + "/AppRun") && !QFile::exists(staging + "/usr")) {
-                // Extraktion fehlgeschlagen -> Hinweis, damit es nicht still scheitert
-                meta["ExtractError"] = "1";
-            }
-            // Name + Version aus Dateiname ableiten (Format: Name-x.y.z[-arch].AppImage)
-            QString base = QFileInfo(path).completeBaseName(); // ohne .AppImage
-            // Version zuerst aus dem VOLLEN Namen extrahieren (bevor Arch/Build-
-            // Suffixe entfernt werden), damit z.B. LM-Studio-0.4.20-1-x64 die
-            // Version 0.4.20 (nicht die Build-Nummer 1) liefert.
-            QString ver;
-            {
-                QRegularExpression verRe("v?[0-9]+(?:\\.[0-9]+)+"); // min. eine Punkt-Version
-                QRegularExpressionMatch vm = verRe.match(base);
-                if (vm.hasMatch()) {
-                    ver = vm.captured(0);
-                } else {
-                    // fallback: einzelne Zahl am Ende (z.B. -1)
-                    QRegularExpression single("-(v?[0-9]+)$");
-                    QRegularExpressionMatch sm = single.match(base);
-                    if (sm.hasMatch()) ver = sm.captured(1);
-                }
-            }
-            // Name = alles vor der Versionsgruppe bereinigen (Arch-Suffix etc.)
-            if (!ver.isEmpty()) {
-                // letztes '-' + Version + evtl. Arch-Suffix abschneiden
-                base.replace(QRegularExpression("[-_]?" + QRegularExpression::escape(ver) + "[-_](x86_64|aarch64|arm64|x64|amd64|i386|i686)$"), "");
-                base.replace(QRegularExpression("[-_]" + QRegularExpression::escape(ver) + "$"), "");
-            }
-            meta["Package"] = base;
-            meta["Version"] = ver.isEmpty() ? "1.0" : ver;
-            meta["Architecture"] = "x86_64";
-            meta["Release"] = "1";
-            // Versuche .desktop im entpackten Image zu finden (fuer Summary/Icon)
-            QDirIterator it(staging, QStringList() << "*.desktop", QDir::Files, QDirIterator::Subdirectories);
-            if (it.hasNext()) {
-                const QString desk = it.next();
-                QFile df(desk);
-                if (df.open(QIODevice::ReadOnly)) {
-                    const QString txt = df.readAll();
-                    for (const QString &line : txt.split('\n')) {
-                        QString k, v;
-                        int idx = line.indexOf('=');
-                        if (idx > 0) { k = line.left(idx).trimmed(); v = line.mid(idx + 1).trimmed(); }
-                        if (k == "Name") meta["Summary"] = v;
-                        else if (k == "Comment") { if (!meta.contains("Summary")) meta["Summary"] = v; }
-                        else if (k == "Icon") meta["Icon"] = v;
-                    }
-                }
-            }
-            return meta;
-        }
         if (isDeb) {
             QTemporaryDir work;
             QString ctrlDir = work.filePath("ctrl");
@@ -781,55 +682,6 @@ private:
         return m.value(a, a);
     }
     // debtap-Methode: alle ELF-Binaries im Staging scannen, benoetigte
-    // AppImage-Hilfe: jede mitgelieferte .so, die zu einem der genannten
-    // Arch-Repo-Pakete gehoert, aus dem staging-Verzeichnis loeschen, damit
-    // das Programm zur Laufzeit die frische System-Lib nutzt (keine
-    // veralteten Mitliefer-Libs mehr). Nur Libs OHNE Arch-Paket bleiben.
-    void stripShippedLibs(const QString &stagingDir, const QStringList &mapped) {
-        Q_UNUSED(mapped);
-        // Alle mitgelieferten Dateien einsammeln, die Arch bereits im System
-        // mitliefert (Shared Libs, GSettings-Schemas, pkg-config, Header, ...).
-        // Wuerden wir sie im Paket belassen, kaeme es bei 'pacman -U' zum
-        // Dateikonflikt mit dem System-Paket (z.B. gtk3 liefert
-        // org.gtk.Settings.*.gschema.xml). Daher weg damit -> System-Datei nutzen.
-        QProcess own;
-        own.start("bash", QStringList() << "-c" << QString(
-            "cd %1 && find . -type f \\( -name '*.so*' -o -name '*.gschema.xml' "
-            "-o -name 'gschemas.compiled' -o -name '*.pc' -o -name '*.h' "
-            "-o -name '*.schema' \\) -printf '%p\\t%f\\n'").arg(stagingDir));
-        own.waitForFinished(15000);
-        const QString out = QString::fromUtf8(own.readAllStandardOutput());
-        int removed = 0;
-        for (const QString &line : out.split('\n', Qt::SkipEmptyParts)) {
-            const QString path = line.section('\t', 0, 0).trimmed();
-            const QString base = line.section('\t', 1, 1).trimmed();
-            if (path.isEmpty() || base.isEmpty()) continue;
-            // pfad ist relativ zum stagingDir (wegen 'cd %1' im find) ->
-            // absolut machen, sonst schlaegt QFile::remove im falschen CWD fehl
-            const QString absPath = QDir(stagingDir).absoluteFilePath(path);
-            // gehoert diese Datei zu einem offiziellen Arch-Repo-Paket?
-            // (pkgfile ohne -v liefert das Paket zur Basename; das ist
-            //  zuverlaessig auch fuer gschema.xml / .pc / .so*)
-            QProcess pf;
-            pf.start("pkgfile", QStringList() << base);
-            pf.waitForFinished(30000);
-            const QStringList hits = QString::fromUtf8(pf.readAllStandardOutput())
-                                         .split('\n', Qt::SkipEmptyParts);
-            bool repoHas = false;
-            for (const QString &h : hits) {
-                const QString cand = h.trimmed();
-                if (cand.startsWith("lib32-")) continue;
-                if (!cand.isEmpty()) { repoHas = true; break; }
-            }
-            if (repoHas) {
-                // Datei loeschen -> System-Datei wird genutzt
-                if (QFile::remove(absPath)) {
-                    ++removed;
-                    QDir(QFileInfo(absPath).absolutePath()).rmdir(".");
-                }
-            }
-        }
-    }
     // Libraries (readelf NEEDED) sammeln und via pkgfile zum echten
     // Arch-Repo-Paket aufloesen. core/extra/multilib bevorzugt (kein AUR).
     void depsFromBinaries(const QString &stagingDir, QStringList &mapped, QStringList &unknown, QStringList &aurDeps) {
@@ -957,6 +809,7 @@ private:
             // Debian-spezifische Pakete, die auf Arch nicht existieren -> ignorieren
             // (Daten sind bereits im umgewandelten Paket enthalten, oder es gibt
             // kein Arch-Aequivalent, das als depends sinnvoll waere)
+            {"chromium-bsu-data", ""}, {"fonts-uralic", ""}, {"ttf-uralic", ""},
             {"libc6", ""}, {"libgcc1", ""}, {"libstdc++6", ""}, {"dpkg", ""},
             {"fonts-dejavu", ""}, {"ttf-dejavu", ""}};
         QStringList raw = isDeb
@@ -1026,7 +879,7 @@ private:
         // Header mit Titel + Theme-Toggle + Sprachauswahl
         auto *header = new QHBoxLayout();
         titleLbl = new QLabel("Paket Converter"); titleLbl->setObjectName("title");
-        auto *sub = new QLabel("Wandelt Debian (.deb) / RedHat (.rpm) / AppImage zu ArchLinux um");
+        auto *sub = new QLabel("Wandelt Debian (.deb) / RedHat (.rpm) zu ArchLinux um");
         sub->setObjectName("sub");
         subLbl = sub;
         auto *leftHead = new QVBoxLayout();
