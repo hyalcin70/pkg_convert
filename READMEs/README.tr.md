@@ -23,7 +23,7 @@ Arch kaynaklarını kullanarak.
 - **deb/rpm → Arch** : çıkarır, gereken kütüphaneleri `readelf` +
   `pkgfile` ile bulur (tam soname, tahmin edilen tablolar yok)
 - **Otomatik kurulum** : repo bağımlılıkları `pacman -S --asdeps` ile
-- **Binary yolu** : `/usr/games/` → `/usr/bin/` taşınır
+- **Binary yolu** : Programların/oyunların çalıştırılabilir dosyaları `/usr/bin/` üzerine taşınır, böylece Arch'ın `PATH` içinde yer alır.
 - **Uyarı** : yalnızca veri paketlerinde (çalıştırılabilir yok)
 - **İpucu penceresi** : kurulumda eksik veri paketleri
   (`-data`, `-common`) varsa

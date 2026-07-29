@@ -24,7 +24,7 @@ fontes oficiais do Arch.
 - **deb/rpm → Arch** : extrai, detecta bibliotecas necessárias via
   `readelf` + `pkgfile` (soname exato, sem tabelas adivinhadas)
 - **Instalação auto** de dependências via `pacman -S --asdeps`
-- **Caminho do binário** : `/usr/games/` é movido para `/usr/bin/`
+- **Caminho do binário** : Os executáveis dos programas/jogos são movidos para `/usr/bin/` para ficarem no `PATH` do Arch.
 - **Aviso** para pacotes de dados puros (sem executável)
 - **Popup de dica** na instalação se faltarem pacotes de dados
   adicionais (`-data`, `-common`)

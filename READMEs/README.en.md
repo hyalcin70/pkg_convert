@@ -23,7 +23,7 @@ This tool converts them without AUR — using only official Arch sources.
 - **deb/rpm → Arch**: extracts, detects required libraries via
   `readelf` + `pkgfile` (exact soname)
 - **Auto-install** of repo dependencies via `pacman -S --asdeps`
-- **Binary path**: `/usr/games/` is moved to `/usr/bin/`
+- **Binary path**: Executables from programs/games are moved to `/usr/bin/` so they are in Arch's `PATH`.
 - **Warning** for pure data packages (no executable program)
 - **Hint popup** at install time if extra data packages
   (`-data`, `-common`) might be missing

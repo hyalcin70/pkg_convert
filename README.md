@@ -31,7 +31,7 @@ repos, and a persistent installation history.
 - **deb/rpm → Arch**: extracts, detects required libraries via
   `readelf` + `pkgfile` (exact soname)
 - **Auto-install** of repo dependencies via `pacman -S --asdeps`
-- **Binary path**: `/usr/games/` is relocated to `/usr/bin/`
+- **Binary path**: Executables from programs/games are moved to `/usr/bin/` so they are in Arch's `PATH`.
 - **Warning** for pure data packages (no executable program)
 - **Hint popup** on install if additional data packages
   (`-data`, `-common`) might be missing

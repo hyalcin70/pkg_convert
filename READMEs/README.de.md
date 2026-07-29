@@ -24,7 +24,7 @@ offiziellen Arch-Quellen.
 - **deb/rpm → Arch**: extrahiert, erkennt benötigte Bibliotheken über
   `readelf` + `pkgfile` (exakte soname, keine geratenen Tabellen)
 - **Auto-Install** der Repo-Abhängigkeiten via `pacman -S --asdeps`
-- **Binary-Pfad**: `/usr/games/` wird nach `/usr/bin/` verschoben
+- **Binary-Pfad**: Ausführbare Dateien aus den Programmen/Spielen werden nach `/usr/bin/` verschoben, damit sie unter Arch im `PATH` liegen.
 - **Warnung** bei reinen Datenpaketen (ohne ausführbares Programm)
 - **Hinweis-Popup** beim Installieren, falls zusätzliche Datenpakete
   (`-data`, `-common`) fehlen könnten
