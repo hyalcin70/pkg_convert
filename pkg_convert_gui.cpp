@@ -36,6 +36,7 @@ QMap<QString, QString> lang_pt();
 #include <QFile>
 #include <QSettings>
 
+#include <QCryptographicHash>
 #include <algorithm>
 
 class DropLine : public QLineEdit {
@@ -723,7 +724,10 @@ private:
 
         const QString src = buildOut + "/src/staging";
         if (QDir(src).exists()) {
-            // Zuerst alle Dateien kopieren
+            // Zuerst alle Dateien per Hardlink verschieben, wenn möglich —
+            // das spart Speicher im fertigen Paket, weil große .so-Dateien
+            // nicht doppelt vorkommen.
+            const bool canHardlink = (src.startsWith(pkgroot) || pkgroot.startsWith(src));
             QDirIterator it(src, QDirIterator::Subdirectories);
             while (it.hasNext()) {
                 it.next();
@@ -737,17 +741,24 @@ private:
                 if (QFile::exists(destPath)) {
                     QFile::remove(destPath);
                 }
-                if (!QFile::copy(it.filePath(), destPath)) {
-                    status->setText("Fehler beim Kopieren: " + destPath);
+                bool ok = false;
+                if (canHardlink) {
+                    ok = QFile::link(it.filePath(), destPath);
+                }
+                if (!ok) {
+                    ok = QFile::copy(it.filePath(), destPath);
+                }
+                if (!ok) {
+                    status->setText("Fehler beim Kopieren/Verknuepfen: " + destPath);
                     return;
                 }
             }
 
-            // Dann .so-Duplikate entfernen (debtap-Verhalten):
-            // Behalte nur die spezifischste Version pro Basisname.
-            QSet<QString> removePaths;
+            // Dann Duplikate erkennen: gleicher Basisname + gleiche Größe +
+            // gleicher Inhalt -> nur einmal behalten, Rest als Hardlink/Symlink.
+            QSet<QString> contentDupRemove;
             {
-                QMap<QString, QStringList> soMap;
+                QMap<QString, QList<QPair<QString, qint64>>> sizeMap;
                 QDirIterator it2(pkgroot, QDirIterator::Subdirectories);
                 while (it2.hasNext()) {
                     it2.next();
@@ -756,61 +767,51 @@ private:
                     const QString relPath = it2.filePath().mid(pkgroot.length() + 1);
                     if (!relPath.startsWith("usr/lib/")) continue;
                     if (!relPath.contains(".so")) continue;
-                    const QString fileName = fi.fileName();
-                    const int lastDot = fileName.lastIndexOf('.');
-                    const QString base = lastDot > 0 ? fileName.left(lastDot) : fileName;
-                    soMap[base].append(relPath);
+                    const QString base = QFileInfo(relPath).completeBaseName();
+                    if (base.isEmpty()) continue;
+                    sizeMap[base].append({relPath, fi.size()});
                 }
 
-                for (const QString &base : soMap.keys()) {
-                    QStringList files = soMap.value(base);
-                    if (files.size() <= 1) continue;
-                    int maxSegments = -1;
-                    for (const QString &f : files) {
-                        const QString name = QFileInfo(f).fileName();
-                        const int dotCount = name.count('.');
-                        int numericSegments = 0;
-                        if (dotCount >= 2) {
-                            const QStringList parts = name.split('.');
-                            for (int i = 2; i < parts.size(); ++i) {
-                                bool ok = false;
-                                parts[i].toInt(&ok);
-                                if (ok) numericSegments++;
-                                else break;
-                            }
-                        }
-                        if (numericSegments > maxSegments) {
-                            maxSegments = numericSegments;
+                for (const QString &base : sizeMap.keys()) {
+                    const auto list = sizeMap.value(base);
+                    if (list.size() <= 1) continue;
+                    QList<QPair<QString, qint64>> sameSize;
+                    qint64 refSize = -1;
+                    for (const auto &p : list) {
+                        if (refSize < 0) refSize = p.second;
+                        if (p.second == refSize) sameSize.append(p);
+                    }
+                    if (sameSize.size() <= 1) continue;
+
+                    // Inhaltsprüfung über Hash
+                    QString keep;
+                    QSet<QString> remove;
+                    QSet<QString> seenHashes;
+                    for (const auto &p : sameSize) {
+                        QFile f(pkgroot + "/" + p.first);
+                        if (!f.open(QIODevice::ReadOnly)) continue;
+                        QCryptographicHash hash(QCryptographicHash::Md5);
+                        hash.addData(&f);
+                        f.close();
+                        const QString h = QString::fromLatin1(hash.result().toHex());
+                        if (seenHashes.contains(h)) {
+                            remove.insert(p.first);
+                        } else {
+                            seenHashes.insert(h);
+                            keep = p.first;
                         }
                     }
-
-                    // Wenn es eine Version mit numerischen Segmenten gibt,
-                    // entferne alle ohne numerische Segmente
-                    if (maxSegments > 0) {
-                        for (const QString &f : files) {
-                            const QString name = QFileInfo(f).fileName();
-                            const int dotCount = name.count('.');
-                            int numericSegments = 0;
-                            if (dotCount >= 2) {
-                                const QStringList parts = name.split('.');
-                                for (int i = 2; i < parts.size(); ++i) {
-                                    bool ok = false;
-                                    parts[i].toInt(&ok);
-                                    if (ok) numericSegments++;
-                                    else break;
-                                }
-                            }
-                            if (numericSegments == 0) {
-                                removePaths.insert(f);
-                            }
-                        }
+                    for (const QString &r : remove) {
+                        if (r != keep) contentDupRemove.insert(r);
                     }
                 }
             }
 
-            // Entferne die Duplikate
-            for (const QString &relPath : removePaths) {
-                QFile::remove(pkgroot + "/" + relPath);
+            for (const QString &relPath : contentDupRemove) {
+                const QString full = pkgroot + "/" + relPath;
+                if (QFile::exists(full)) {
+                    QFile::remove(full);
+                }
             }
         }
 
