@@ -41,7 +41,7 @@ QMap<QString, QString> lang_tr() {
                 {"buildSrc", "Paket + Kaynaklar"},
                 {"targetDir", "Hedef klasör: "},
                 {"errNoBuiltPkg", "❌ Kurulacak oluşturulmuş paket yok."},
-                {"errNoDebRpm", "❌ Yalnızca .deb, .rpm desteklenir."},
+                {"errNoDebRpm", "❌ Sadece .deb veya .rpm desteklenir."},
                 {"errNoTarget", "❌ İptal – hedef klasör seçilmedi."},
                 {"errPkgbuild", "❌ PKGBUILD yazılamıyor: "},
                 {"msgBuildFail", "❌ Oluşturma başarısız."},
@@ -78,5 +78,10 @@ QMap<QString, QString> lang_tr() {
                 {"pkgbuildLabel", "PKGBUILD: "},
                 {"depsInstalled", "✅ Bağımlılıklar kuruldu: "},
                 {"depsFailed", "❌ Bağımlılıklar BAŞARISIZ: "},
+                {"warnIntroTitle", "Dönüştürme uyarısı"},
+                {"warnIntro", "Otomatik dönüşüm başarısız olabilir: örneğin bağımlılıklar eksikse, "
+                    "betikler yoksa veya sistem farkları tanınmıyorsa."},
+                {"warnContinue", "Yine de devam edilsin mi?"},
+                {"msgBuildAborted", "❌ Build iptal edildi."},
     };
 }

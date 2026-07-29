@@ -42,7 +42,7 @@ QMap<QString, QString> lang_pt() {
                 {"buildSrc", "Pacote + Fontes"},
                 {"targetDir", "Pasta destino para "},
                 {"errNoBuiltPkg", "❌ Nenhum pacote construído para instalar."},
-                {"errNoDebRpm", "❌ Apenas .deb, .rpm são suportados."},
+                {"errNoDebRpm", "❌ Apenas .deb ou .rpm são suportados."},
                 {"errNoTarget", "❌ Cancelado – nenhuma pasta destino escolhida."},
                 {"errPkgbuild", "❌ Não é possível escrever o PKGBUILD : "},
                 {"msgBuildFail", "❌ Falha ao construir."},
@@ -64,7 +64,7 @@ QMap<QString, QString> lang_pt() {
                 {"unknown", "Desconhecido"},
                 {"allOk", "— (tudo ok !)"},
                 {"noMapped", "— nenhum mapeado"},
-                {"extraDeps", "📦 Converter também (dependências Debian/RPM): "},
+                {"extraDeps", "📦 Converter também (dependências Debian/RPM) : "},
                 {"extraDepsNote", "   Estes pacotes são referenciados pelo programa (geralmente dados/"
                     "localização). Sem eles, arquivos podem faltar ao iniciar.\n\n"},
                 {"notSatisfiable", "⚠ NÃO SATISFATÍVEL dos repositórios Arch (versão exata de biblioteca ausente) : "},
@@ -79,5 +79,10 @@ QMap<QString, QString> lang_pt() {
                 {"pkgbuildLabel", "PKGBUILD : "},
                 {"depsInstalled", "✅ Dependências instaladas : "},
                 {"depsFailed", "❌ Dependências FALHARAM : "},
+                {"warnIntroTitle", "Aviso de conversão"},
+                {"warnIntro", "A conversão automática pode falhar: por exemplo, se dependências estiverem incompletas, "
+                    "faltarem scripts ou diferenças do sistema não forem reconhecidas."},
+                {"warnContinue", "Continuar mesmo assim?"},
+                {"msgBuildAborted", "❌ Build cancelado."},
     };
 }

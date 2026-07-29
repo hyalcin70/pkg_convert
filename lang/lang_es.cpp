@@ -42,7 +42,7 @@ QMap<QString, QString> lang_es() {
                 {"buildSrc", "Paquete + Fuentes"},
                 {"targetDir", "Carpeta destino para "},
                 {"errNoBuiltPkg", "❌ Ningún paquete construido para instalar."},
-                {"errNoDebRpm", "❌ Solo se admiten .deb, .rpm."},
+                {"errNoDebRpm", "❌ Solo se admiten .deb o .rpm."},
                 {"errNoTarget", "❌ Cancelado – ninguna carpeta destino elegida."},
                 {"errPkgbuild", "❌ No se puede escribir el PKGBUILD : "},
                 {"msgBuildFail", "❌ Fallo al construir."},
@@ -79,5 +79,10 @@ QMap<QString, QString> lang_es() {
                 {"pkgbuildLabel", "PKGBUILD : "},
                 {"depsInstalled", "✅ Dependencias instaladas : "},
                 {"depsFailed", "❌ Dependencias FALLIDAS : "},
+                {"warnIntroTitle", "Aviso de conversión"},
+                {"warnIntro", "La conversión automática puede fallar: por ejemplo si faltan dependencias, "
+                    "faltan scripts o no se reconocen diferencias del sistema."},
+                {"warnContinue", "¿Continuar de todos modos?"},
+                {"msgBuildAborted", "❌ Build cancelado."},
     };
 }

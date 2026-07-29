@@ -31,41 +31,36 @@ solo fuentes oficiales de Arch.
 - **Registro copiable**, historial de instalación persistente
 - **Alternador Claro/Oscuro** (por defecto: claro)
 
-## ¿Por qué pkg_convert en vez de debtap / rpmtoarch ?
+## ¿Por qué pkg_convert?
 
-Existen otros convertidores (debtap, rpmtoarch). Esto es por qué
-pkg_convert es mejor para la mayoría:
+pkg_convert sigue un enfoque propio para formatos de paquetes
+externos, pensado para quienes quieren convertir directamente en Arch
+sin depender de ayuda del AUR en ese paso.
 
-1. **Una herramienta para los dos formatos.** `debtap` solo maneja
-   `.deb` (falla en `.rpm` con *"not a valid deb package"*), mientras
-   `rpmtoarch` solo `.rpm`. pkg_convert maneja **los dos**
-   (`.deb`, `.rpm`) desde la misma GUI con resultados
-   idénticos (verificado: mismo hash binario, mismo tamaño para deb/rpm).
-2. **Sin base de datos de 1,1 GB.** `debtap` descarga una lista de
-   paquetes Debian/Ubuntu (≈1,1 GB de caché, con root). pkg_convert usa
-   `pkgfile`, que consulta tu base **local** de Arch — sin gran
-   descarga, sin paso de actualización separado.
-3. **Detección de dependencias más completa.** En pruebas con
-   diferentes programas disponibles tanto en `.deb` o `.rpm`,
-   pkg_convert resolvió **11** bibliotecas
-   (gtk3, webkit2gtk-4.1, cairo, pango, glib2, libsoup, zlib, glibc,
-   gcc-libs, gdk-pixbuf2, libx11) frente a **4** de debtap.
-4. **C++/Qt6 nativo, sin runtime Python.** `debtap` es bash + Python
-   (incluso llama a `namcap` vía Python). pkg_convert compila a un solo
-   ELF de ~130 KB — sin intérprete, sin dependencia Python.
-5. **GUI Qt6 integrada con 6 idiomas** (DE/EN/FR/ES/TR/PT), claro/
-   oscuro, historial, registro copiable.
-6. **Sin AUR.** `debtap`/`rpmtoarch` vienen de AUR. pkg_convert se
-   construye desde tu código fuente vía `makepkg -si`.
+1. **Una herramienta para ambos formatos.** En vez de combinar
+   opciones de un solo formato, pkg_convert trabaja con **`.deb` y
+   `.rpm`** desde la misma GUI y con estructura de paquete coherente.
+2. **Base de datos local de Arch en vez de cachés externas grandes.**
+   Usa `pkgfile` contra tu sync DB local — sin descargas masivas ni
+   servicios de actualización aparte.
+3. **Dependencias por soname real.** Se detectan con `readelf` +
+   `pkgfile`, no por tablas de nombres fijas de otras distribuciones.
+4. **C++/Qt6 nativo, sin intérprete en runtime.** Un solo binario,
+   sin Python/Bash durante la ejecución.
+5. **GUI Qt6 integrada** con multilenguaje, claro/oscuro, historial
+   de instalaciones y registro copiable.
+6. **Sin helper del AUR para instalar.** Build y test desde fuente
+   con `makepkg -si`.
 
 ### Limitaciones honestas
 
-- Aún sin script `.INSTALL` para el caché de iconos (debtap genera uno
-  con `gtk-update-icon-cache` + `update-desktop-database`).
-- `makepkg` quita símbolos del binario por defecto (≈12 % más pequeño
-  que la copia 1:1 de debtap) ; funcionalmente idéntico.
-- `pkgname` lleva sufijo de versión (ej. `program-1.99.16`).
-- `pkgfile` depende de una base local actualizada ; ejecuta
+- Aún sin script `.INSTALL` para refresco automático de caché de
+  iconos; los iconos del menú pueden requerir `gtk-update-icon-cache`
+  + `update-desktop-database` manual.
+- `makepkg` quita símbolos por defecto; funcionalmente igual a una
+  copia 1:1, solo más pequeño.
+- `pkgname` lleva sufijo de versión, ej. `program-1.99.16`.
+- `pkgfile` necesita una sync DB local actualizada; ejecuta
   `pacman -Sy` si las correspondencias parecen obsoletas.
 
 ## Construir e instalar (desde fuentes, sin AUR)

@@ -42,7 +42,7 @@ QMap<QString, QString> lang_de() {
                 {"buildSrc", "Paket + Quellen"},
                 {"targetDir", "Zielordner für "},
                 {"errNoBuiltPkg", "❌ Kein gebautes Paket zum Installieren vorhanden."},
-                {"errNoDebRpm", "❌ Nur .deb, .rpm werden unterstützt."},
+                {"errNoDebRpm", "❌ Nur .deb oder .rpm werden unterstützt."},
                 {"errNoTarget", "❌ Abbruch – kein Zielordner gewählt."},
                 {"errPkgbuild", "❌ Kann PKGBUILD nicht schreiben: "},
                 {"msgBuildFail", "❌ Build fehlgeschlagen."},
@@ -79,5 +79,10 @@ QMap<QString, QString> lang_de() {
                 {"pkgbuildLabel", "PKGBUILD: "},
                 {"depsInstalled", "✅ Abhängigkeiten installiert: "},
                 {"depsFailed", "❌ Abhängigkeiten FEHLGESCHLAGEN: "},
+                {"warnIntroTitle", "Hinweis zum Umbau"},
+                {"warnIntro", "Der automatische Umbau kann fehlschlagen – z.B. bei unvollständigen Abhängigkeiten, "
+                    "fehlenden Skripten oder nicht erkannten Systemunterschieden."},
+                {"warnContinue", "Trotzdem fortfahren?"},
+                {"msgBuildAborted", "❌ Build abgebrochen."},
     };
 }

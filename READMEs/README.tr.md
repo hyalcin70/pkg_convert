@@ -32,40 +32,34 @@ Arch kaynaklarını kullanarak.
 
 ## debtap / rpmtoarch yerine neden pkg_convert?
 
-Başka dönüştürücüler de var (debtap, rpmtoarch). İşte pkg_convert'in
-çoğu kullanıcı için neden daha iyi olduğu:
+Başka dönüştürücüler de var (debtap, rpmtoarch). pkg_convert,
+kendi çalışma prensibiyle şunları hedefler: Arch üzerinde doğrudan
+çalışmak, dönüştürme adımında AUR yardımcılarına bağlı kalmamak.
 
-1. **İki biçim için tek araç.** `debtap` yalnızca `.deb` ile
-   çalışır (`.rpm`'de sert şekilde *"not a valid deb package"* der),
-   `rpmtoarch` yalnızca `.rpm`. pkg_convert **ikisini de** (`.deb`,
-   `.rpm`) aynı arayüzden, aynı sonuçla yapar (doğrulandı:
-   aynı binary hash, aynı paket boyutu deb/rpm için).
-2. **1,1 GB veritabanı yok.** `debtap`, Debian/Ubuntu paket listesi
-   indirir (≈1,1 GB önbellek, root ile). pkg_convert `pkgfile` kullanır
-   ve **yerel** Arch repo veritabanını sorgular — büyük indirme yok,
-   ayrı güncelleme adımı yok.
-3. **Daha eksiksiz bağımlılık tespiti.** Hem `.deb` hem de `.rpm`
-   olarak verilen farklı programlarla yapılan testlerde pkg_convert
-   **11** kütüphane çözdü
-   (gtk3, webkit2gtk-4.1, cairo, pango, glib2, libsoup, zlib, glibc,
-   gcc-libs, gdk-pixbuf2, libx11) debtap'ın **4**'üne karşı.
-   soname eşleşmesi = daha temiz paket.
-4. **Yerel C++/Qt6, Python çalışma ortamı yok.** `debtap` bash + Python'dır
-   (Python ile `namcap` çağırır bile). pkg_convert tek bir ~130 KB ELF'e
-   derlenir — yorumlayıcı yok, Python bağımlılığı yok.
-5. **6 dilde entegre Qt6 arayüzü** (DE/EN/FR/ES/TR/PT), açık/koyu,
-   kurulum geçmişi, kopyalanabilir günlük.
-6. **AUR gerekmez.** `debtap`/`rpmtoarch` AUR'dan gelir. pkg_convert
-   kendi kaynağınızdan `makepkg -si` ile derlenir.
+1. **İki farklı format için tek araç.** Birden fazla tek-format
+   çözümü birleşturmek yerine pkg_convert **`.deb` ve `.rpm`**'i tek
+   arayüzde, tutarlı paket düzeniyle işler.
+2. **Büyük harici cache yerine yerel Arch veritabanı.** `pkgfile`
+   kullanır, mevcut Arch sync DB'ye sorgu yapar — büyük indirme yok,
+   ayrı bir güncelleme hizmeti yok.
+3. **Gerçek soname lookups ile bağımlılık tespiti.** Kütüphaneler
+   `readelf` + `pkgfile` ile bulunur, başka dağıtımların sabit
+   isim tablolarına bağlı değildir.
+4. **C++/Qt6 yerel, runtime yorumlayıcı yok.** Tek bir yerel ELF,
+   çalışma zamanında Python/Bash gerekmez.
+5. **Entegre Qt6 arayüzü** çok dilli, açık/koyu, kurulum geçmişi ve
+   kopyalanabilir günlük ile.
+6. **AUR helper gerekmez.** `makepkg -si` ile kaynak üzerinden kurulum.
 
 ### Dürüst sınırlamalar
 
-- Henüz ikon önbelleği için `.INSTALL` betiği yok (debtap bunu
-  `gtk-update-icon-cache` + `update-desktop-database` ile üretir).
-- `makepkg` binary'den sembolleri varsayılan olarak çıkarır (debtap'ın
-  1:1 kopyasından ≈12 % küçük) ; işlevsel olarak aynı.
-- `pkgname` sürüm son eki taşır (ör. `program-1.99.16`).
-- `pkgfile` güncel yerel sync db'ye dayanır ; eşleşmeler eskiyse
+- Henüz ikon önbelleği için `.INSTALL` betiği yok; menü ikonları
+  `gtk-update-icon-cache` + `update-desktop-database` ile el ile
+  güncellenebilir.
+- `makepkg` varsayılan olarak sembolleri çıkarır; işlevsel olarak
+  diğer araçların 1:1 kopyasıyla aynıdır, daha küçüktür.
+- `pkgname` sürüm son eki taşır, örn. `program-1.99.16`.
+- `pkgfile` güncel yerel sync db gerektirir; eşleşmeler eskiyse
   `pacman -Sy` çalıştırın.
 
 ## Derleme & Kurulum (kaynaktan, AUR'suz)

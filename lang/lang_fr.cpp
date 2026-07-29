@@ -41,7 +41,7 @@ QMap<QString, QString> lang_fr() {
                 {"buildSrc", "Paquet + Sources"},
                 {"targetDir", "Dossier cible pour "},
                 {"errNoBuiltPkg", "❌ Aucun paquet construit à installer."},
-                {"errNoDebRpm", "❌ Seuls .deb, .rpm sont pris en charge."},
+                {"errNoDebRpm", "❌ Seuls .deb ou .rpm sont pris en charge."},
                 {"errNoTarget", "❌ Annulé – aucun dossier cible choisi."},
                 {"errPkgbuild", "❌ Impossible d'écrire le PKGBUILD : "},
                 {"msgBuildFail", "❌ Échec de la construction."},
@@ -78,5 +78,10 @@ QMap<QString, QString> lang_fr() {
                 {"pkgbuildLabel", "PKGBUILD : "},
                 {"depsInstalled", "✅ Dépendances installées : "},
                 {"depsFailed", "❌ Dépendances EN ÉCHEC : "},
+                {"warnIntroTitle", "Avis de conversion"},
+                {"warnIntro", "La conversion automatique peut échouer : par exemple si des dépendances sont incomplètes, "
+                    "des scripts manquent ou des différences système ne sont pas reconnues."},
+                {"warnContinue", "Continuer quand même ?"},
+                {"msgBuildAborted", "❌ Construction annulée."},
     };
 }

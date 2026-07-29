@@ -352,6 +352,21 @@ private slots:
         progress->setRange(0, 0);
         status->setText(i18n("working"));
 
+        QMessageBox hint(this);
+        hint.setWindowTitle(i18n("warnIntroTitle"));
+        hint.setText(i18n("warnIntro"));
+        hint.setInformativeText(i18n("warnContinue"));
+        hint.setIcon(QMessageBox::Warning);
+        auto *okBtn = hint.addButton(QMessageBox::Ok);
+        auto *cancelBtn = hint.addButton(QMessageBox::Cancel);
+        hint.exec();
+        if (hint.clickedButton() == cancelBtn) {
+            progress->setVisible(false);
+            btnBuild->setEnabled(true);
+            status->setText(i18n("msgBuildAborted"));
+            return;
+        }
+
         QTemporaryDir tmp;
         const QString staging = tmp.filePath("staging");
         QDir().mkpath(staging);

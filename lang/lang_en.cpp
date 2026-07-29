@@ -41,7 +41,7 @@ QMap<QString, QString> lang_en() {
                 {"buildSrc", "Package + Sources"},
                 {"targetDir", "Target folder for "},
                 {"errNoBuiltPkg", "❌ No built package available to install."},
-                {"errNoDebRpm", "❌ Only .deb, .rpm are supported."},
+                {"errNoDebRpm", "❌ Only .deb or .rpm are supported."},
                 {"errNoTarget", "❌ Aborted – no target folder chosen."},
                 {"errPkgbuild", "❌ Cannot write PKGBUILD: "},
                 {"msgBuildFail", "❌ Build failed."},
@@ -78,5 +78,10 @@ QMap<QString, QString> lang_en() {
                 {"pkgbuildLabel", "PKGBUILD: "},
                 {"depsInstalled", "✅ Dependencies installed: "},
                 {"depsFailed", "❌ Dependencies FAILED: "},
+                {"warnIntroTitle", "Conversion notice"},
+                {"warnIntro", "Automatic conversion may fail – for example if dependencies are incomplete, "
+                    "scripts are missing, or system differences are not recognized."},
+                {"warnContinue", "Continue anyway?"},
+                {"msgBuildAborted", "❌ Build aborted."},
     };
 }

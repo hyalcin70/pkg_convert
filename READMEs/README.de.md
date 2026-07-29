@@ -31,47 +31,39 @@ offiziellen Arch-Quellen.
 - **Kopierbarer Log**, persistente Installations-Historie
 - **Hell/Dunkel**-Umschalter (Standard: hell)
 
-## Warum pkg_convert statt debtap / rpmtoarch?
+## Gestaltungsziele
 
-Es gibt andere Konverter (debtap, rpmtoarch). Hier ist, warum
-pkg_convert für die meisten Anwender die bessere Wahl ist:
+pkg_convert verfolgt einen eigenen Ansatz für fremde Paketformate
+und richtet sich an Anwender, die direkt unter Arch arbeiten wollen,
+ohne AUR-Hilfsmittel für den Konvertierungsschritt selbst.
 
-1. **Ein Tool für beide Formate.** `debtap` kann nur `.deb`
-   (bricht bei `.rpm` hart ab mit *"not a valid deb package"*),
-   `rpmtoarch` nur `.rpm`. pkg_convert beherrscht **beide**
-   (`.deb`, `.rpm`) aus derselben GUI mit identischen
-   Ergebnissen (verifiziert: gleiche Binary-Hash, gleiche Paketgröße bei deb/rpm).
-2. **Keine 1,1-GB-Datenbank.** `debtap` lädt eine Debian/Ubuntu-
-   Paketliste (≈1,1 GB Cache, mit Root-Rechten). pkg_convert nutzt
-   `pkgfile`, das deine **lokale** Arch-Repo-Datenbank abfragt — kein
-   großer Download, kein separater Update-Schritt.
-3. **Vollständigere Abhängigkeitserkennung.** In Tests mit
-   unterschiedlichen Programmen, die als `.deb` oder `.rpm`
-   vorlagen, löste pkg_convert **11** Bibliotheken auf
-   (gtk3, webkit2gtk-4.1, cairo, pango, glib2, libsoup, zlib, glibc,
-   gcc-libs, gdk-pixbuf2, libx11) statt **4** bei debtap. Mehr
-   soname-Treffer bedeuten ein saubereres Paket.
-4. **Nativ C++/Qt6, keine Python-Laufzeit.** `debtap` ist Bash + Python
-   (es ruft sogar `namcap` via Python auf). pkg_convert kompiliert zu
-   einem einzelnen ~130-KB-ELF — kein Interpreter, keine Python-
-   Abhängigkeit zur Laufzeit.
-5. **Integrierte Qt6-GUI mit 6 Sprachen** (DE/EN/FR/ES/TR/PT),
-   Hell/Dunkel, Installations-Historie, kopierbarer Log — kein
-   separates GTK-Hilfsfenster neben einer Konsole.
-6. **Kein AUR nötig.** `debtap`/`rpmtoarch` kommen aus dem AUR.
-   pkg_convert baut aus eigenem Quellcode via `makepkg -si`.
+1. **Ein Tool für beide Fremdformate.** Statt verschiedene
+   Ein-Format-Lösungen zu kombinieren, beherrscht pkg_convert
+   **`.deb` und `.rpm`** in derselben GUI mit konsistentem
+   Paketlayout.
+2. **Lokale Arch-Datenbank statt großer Fremd-Caches.** Es wird
+   `pkgfile` genutzt, das deine vorhandene Arch-Sync-DB abfragt —
+   kein Mega-Cache, kein separater Aktualisierungsdienst.
+3. **Abhängigkeiten über echte Soname-Lookups.** Required Libraries
+   werden per `readelf` + `pkgfile` ermittelt, nicht über feste
+   Namens-Tabellen fremder Distributionen.
+4. **Kompiliertes C++/Qt6 ohne Laufzeit-Interpreter-Abhängigkeit.**
+   Ein einzelnes natives Binary, kein Python/Bash zur Laufzeit.
+5. **Integrierte Qt6-GUI** mit Mehrsprachigkeit, Hell/Dunkel,
+   Installations-Historie und kopierbarem Log.
+6. **Installation ohne AUR-Hilfsmittel.** Build und Test laufen über
+   normalen Quellcode + `makepkg -si`.
 
 ### Ehrliche Einschränkungen
 
-- Noch kein `.INSTALL`-Skript für Icon-Cache-Aktualisierung (debtap
-  erzeugt eines mit `gtk-update-icon-cache` + `update-desktop-database`);
-  Menü-Icons erscheinen evtl. erst nach manuellem Cache-Update.
-- `makepkg` strippt das Binary standardmäßig (≈12 % kleiner als debtaps
-  1:1-Kopie); funktional identisch.
-- `pkgname` trägt einen Versions-Suffix (z.B. `program-1.99.16`)
-  statt eines sauberen Namens.
-- `pkgfile` verlässt sich auf eine aktuelle lokale Sync-DB; bei
-  veralteten Mappings `pacman -Sy` ausführen.
+- Kein `.INSTALL`-Skript für automatische Icon-Cache-Aktualisierung;
+  Menü-Icons erscheinen ggf. erst nach manuellem `gtk-update-icon-cache`
+  + `update-desktop-database`.
+- `makepkg` strippt Binaries standardmäßig; funktional identisch zur
+  1:1-Kopie anderer Werkzeuge, nur kleiner.
+- `pkgname` trägt einen Versions-Suffix, z.B. `program-1.99.16`.
+- `pkgfile` erfordert eine aktuelle lokale Sync-DB; bei veralteten
+  Mappings `pacman -Sy` ausführen.
 
 ## Bauen & Installieren (aus Quelle, ohne AUR)
 
