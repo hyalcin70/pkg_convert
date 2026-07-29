@@ -757,10 +757,11 @@ private:
             buildinfoFile.close();
         }
 
-        // .MTREE from pkgroot — debtap-kompatibel mit Prüfsummen
+        // .MTREE — pacman erwartet plaintext, kein komprimiertes tar
         QProcess mtreeProcs;
-        mtreeProcs.start("bsdtar", QStringList() << "-czf" << "-"
-            << "-C" << pkgroot << "--format" << "mtree"
+        mtreeProcs.start("bsdtar", QStringList()
+            << "-C" << pkgroot
+            << "--format" << "mtree"
             << "--options=!all,use-set,type,uid,gid,mode,time,size,md5,sha256,link"
             << "." << ".PKGINFO" << ".BUILDINFO");
         mtreeProcs.waitForFinished(-1);
