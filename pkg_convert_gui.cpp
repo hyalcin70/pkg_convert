@@ -406,25 +406,34 @@ private slots:
         QDir().mkpath(src);
         copyDir(staging, src);
 
-        // Viele .deb/.rpm legen Spiele/Binares in /usr/games/ ab - das ist
-        // auf Arch oft NICHT in $PATH, daher nach /usr/bin/ verschieben,
-        // damit das Programm startbar ist.
-        QDir gamesDir(src + "/usr/games");
-        if (gamesDir.exists()) {
-            QDir().mkpath(src + "/usr/bin");
-            for (const QFileInfo &fi : gamesDir.entryInfoList(QDir::AllEntries | QDir::NoDotAndDotDot)) {
-                const QString dest = src + "/usr/bin/" + fi.fileName();
-                if (fi.isDir())
-                    copyDir(fi.filePath(), dest);
-                else {
+        // Arch-Pfad-Anpassung ohne hardcodierte Namen:
+        // * Konvertiere nur echte ELF-Binaries aus /usr/games nach /usr/bin,
+        //   weil /usr/games unter Arch haeufig NICHT in $PATH liegt.
+        // * Nur-verschieben statt alles kopieren/verschieben; Daten/Desktops bleiben unberuehrt.
+        {
+            const QString gamesDirPath = src + "/usr/games";
+            QDir gamesDir(gamesDirPath);
+            if (gamesDir.exists()) {
+                QDir().mkpath(src + "/usr/bin");
+                const auto entries = gamesDir.entryInfoList(QDir::AllEntries | QDir::NoDotAndDotDot);
+                for (const QFileInfo &fi : entries) {
+                    if (!fi.isFile()) continue;
+                    QFile f(fi.filePath());
+                    if (!f.open(QIODevice::ReadOnly)) continue;
+                    const QByteArray magic = f.read(4);
+                    f.close();
+                    if (!magic.startsWith("\x7f" "ELF")) continue;
+                    const QString dest = src + "/usr/bin/" + fi.fileName();
                     QFile::remove(dest);
-                    QFile::rename(fi.filePath(), dest);
+                    if (!QFile::rename(fi.filePath(), dest)) {
+                        // Fallback: falls rename scheitert, zuruecksetzen; keine hardcodierten Namen.
+                        QFile::copy(fi.filePath(), dest);
+                    }
                 }
+                // nur entfernen, wenn der Ordner danach tatsaechlich leer ist
+                if (gamesDir.entryList(QDir::AllEntries | QDir::NoDotAndDotDot).isEmpty())
+                    QDir(src + "/usr").rmdir("games");
             }
-            // leeres /usr/games entfernen
-            QDir(src + "/usr").rmdir("games");
-            // ggf. auch /usr/games komplett weg, wenn nichts anderes drin
-            QDir(src + "/usr").rmdir("games");
         }
 
         // Warnung, wenn dieses Paket KEIN ausfuehrbares Programm enthaelt
@@ -437,12 +446,13 @@ private slots:
                 it.next();
                 const QFileInfo fi = it.fileInfo();
                 if (!fi.isFile()) continue;
-                // Datei in bin/ oder games/ mit Groesse > 0 gilt als Binary-Kandidat
-                if ((it.filePath().contains("/bin/") || it.filePath().contains("/games/"))
-                    && fi.size() > 0) {
-                    foundBin = true;
-                    break;
-                }
+                QFile f(it.filePath());
+                if (!f.open(QIODevice::ReadOnly)) continue;
+                const QByteArray magic = f.read(4);
+                f.close();
+                if (!magic.startsWith("\x7f" "ELF")) continue;
+                foundBin = true;
+                break;
             }
             if (!foundBin && build) {
                 warnNoBinary = i18n("warnNoBinary");
