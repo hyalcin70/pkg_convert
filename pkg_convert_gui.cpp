@@ -317,9 +317,7 @@ private slots:
         m_path = path;
         // Ordner der Quelldatei merken, damit "Durchsuchen" dort startet
         m_settings.setValue("lastSrcDir", QFileInfo(path).absolutePath());
-        const bool isDeb = path.endsWith(".deb");
-        const bool isRpm = path.endsWith(".rpm");
-        if (!(isDeb || isRpm)) {
+        if (!(path.endsWith(".deb") || path.endsWith(".rpm"))) {
             status->setText(i18n("errNoDebRpm"));
             return;
         }
@@ -338,7 +336,8 @@ private slots:
         if (!tmp.isValid()) return;
         const QString staging = tmp.filePath("staging");
         QDir().mkpath(staging);
-        QMap<QString, QString> meta = parseMeta(path, staging, isDeb, isRpm);
+        const bool isDeb = path.endsWith(".deb");
+        QMap<QString, QString> meta = parseMeta(path, staging, isDeb);
         metaLbl->setText(QString("Name: %1   Version: %2   Arch: %3   Format: %4")
             .arg(sanitizeName(meta.value("Package", "?")),
                  sanitizeVer(meta.value("Version", "?")),
@@ -356,12 +355,14 @@ private slots:
         const QString staging = tmp.filePath("staging");
         QDir().mkpath(staging);
         const bool isDeb = m_path.endsWith(".deb");
-        const bool isRpm = m_path.endsWith(".rpm");
-        QMap<QString, QString> meta = parseMeta(m_path, staging, isDeb, isRpm);
+        QMap<QString, QString> meta = parseMeta(m_path, staging, isDeb);
         const QString name = sanitizeName(meta.value("Package", "converted"));
         const QString ver = sanitizeVer(meta.value("Version", "1.0"));
         QString pkgrel = meta.value("Release", "1");
         if (!QRegularExpression("^\\d+$").match(pkgrel).hasMatch()) pkgrel = "1";
+
+        const QString arch = mapArch(meta.value("Architecture", "x86_64"));
+        const QString desc = meta.value("Summary", meta.value("Description", "konvertiertes Paket")).split('\n').first().left(200);
 
         // Ziel-Verzeichnis vom User waehlen (Startordner = zuletzt gewaehlt, sonst Downloads)
         const QString lastDir = m_settings.value("lastOutDir",
@@ -449,23 +450,19 @@ private slots:
         }
 
         // PKGBUILD schreiben
-        const QString arch = mapArch(meta.value("Architecture", "x86_64"));
         QStringList mapped, unknown, aurDeps;
-        {
-            // debtap-Methode: echte Binaries scannen (readelf NEEDED) und jede
-            // Library via pkgfile zum ECHTEN Arch-Repo-Paketnamen aufloesen.
-            // Keine geratene Namenstabelle mehr.
-            depsFromBinaries(src, mapped, unknown, aurDeps);
-            // Fallback/Ergaenzung: Metadaten-Mapping (falls Binaries nichts liefern)
-            if (mapped.isEmpty() && aurDeps.isEmpty())
-                mapDeps(meta, isDeb, mapped, unknown, aurDeps);
-        }
+        // debtap-Methode: echte Binaries scannen (readelf NEEDED) und jede
+        // Library via pkgfile zum ECHTEN Arch-Repo-Paketnamen aufloesen.
+        // Keine geratene Namenstabelle mehr.
+        depsFromBinaries(src, mapped, unknown, aurDeps);
+        // Fallback/Ergaenzung: Metadaten-Mapping (falls Binaries nichts liefern)
+        if (mapped.isEmpty() && aurDeps.isEmpty())
+            mapDeps(meta, isDeb, mapped, unknown, aurDeps);
         // Deps fuer spaetere Installation merken
         m_lastDeps = mapped;
         m_lastAurDeps = aurDeps;
-        const QString desc = meta.value("Summary", meta.value("Description", "konvertiertes Paket")).split('\n').first().left(200);
         QString pb;
-        pb += QString("# Generiert von Paket Converter (%1 -> Arch)\n").arg(isDeb ? "deb" : "rpm");
+        pb += "# Generiert von Paket Converter (deb/rpm -> Arch)\n";
         pb += QString("# Quelle: %1 (%2)\n").arg(meta.value("Package", name), isDeb ? "deb" : "rpm");
         pb += QString("pkgname=%1\n").arg(name);
         pb += QString("pkgver=%1\n").arg(ver);
@@ -476,7 +473,7 @@ private slots:
         pb += QString("license=('%1')\n").arg(meta.value("License", "custom"));
         pb += "depends=(\n";
         for (const auto &d : mapped) pb += "  '" + d + "'\n";
-        if (mapped.isEmpty()) pb += "  # keine\n";
+        if (mapped.isEmpty()) pb += "  # keine gemappt\n";
         pb += ")\n";
         pb += QString("# --- nicht gemappte Fremd-Abhaengigkeiten (manuell pruefen) ---\n");
         pb += QString("# TODO: %1\n").arg(unknown.isEmpty() ? "keine" : unknown.join(", "));
@@ -552,25 +549,22 @@ private slots:
 
         result += i18n("pkgbuildLabel") + buildOut + "/PKGBUILD\n";
 
+        // Paketmetadaten für pacman schreiben, damit das Ergebnis ein
+        // vollwertiges .pkg.tar.zst wird. Erst jetzt, nach allen Bearbeitungen
+        // an src/staging (games-Verschiebung etc.).
+        writePackageMetadata(buildOut, name, ver, pkgrel, arch, desc, meta, isDeb);
+
         if (build) {
-            QStringList args = {"-f", "--nodeps", "--noconfirm"};
-            if (withSources) args.prepend("-s"); // sources mitbauen
-            QProcess mp;
-            mp.setWorkingDirectory(buildOut);
-            mp.start("makepkg", args);
-            mp.waitForFinished(-1);
-            if (mp.exitCode() == 0) {
-                // Paketname deterministisch aus name/ver/pkgrel ableiten
-                // (nicht aus dem Verzeichnis suchen - dort koennen alte
-                // Pakete liegen, die dann faelschlicherweise erwischt wuerden).
-                const QString built = QString("%1-%2-%3-%4.pkg.tar.zst").arg(name, ver, pkgrel, arch);
-                result += i18n("msgPkgBuilt") + "\n" + buildOut + "/" + built + "\n";
+            // Paket wurde bereits von writePackageMetadata gebaut.
+            const QString built = buildOut + "/" + QString("%1-%2-%3-%4.pkg.tar.zst").arg(name, ver, pkgrel, arch);
+            if (QFile::exists(built)) {
+                result += i18n("msgPkgBuilt") + "\n" + built + "\n";
                 status->setText(i18n("msgPkgBuilt"));
-                m_lastPkg = buildOut + "/" + built;
+                m_lastPkg = built;
                 m_lastName = name;
-                btnInstall->setEnabled(true);  // Installieren jetzt moeglich
+                btnInstall->setEnabled(true);
             } else {
-                result += i18n("msgBuildFail") + "\n" + mp.readAllStandardError();
+                result += i18n("msgBuildFail") + "\nPaketmetadaten konnten nicht geschrieben werden.\n";
                 status->setText(i18n("msgBuildFail"));
             }
             // src-Paket Hinweis
@@ -604,7 +598,180 @@ private slots:
 
 private:
     // ---- helpers ----
-    QMap<QString, QString> parseMeta(const QString &path, const QString &staging, bool isDeb, bool isRpm) {
+    void writePackageMetadata(const QString &buildOut,
+                              const QString &name,
+                              const QString &ver,
+                              const QString &pkgrel,
+                              const QString &arch,
+                              const QString &desc,
+                              const QMap<QString, QString> &meta,
+                              bool isDeb) {
+        const QString pkgroot = buildOut + "/pkg";
+        QDir().mkpath(pkgroot);
+
+        const QString src = buildOut + "/src/staging";
+        if (QDir(src).exists()) {
+            // Zuerst alle Dateien kopieren
+            QDirIterator it(src, QDirIterator::Subdirectories);
+            while (it.hasNext()) {
+                it.next();
+                const QFileInfo fi = it.fileInfo();
+                if (fi.isDir()) continue;
+                QString relPath = it.filePath().mid(src.length() + 1);
+                if (relPath.startsWith("./")) relPath.remove(0, 2);
+                if (relPath.isEmpty()) continue;
+                const QString destPath = pkgroot + "/" + relPath;
+                QDir().mkpath(QFileInfo(destPath).path());
+                if (QFile::exists(destPath)) {
+                    QFile::remove(destPath);
+                }
+                if (!QFile::copy(it.filePath(), destPath)) {
+                    status->setText("Fehler beim Kopieren: " + destPath);
+                    return;
+                }
+            }
+
+            // Dann .so-Duplikate entfernen (debtap-Verhalten):
+            // Behalte nur die spezifischste Version pro Basisname.
+            QSet<QString> removePaths;
+            {
+                QMap<QString, QStringList> soMap;
+                QDirIterator it2(pkgroot, QDirIterator::Subdirectories);
+                while (it2.hasNext()) {
+                    it2.next();
+                    const QFileInfo fi = it2.fileInfo();
+                    if (!fi.isFile()) continue;
+                    const QString relPath = it2.filePath().mid(pkgroot.length() + 1);
+                    if (!relPath.startsWith("usr/lib/")) continue;
+                    if (!relPath.contains(".so")) continue;
+                    const QString fileName = fi.fileName();
+                    const int lastDot = fileName.lastIndexOf('.');
+                    const QString base = lastDot > 0 ? fileName.left(lastDot) : fileName;
+                    soMap[base].append(relPath);
+                }
+
+                for (const QString &base : soMap.keys()) {
+                    QStringList files = soMap.value(base);
+                    if (files.size() <= 1) continue;
+                    int maxSegments = -1;
+                    for (const QString &f : files) {
+                        const QString name = QFileInfo(f).fileName();
+                        const int dotCount = name.count('.');
+                        int numericSegments = 0;
+                        if (dotCount >= 2) {
+                            const QStringList parts = name.split('.');
+                            for (int i = 2; i < parts.size(); ++i) {
+                                bool ok = false;
+                                parts[i].toInt(&ok);
+                                if (ok) numericSegments++;
+                                else break;
+                            }
+                        }
+                        if (numericSegments > maxSegments) {
+                            maxSegments = numericSegments;
+                        }
+                    }
+
+                    // Wenn es eine Version mit numerischen Segmenten gibt,
+                    // entferne alle ohne numerische Segmente
+                    if (maxSegments > 0) {
+                        for (const QString &f : files) {
+                            const QString name = QFileInfo(f).fileName();
+                            const int dotCount = name.count('.');
+                            int numericSegments = 0;
+                            if (dotCount >= 2) {
+                                const QStringList parts = name.split('.');
+                                for (int i = 2; i < parts.size(); ++i) {
+                                    bool ok = false;
+                                    parts[i].toInt(&ok);
+                                    if (ok) numericSegments++;
+                                    else break;
+                                }
+                            }
+                            if (numericSegments == 0) {
+                                removePaths.insert(f);
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Entferne die Duplikate
+            for (const QString &relPath : removePaths) {
+                QFile::remove(pkgroot + "/" + relPath);
+            }
+        }
+
+        // .PKGINFO
+        const QString pkgver = QString("%1-%2").arg(ver, pkgrel);
+        QString pkginfo = QString("# Generated by pkg_convert\n");
+        pkginfo += QString("pkgname = %1\n").arg(name);
+        pkginfo += QString("pkgver = %1\n").arg(pkgver);
+        pkginfo += QString("pkgdesc = %1\n").arg(desc);
+        pkginfo += QString("pkgbase = %1\n").arg(name);
+        pkginfo += QString("url = %1\n").arg(meta.value("URL", ""));
+        pkginfo += QString("builddate = %1\n").arg(QDateTime::currentSecsSinceEpoch());
+        pkginfo += QString("packager = pkg_convert\n");
+        pkginfo += QString("arch = %1\n").arg(arch);
+        pkginfo += QString("license = %1\n").arg(meta.value("License", "custom"));
+        QStringList deps;
+        if (isDeb) {
+            deps = meta.value("Depends", "").split(',', Qt::SkipEmptyParts);
+        } else {
+            deps = meta.value("Requires", "").split('\n', Qt::SkipEmptyParts);
+        }
+        for (const QString &d : deps) {
+            const QString dep = d.trimmed();
+            if (!dep.isEmpty())
+                pkginfo += QString("depend = %1\n").arg(dep);
+        }
+
+        QFile pkginfoFile(pkgroot + "/.PKGINFO");
+        if (pkginfoFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            pkginfoFile.write(pkginfo.toUtf8());
+            pkginfoFile.close();
+        }
+
+        // .BUILDINFO
+        QString buildinfo = QString("# Generated by pkg_convert\n");
+        buildinfo += QString("builddate = %1\n").arg(QDateTime::currentSecsSinceEpoch());
+        buildinfo += QString("startdir = %1\n").arg(buildOut);
+        buildinfo += QString("pkgname = %1\n").arg(name);
+        buildinfo += QString("pkgver = %1\n").arg(pkgver);
+        buildinfo += "buildmachine = unknown\n";
+        buildinfo += "packager = pkg_convert\n";
+
+        QFile buildinfoFile(pkgroot + "/.BUILDINFO");
+        if (buildinfoFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            buildinfoFile.write(buildinfo.toUtf8());
+            buildinfoFile.close();
+        }
+
+        // .MTREE from pkgroot — debtap-kompatibel mit Prüfsummen
+        QProcess mtreeProcs;
+        mtreeProcs.start("bsdtar", QStringList() << "-czf" << "-"
+            << "-C" << pkgroot << "--format" << "mtree"
+            << "--options=!all,use-set,type,uid,gid,mode,time,size,md5,sha256,link"
+            << "." << ".PKGINFO" << ".BUILDINFO");
+        mtreeProcs.waitForFinished(-1);
+        QByteArray mtreeData = mtreeProcs.readAllStandardOutput();
+        if (!mtreeData.isEmpty()) {
+            QFile mtreeFile(pkgroot + "/.MTREE");
+            if (mtreeFile.open(QIODevice::WriteOnly)) {
+                mtreeFile.write(mtreeData);
+                mtreeFile.close();
+            }
+        }
+
+        // Build the final .pkg.tar.zst — debtap nutzt ultrakompression
+        const QString finalPkg = buildOut + "/" + QString("%1-%2-%3-%4.pkg.tar.zst").arg(name, ver, pkgrel, arch);
+        QProcess buildProc;
+        buildProc.start("bash", QStringList() << "-c"
+            << QString(R"(tar -c -C '%1' . --transform='s,^\./,,' | zstd -q -T0 --ultra -15 -c > '%2')").arg(pkgroot, finalPkg));
+        buildProc.waitForFinished(-1);
+    }
+
+    QMap<QString, QString> parseMeta(const QString &path, const QString &staging, bool isDeb) {
         QMap<QString, QString> meta;
         if (isDeb) {
             QTemporaryDir work;
@@ -614,29 +781,46 @@ private:
             QProcess arx; arx.start("bash", QStringList() << "-c"
                 << QString("cd '%1' && ar x '%2'").arg(work.path(), path));
             arx.waitForFinished();
+            if (arx.exitCode() != 0) {
+                meta["_deb_ar_error"] = "ar x failed for deb archive";
+                return meta;
+            }
             // control
             QProcess ar; ar.start("bash", QStringList() << "-c"
                 << QString("cd '%1' && ls control.tar* 2>/dev/null | head -1").arg(work.path()));
             ar.waitForFinished();
             QString ca = work.filePath(ar.readAllStandardOutput().trimmed());
             if (QFile::exists(ca)) {
-                QProcess::execute("bsdtar", QStringList() << "-xf" << ca << "-C" << ctrlDir);
-                QFile cf(ctrlDir + "/control");
-                if (cf.open(QIODevice::ReadOnly)) {
-                    const QString txt = cf.readAll();
-                    for (const QString &line : txt.split('\n')) {
-                        int idx = line.indexOf(':');
-                        if (idx > 0) meta[line.left(idx).trimmed()] = line.mid(idx + 1).trimmed();
+                QProcess tar;
+                tar.start("tar", QStringList() << "-xf" << ca << "-C" << ctrlDir);
+                tar.waitForFinished();
+                if (tar.exitCode() == 0) {
+                    QFile cf(ctrlDir + "/control");
+                    if (cf.open(QIODevice::ReadOnly)) {
+                        const QString txt = cf.readAll();
+                        for (const QString &line : txt.split('\n')) {
+                            int idx = line.indexOf(':');
+                            if (idx > 0) meta[line.left(idx).trimmed()] = line.mid(idx + 1).trimmed();
+                        }
                     }
                 }
             }
             // data
             QProcess ar2; ar2.start("bash", QStringList() << "-c"
                 << QString("cd '%1' && ls data.tar* 2>/dev/null | head -1").arg(work.path()));
-            ar2.waitForFinished();
+            ar2.waitForFinished(-1);
             QString da = work.filePath(ar2.readAllStandardOutput().trimmed());
-            if (QFile::exists(da))
-                QProcess::execute("bsdtar", QStringList() << "-xf" << da << "-C" << staging);
+            if (QFile::exists(da)) {
+                QProcess tar2;
+                tar2.start("tar", QStringList() << "-xf" << da << "-C" << staging);
+                tar2.waitForFinished(-1);
+                if (tar2.exitCode() != 0) {
+                    meta["_deb_data_extract_error"] = QString("tar xf data.tar failed with exit code %1").arg(tar2.exitCode());
+                    meta["_deb_data_stderr"] = tar2.readAllStandardError();
+                }
+            } else {
+                meta["_deb_data_missing"] = "no data.tar in deb";
+            }
         } else {
             // RPM: zuverlaessig via rpm2cpio | cpio entpacken (bsdtar kann
             // nicht alle RPM-Formate/Compressions lesen -> sonst leeres Paket)
