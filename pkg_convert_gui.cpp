@@ -608,6 +608,108 @@ private slots:
 
 private:
     // ---- helpers ----
+    static QString mapDebDepToArch(const QString &dep) {
+        static const QMap<QString, QString> debToArch = {
+            {"libc6", "glibc"},
+            {"libc6-base", "glibc"},
+            {"libgcc1", "libgcc"},
+            {"libgcc-s1", "libgcc"},
+            {"libstdc++6", "libstdc++"},
+            {"zlib1g", "zlib"},
+            {"libssl1.1", "openssl-1.1"},
+            {"libssl3", "openssl"},
+            {"libcurl4", "curl"},
+            {"libxml2", "libxml2"},
+            {"libsqlite3-0", "sqlite"},
+            {"libzstd1", "zstd"},
+            {"liblzma5", "xz"},
+            {"liblz4-1", "lz4"},
+            {"libbz2-1.0", "bzip2"},
+            {"libtiff5", "libtiff"},
+            {"libpng16-16", "libpng"},
+            {"libjpeg62-turbo", "libjpeg-turbo"},
+            {"libfreetype6", "freetype2"},
+            {"libfontconfig1", "fontconfig"},
+            {"libexpat1", "expat"},
+            {"libx11-6", "libx11"},
+            {"libxext6", "libxext"},
+            {"libxrender1", "libxrender"},
+            {"libxi6", "libxi"},
+            {"libxrandr2", "libxrandr"},
+            {"libxcursor1", "libxcursor"},
+            {"libxinerama1", "libxinerama"},
+            {"libglib2.0-0", "glib2"},
+            {"libgtk-3-0", "gtk3"},
+            {"libqt5core5a", "qt5-base"},
+            {"libqt5gui5", "qt5-base"},
+            {"libqt5widgets5", "qt5-base"},
+            {"libqt6core6", "qt6-base"},
+            {"libqt6gui6", "qt6-base"},
+            {"libqt6widgets6", "qt6-base"},
+            {"libudev1", "systemd-libs"},
+            {"libdbus-1-3", "dbus"},
+            {"libasound2", "alsa-lib"},
+            {"libpulse0", "libpulse"},
+            {"libgl1", "libglvnd"},
+            {"libegl1", "libglvnd"},
+            {"libgles2", "libglvnd"},
+            {"libvulkan1", "vulkan-icd-loader"},
+            {"libxcb1", "libxcb"},
+            {"libxkbcommon0", "xkbcommon"},
+            {"libwayland-client0", "wayland"},
+            {"libdrm2", "libdrm"},
+            {"libgbm1", "mesa"},
+            {"libnss3", "nss"},
+            {"libnspr4", "nspr"},
+            {"libcups2", "cups"},
+            {"libxss1", "libxss"},
+            {"libxtst6", "libxtst"},
+            {"libxxf86vm1", "libxxf86vm"},
+            {"libxcomposite1", "libxcomposite"},
+            {"libxdamage1", "libxdamage"},
+            {"libxfixes3", "libxfixes"},
+            {"libxshmfence1", "libxshmfence"},
+            {"libunwind8", "libunwind"},
+            {"libblosc1", "c-blosc"},
+            {"libhdf5-103", "hdf5"},
+            {"libnetcdf19", "netcdf"},
+            {"libjson-c5", "json-c"},
+            {"libusb-1.0-0", "libusb"},
+            {"libuuid1", "util-linux-libs"},
+            {"libgpg-error0", "libgpg-error"},
+            {"libassuan0", "assuan"},
+            {"libgcrypt20", "libgcrypt"},
+            {"libkrb5-3", "krb5"},
+            {"libk5crypto3", "krb5"},
+            {"libcom-err2", "krb5"},
+            {"libkrb5support0", "krb5"},
+            {"libselinux1", "libselinux"},
+            {"libpcre2-8-0", "pcre2"},
+            {"libpcre3", "pcre"},
+            {"libreadline8", "readline"},
+            {"libncurses6", "ncurses"},
+            {"libtinfo6", "ncurses"},
+            {"libgssapi-krb5-2", "krb5"},
+            {"libldap-2.5-0", "ldb"},
+            {"libsasl2-2", "cyrus-sasl"},
+            {"libffi8", "libffi"},
+            {"libyaml-0-2", "libyaml"},
+        };
+        QString cleaned = dep.trimmed();
+        if (cleaned.isEmpty()) return dep;
+        QString base = cleaned.split(QRegularExpression("[<>=~! ]"), Qt::SkipEmptyParts).value(0).trimmed();
+        if (base.isEmpty()) return dep;
+        const QString archName = debToArch.value(base);
+        if (!archName.isEmpty()) {
+            QString version = cleaned.mid(base.length()).trimmed();
+            if (!version.isEmpty()) {
+                return archName + version;
+            }
+            return archName;
+        }
+        return dep;
+    }
+
     void writePackageMetadata(const QString &buildOut,
                               const QString &name,
                               const QString &ver,
@@ -731,9 +833,10 @@ private:
             deps = meta.value("Requires", "").split('\n', Qt::SkipEmptyParts);
         }
         for (const QString &d : deps) {
-            const QString dep = d.trimmed();
-            if (!dep.isEmpty())
-                pkginfo += QString("depend = %1\n").arg(dep);
+            QString dep = d.trimmed();
+            if (dep.isEmpty()) continue;
+            if (isDeb) dep = mapDebDepToArch(dep);
+            pkginfo += QString("depend = %1\n").arg(dep);
         }
 
         QFile pkginfoFile(pkgroot + "/.PKGINFO");
