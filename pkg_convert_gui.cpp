@@ -764,7 +764,7 @@ private:
                     ok = QFile::copy(it.filePath(), destPath);
                 }
                 if (!ok) {
-                    status->setText("Fehler beim Kopieren/Verknuepfen: " + destPath);
+                    status->setText(i18n("linkCopyError") + destPath);
                     return;
                 }
             }
@@ -1308,7 +1308,7 @@ private:
             if (bm.width() > 360) bm = bm.scaledToWidth(360, Qt::SmoothTransformation);
             brand->setPixmap(bm);
         } else {
-            brand->setText("created by SattNEK");  // Fallback-Text
+            brand->setText(i18n("brandFallback"));
         }
         v->addWidget(brand);
     }
