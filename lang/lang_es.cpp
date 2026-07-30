@@ -86,5 +86,7 @@ QMap<QString, QString> lang_es() {
         "faltan scripts o no se reconocen diferencias del sistema.");
     m.insert("warnContinue", "Continuar de todos modos?");
     m.insert("msgBuildAborted", "❌ Construccion cancelada.");
-    return m;
+    
+    m.insert("warnNoBinary", "❌ No hay paquete ejecutable.");
+return m;
 }
