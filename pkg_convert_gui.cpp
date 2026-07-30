@@ -78,7 +78,6 @@ public:
         applyLang();
     }
 
-    // --- i18n: Sprache -> Schluessel -> Text ---
     QString i18n(const QString &key) const {
         static const QMap<QString, QMap<QString, QString>> T = {
             {"de", lang_de()},

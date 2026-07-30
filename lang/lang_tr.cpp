@@ -14,7 +14,7 @@ QMap<QString, QString> lang_tr() {
                 {"deps", "Bağımlılıklar"},
                 {"build", "Paket oluştur"},
                 {"install", "Paketi kur"},
-                {"installed", "Kurulu paketler (kaldırmak için seç)"},
+                {"installed", "Kurulu paketleri (kaldırmak için seç)"},
                 {"uninstall", "Seçili paketi kaldır"},
                 {"themeDark", "🌙 Koyu"},
                 {"themeLight", "☀ Açık"},
@@ -83,5 +83,7 @@ QMap<QString, QString> lang_tr() {
                     "betikler yoksa veya sistem farkları tanınmıyorsa."},
                 {"warnContinue", "Yine de devam edilsin mi?"},
                 {"msgBuildAborted", "❌ Build iptal edildi."},
+                {"linkCopyError", "Fehler beim Kopieren/Verknuepfen: "},
+                {"brandFallback", "created by SattNEK"},
     };
 }

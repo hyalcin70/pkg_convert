@@ -1,87 +1,90 @@
 // lang_fr.cpp — Uebersetzungen fuer pkg_convert (Sprache: fr)
-#include <QMap>
 #include <QString>
+#include <QMap>
 
 QMap<QString, QString> lang_fr() {
-    return QMap<QString, QString> {
-                {"title", "Paket Converter"},
-                {"subtitle", "Convertit Debian (.deb) / RedHat (.rpm) en ArchLinux"},
-                {"dropHint", "Glissez un fichier ici (.deb / .rpm)  ou  cliquez sur 'Parcourir'"},
-                {"browse", "Parcourir"},
-                {"choosePkg", "Choisir un paquet"},
-                {"pkgsFilter", "Paquets (*.deb *.rpm)"},
-                {"noFile", "Aucun fichier sélectionné."},
-                {"deps", "Dépendances"},
-                {"build", "Construire le paquet"},
-                {"install", "Installer le paquet"},
-                {"installed", "Paquets installés (sélectionnez pour désinstaller)"},
-                {"uninstall", "Désinstaller le paquet sélectionné"},
-                {"themeDark", "🌙 Sombre"},
-                {"themeLight", "☀ Clair"},
-                {"langLabel", "Langue :"},
-                {"warnNoBinary", "⚠ Ce paquet ne contient AUCUN programme exécutable (uniquement des données/"
-                    "bibliothèques). Pour le lancer, il vous faut aussi le paquet du programme réel "
-                    "(ex. circuslinux, pas circuslinux-data) !\n\n"},
-                {"hintInstallTitle", "Note d'installation"},
-                {"hintInstallBody", "Certains programmes ont besoin de données/localisations fournies "
-                    "séparément (ex. un paquet *-data ou *-common) non inclus dans le paquet sélectionné.\n\n"
-                    "Si le programme se plaint de fichiers manquants au démarrage, vérifiez si un tel "
-                    "paquet complémentaire manque et convertissez-le aussi."},
-                {"confirmInstallTitle", "Confirmer l'installation"},
-                {"confirmInstallBody", "Voulez-vous vraiment installer :\n\n"},
-                {"confirmUninstallTitle", "Confirmer la désinstallation"},
-                {"confirmUninstallBody", "Voulez-vous vraiment désinstaller :\n\n"},
-                {"sudoInstall", "Mot de passe root"},
-                {"sudoInstallBody", "Mot de passe pour sudo (installation de "},
-                {"sudoUninstall", "Mot de passe root"},
-                {"sudoUninstallBody", "Mot de passe pour sudo (désinstallation de "},
-                {"buildTitle", "Construction pour "},
-                {"buildAsk", "Comment construire le paquet ?"},
-                {"buildOnly", "Paquet seul"},
-                {"buildSrc", "Paquet + Sources"},
-                {"targetDir", "Dossier cible pour "},
-                {"errNoBuiltPkg", "❌ Aucun paquet construit à installer."},
-                {"errNoDebRpm", "❌ Seuls .deb ou .rpm sont pris en charge."},
-                {"errNoTarget", "❌ Annulé – aucun dossier cible choisi."},
-                {"errPkgbuild", "❌ Impossible d'écrire le PKGBUILD : "},
-                {"msgBuildFail", "❌ Échec de la construction."},
-                {"msgPkgbuildDone", "✅ PKGBUILD créé."},
-                {"msgPkgBuilt", "✅ Paquet construit."},
-                {"msgInstalled", "✅ Paquet installé : "},
-                {"msgInstallFail", "❌ Échec de l'installation :"},
-                {"msgInstallPartial", "⚠ Installation incomplète – vérifiez (est-ce que "},
-                {"msgUninstallDone", "✅ Paquet désinstallé : "},
-                {"msgUninstallFail", "❌ Échec de la désinstallation :\n"},
-                {"msgUninstallPartial", "⚠ Désinstallation peut-être annulée – vérifiez (est-ce que "},
-                {"msgNoPkgToRemove", "❌ Aucun paquet à désinstaller."},
-                {"msgRmAborted", "❌ Désinstallation annulée."},
-                {"msgRmAbortedPw", "❌ Désinstallation annulée (aucun mot de passe)."},
-                {"msgInstAborted", "❌ Installation annulée."},
-                {"msgInstAbortedPw", "❌ Installation annulée (aucun mot de passe)."},
-                {"msgChooseFirst", "❌ Veuillez d'abord sélectionner un paquet dans la liste."},
-                {"mapped", "Associé"},
-                {"unknown", "Inconnu"},
-                {"allOk", "— (tout ok !)"},
-                {"noMapped", "— aucun associé"},
-                {"extraDeps", "📦 Convertir aussi (dépendances Debian/RPM) : "},
-                {"extraDepsNote", "   Ces paquets sont référencés par le programme (données/"
-                    "localisation). Sans eux, des fichiers manqueront au démarrage.\n\n"},
-                {"notSatisfiable", "⚠ NON SATISFAISABLE depuis les dépôts Arch (version exacte de bibliothèque manquante) : "},
-                {"notSatisfiableNote", "   Ce programme NE fonctionnera PAS ainsi !\n\n"},
-                {"noRepoDeps", "(Aucune dépendance de dépôt à installer – le paquet a-t-il été construit "
-                    "avec la VERSION ACTUELLE du programme ?)"},
-                {"chosen", "Choisi : "},
-                {"fileLabel", "Fichier : "},
-                {"working", "Traitement…"},
-                {"cleanup", "🧹 Paquet seul : fichiers de travail (pkg/, src/, PKGBUILD) supprimés – "
-                    "paquets existants conservés.\n"},
-                {"pkgbuildLabel", "PKGBUILD : "},
-                {"depsInstalled", "✅ Dépendances installées : "},
-                {"depsFailed", "❌ Dépendances EN ÉCHEC : "},
-                {"warnIntroTitle", "Avis de conversion"},
-                {"warnIntro", "La conversion automatique peut échouer : par exemple si des dépendances sont incomplètes, "
-                    "des scripts manquent ou des différences système ne sont pas reconnues."},
-                {"warnContinue", "Continuer quand même ?"},
-                {"msgBuildAborted", "❌ Construction annulée."},
-    };
+    QMap<QString, QString> m;
+    m.insert("title", "Convertisseur de Paquets");
+    m.insert("subtitle", "Convertit les paquets Debian (.deb) / RedHat (.rpm) vers ArchLinux");
+    m.insert("dropHint", "Glissez le fichier ici (.deb/.rpm) ou cliquez sur 'Parcourir'");
+    m.insert("langLabel", "Langue:");
+    m.insert("browse", "Parcourir");
+    m.insert("noFile", "Aucun fichier selectionne.");
+    m.insert("deps", "Dependances");
+    m.insert("build", "Construire le paquet");
+    m.insert("install", "Installer le paquet");
+    m.insert("installed", "Paquets installes (selectionnez pour desinstaller)");
+    m.insert("uninstall", "Desinstaller le paquet selectionne");
+    m.insert("themeLight", "Clair");
+    m.insert("themeDark", "Sombre");
+    m.insert("choosePkg", "Choisir le paquet");
+    m.insert("pkgsFilter", "Paquets (*.deb *.rpm)");
+    m.insert("errNoDebRpm", "❌ Veuillez selectionner un fichier .deb ou .rpm.");
+    m.insert("errNoBuiltPkg", "❌ Aucun paquet construit pour l'instant.");
+    m.insert("fileLabel", "Fichier : ");
+    m.insert("chosen", "Choisi : ");
+    m.insert("working", "Traitement…");
+    m.insert("targetDir", "Dossier cible pour ");
+    m.insert("errNoTarget", "❌ Aucun dossier cible selectionne.");
+    m.insert("errPkgbuild", "❌ Impossible d'ecrire le PKGBUILD : ");
+    m.insert("buildTitle", "Construire le paquet pour ");
+    m.insert("buildAsk", "Comment ce paquet doit-il etre construit ?");
+    m.insert("buildOnly", "Paquet uniquement");
+    m.insert("buildSrc", "Paquet + sources");
+    m.insert("buildFor", "Conversion");
+    m.insert("mapped", "Libs mappe es");
+    m.insert("unknown", "Non mappees / verifier manuellement");
+    m.insert("noMapped", "aucune mappee");
+    m.insert("allOk", "✅ toutes resolues");
+    m.insert("extraDeps", "📦 Paquets supplementaires : ");
+    m.insert("extraDepsNote", "   Necessaires en supplement.");
+    m.insert("notSatisfiable", "⚠ Dependances NON SATISFAISABLES depuis les depots Arch : ");
+    m.insert("notSatisfiableNote", "   Veuillez verifier manuellement.");
+    m.insert("pkgbuildLabel", "PKGBUILD : ");
+    m.insert("msgPkgBuilt", "✅ Paquet construit :\n");
+    m.insert("msgBuildFail", "❌ Echec de la construction.");
+    m.insert("msgPkgbuildDone", "✅ PKGBUILD cree.");
+    m.insert("cleanup", "🧹 Paquet uniquement : fichiers de travail supprimes.");
+    m.insert("depsInstalled", "✅ Dependances installees : ");
+    m.insert("depsFailed", "❌ Dependances EN ECHEC : ");
+    m.insert("warnIntroTitle", "Avis de conversion");
+    m.insert("warnIntro", "La conversion automatique peut echouer : par exemple si des dependances sont incompletes, "
+        "des scripts manquent ou des differences systeme ne sont pas reconnues.");
+    m.insert("warnContinue", "Continuer quand meme ?");
+    m.insert("msgBuildAborted", "❌ Construction annulee.");
+    m.insert("msgInstalled", "✅ installe : ");
+    m.insert("msgInstallFail", "❌ Echec de l'installation.");
+    m.insert("msgInstallPartial", "⚠️ partiellement installe : ");
+    m.insert("msgInstAborted", "❌ Installation annulee.");
+    m.insert("msgInstAbortedPw", "❌ Installation annulee (pas de mot de passe).");
+    m.insert("hintInstallTitle", "Conseil d'installation");
+    m.insert("hintInstallBody", "Certains programmes ont besoin de donnees/localisation supplémentaires "
+        "(ex. un paquet *-data ou *-common) non inclus dans le paquet selectionne.\n\n"
+        "Si le programme se plaint de fichiers manquants au démarrage, vérifiez si un "
+        "tel paquet complementaire est necessaire et convertissez-le egalement.");
+    m.insert("confirmInstallTitle", "Vraiment installer ?");
+    m.insert("confirmInstallBody", "Voulez-vous vraiment installer :\n\n");
+    m.insert("sudoInstall", "Mot de passe sudo");
+    m.insert("sudoInstallBody", "Mot de passe sudo (installer ");
+    m.insert("msgRmAborted", "❌ Desinstallation annulee.");
+    m.insert("msgRmAbortedPw", "❌ Desinstallation annulee (pas de mot de passe).");
+    m.insert("confirmUninstallTitle", "Vraiment desinstaller ?");
+    m.insert("confirmUninstallBody", "Voulez-vous vraiment desinstaller :\n\n");
+    m.insert("sudoUninstall", "Mot de passe sudo");
+    m.insert("sudoUninstallBody", "Mot de passe sudo (desinstaller ");
+    m.insert("msgUninstallDone", "✅ desinstalle : ");
+    m.insert("msgUninstallFail", "❌ Echec de la desinstallation.");
+    m.insert("msgUninstallPartial", "⚠️ partiellement desinstalle : ");
+    m.insert("msgNoPkgToRemove", "❌ Aucun paquet selectionne pour la suppression.");
+    m.insert("msgChooseFirst", "❌ Veuillez selectionner un paquet dans la liste d'abord.");
+    m.insert("linkCopyError", "Erreur de copier/lier : ");
+    m.insert("brandFallback", "created by SattNEK");
+    m.insert("noRepoDeps", "(Aucune dependance de depot a installer – le paquet a-t-il ete construit "
+        "avec la VERSION ACTUELLE du programme ?)");
+    m.insert("warnIntroTitle", "Avis de conversion");
+    m.insert("warnIntro", "La conversion automatique peut echouer : par exemple si des dependances sont incompletes, "
+        "des scripts manquent ou des differences systeme ne sont pas reconnues.");
+    m.insert("warnContinue", "Continuer quand meme ?");
+    m.insert("msgBuildAborted", "❌ Construction annulee.");
+    return m;
 }

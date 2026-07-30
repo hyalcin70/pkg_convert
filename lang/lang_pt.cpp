@@ -84,5 +84,7 @@ QMap<QString, QString> lang_pt() {
                     "faltarem scripts ou diferenças do sistema não forem reconhecidas."},
                 {"warnContinue", "Continuar mesmo assim?"},
                 {"msgBuildAborted", "❌ Build cancelado."},
+                {"linkCopyError", "Fehler beim Kopieren/Verknuepfen: "},
+                {"brandFallback", "created by SattNEK"},
     };
 }

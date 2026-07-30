@@ -84,5 +84,9 @@ QMap<QString, QString> lang_de() {
                     "fehlenden Skripten oder nicht erkannten Systemunterschieden."},
                 {"warnContinue", "Trotzdem fortfahren?"},
                 {"msgBuildAborted", "❌ Build abgebrochen."},
+                {"linkCopyError", "Fehler beim Kopieren/Verknuepfen: "},
+                {"brandFallback", "created by SattNEK"},
+                {"linkCopyError", "Fehler beim Kopieren/Verknuepfen: "},
+                {"brandFallback", "created by SattNEK"},
     };
 }
