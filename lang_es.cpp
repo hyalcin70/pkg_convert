@@ -81,12 +81,6 @@ QMap<QString, QString> lang_es() {
     m.insert("brandFallback", "created by SattNEK");
     m.insert("noRepoDeps", "(Ninguna dependencia de repositorio que instalar – fue el paquete "
         "construido con la VERSION ACTUAL del programa?)");
-    m.insert("warnIntroTitle", "Aviso de conversion");
-    m.insert("warnIntro", "La conversion automatica puede fallar: por ejemplo si faltan dependencias, "
-        "faltan scripts o no se reconocen diferencias del sistema.");
-    m.insert("warnContinue", "Continuar de todos modos?");
-    m.insert("msgBuildAborted", "❌ Construccion cancelada.");
-    
-    m.insert("warnNoBinary", "❌ No hay paquete ejecutable.");
-return m;
+
+    return m;
 }
