@@ -23,16 +23,16 @@ source=("pkg_convert_gui.cpp"
         "lang_tr.cpp"
         "lang_pt.cpp")
 sha256sums=('11c9275defe9774472fdcfee7d82b72429aeae5e4768b3fe937ac249722c749c'
-            '0eeb19ddb3e008110951eca6bd11224386d6b1920fb30e82d9404774d8662bdb'
+            'f4eab89ccafa55fbf3a72bcaed4ce5b262200b92403c6a4595dee7bbb2873358'
             'bd8f98bdc2ee2748520d4df9099678898aabed9d800d691eba307479bc274b1c'
             '1c35318b13f7f32e5921bd4e0de0669202e8ec618075312e1eb60de41bcf294d'
             'f9f56f750c0da701623ea8a1f28b5c3e7f836ee5f178e4d7ec484f95cf0b4996'
-            "$(sha256sum lang_de.cpp | awk '{print $1}')"
-            "$(sha256sum lang_en.cpp | awk '{print $1}')"
-            "$(sha256sum lang_fr.cpp | awk '{print $1}')"
-            "$(sha256sum lang_es.cpp | awk '{print $1}')"
-            "$(sha256sum lang_tr.cpp | awk '{print $1}')"
-            "$(sha256sum lang_pt.cpp | awk '{print $1}')")
+            'a23ca227b8db46abbdf878880e8a21c0c90d7ad9a69fb21f913fc19587b93939'
+            'e882365c28f2b7533b01cb621b670189f95ded69384862c13bced8c6ce7d7b1f'
+            '121254503a0aa924090b0c54243d6f36603a5d37fbff71423b86765ef66f65cc'
+            '9d20708f3f7f47e874285d547fc13f56b701defd3c629a6486711999e1a1d038'
+            '5c9a632c76aa5569c4a24e2201f0128180e3e0d07bfa48ec0d0edf753ba35b5a'
+            'af4125b4a755258249d86015896474a4663c960fcb94e881be2a0cd6c842cd1a')
 
 build() {
   cd "$srcdir"
