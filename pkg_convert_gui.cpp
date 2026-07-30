@@ -68,7 +68,7 @@ class MainWindow : public QMainWindow {
     Q_OBJECT
 public:
     explicit MainWindow(QWidget *p = nullptr) : QMainWindow(p) {
-        setWindowTitle(QStringLiteral("Paket Converter – Debian/RedHat zu ArchLinux"));
+        setWindowTitle(i18n("title") + " – " + i18n("buildFor"));
         resize(760, 580);
         m_dark = m_settings.value("theme", "light").toString() == "dark";
         applyTheme();
@@ -80,7 +80,6 @@ public:
 
     // --- i18n: Sprache -> Schluessel -> Text ---
     QString i18n(const QString &key) const {
-        // Sprach-Tabellen kommen aus lang_XX.cpp (pro Sprache eine Datei).
         static const QMap<QString, QMap<QString, QString>> T = {
             {"de", lang_de()},
             {"en", lang_en()},
@@ -155,6 +154,7 @@ private slots:
         if (subLbl)    subLbl->setText(i18n("subtitle"));
         if (drop)      drop->setPlaceholderText(i18n("dropHint"));
         if (browseBtn) browseBtn->setText(i18n("browse"));
+        if (metaLbl)   metaLbl->setText(i18n("noFile"));
         if (dep_h)     dep_h->setText(i18n("deps"));
         if (btnBuild)  btnBuild->setText(i18n("build"));
         if (btnInstall) btnInstall->setText(i18n("install"));
