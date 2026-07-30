@@ -42,11 +42,11 @@ QMap<QString, QString> lang_pt();
 class DropLine : public QLineEdit {
     Q_OBJECT
 public:
-    explicit DropLine(QWidget *p = nullptr) : QLineEdit(p) {
+    explicit DropLine(QWidget *p = nullptr, const QString &placeholder = {})
+        : QLineEdit(p) {
         setAcceptDrops(true);
         setReadOnly(true);
-        setPlaceholderText(QStringLiteral(
-            "Datei hierher ziehen (.deb / .rpm)  oder  'Durchsuchen' klicken"));
+        if (!placeholder.isEmpty()) setPlaceholderText(placeholder);
     }
 signals:
     void fileDropped(const QString &path);
@@ -151,18 +151,17 @@ private slots:
         if (themeBtn) themeBtn->setText(m_dark ? i18n("themeLight") : i18n("themeDark"));
     }
     void applyLang() {
-        // Alle sichtbaren Texte neu setzen (UI wurde schon in buildUi() gebaut)
         if (titleLbl)  titleLbl->setText(i18n("title"));
         if (subLbl)    subLbl->setText(i18n("subtitle"));
         if (drop)      drop->setPlaceholderText(i18n("dropHint"));
         if (browseBtn) browseBtn->setText(i18n("browse"));
-        if (metaLbl)   metaLbl->setText(metaLbl->text().isEmpty() ? i18n("noFile") : metaLbl->text());
         if (dep_h)     dep_h->setText(i18n("deps"));
         if (btnBuild)  btnBuild->setText(i18n("build"));
         if (btnInstall) btnInstall->setText(i18n("install"));
         if (inst_h)    inst_h->setText(i18n("installed"));
         if (uninstallBtn) uninstallBtn->setText(i18n("uninstall"));
         if (themeBtn)  themeBtn->setText(m_dark ? i18n("themeLight") : i18n("themeDark"));
+        if (langLbl)   langLbl->setText(i18n("langLabel"));
         if (langCombo) {
             const int i = langCombo->findData(m_lang);
             if (i >= 0) langCombo->setCurrentIndex(i);
@@ -478,7 +477,7 @@ private slots:
 
         // PKGBUILD schreiben
         QStringList mapped, unknown, aurDeps;
-        // Echte Binaries scannen (readelf NEEDED) und jede
+        // debtap-Methode: echte Binaries scannen (readelf NEEDED) und jede
         // Library via pkgfile zum ECHTEN Arch-Repo-Paketnamen aufloesen.
         // Keine geratene Namenstabelle mehr.
         depsFromBinaries(src, mapped, unknown, aurDeps);
@@ -894,7 +893,7 @@ private:
             }
         }
 
-        // Build the final .pkg.tar.zst — ultrakompression fuer .tar.zst
+        // Build the final .pkg.tar.zst — debtap nutzt ultrakompression
         const QString finalPkg = buildOut + "/" + QString("%1-%2-%3-%4.pkg.tar.zst").arg(name, ver, pkgrel, arch);
         QProcess buildProc;
         buildProc.start("bash", QStringList() << "-c"
@@ -996,7 +995,7 @@ private:
             {"noarch", "any"}, {"all", "any"}, {"any", "any"}};
         return m.value(a, a);
     }
-    // ELF-Binaries im Staging scannen, benoetigte
+    // debtap-Methode: alle ELF-Binaries im Staging scannen, benoetigte
     // Libraries (readelf NEEDED) sammeln und via pkgfile zum echten
     // Arch-Repo-Paket aufloesen. core/extra/multilib bevorzugt (kein AUR).
     void depsFromBinaries(const QString &stagingDir, QStringList &mapped, QStringList &unknown, QStringList &aurDeps) {
@@ -1193,8 +1192,8 @@ private:
 
         // Header mit Titel + Theme-Toggle + Sprachauswahl
         auto *header = new QHBoxLayout();
-        titleLbl = new QLabel("Paket Converter"); titleLbl->setObjectName("title");
-        auto *sub = new QLabel("Wandelt Debian (.deb) / RedHat (.rpm) zu ArchLinux um");
+        titleLbl = new QLabel(i18n("title")); titleLbl->setObjectName("title");
+        auto *sub = new QLabel(i18n("subtitle"));
         sub->setObjectName("sub");
         subLbl = sub;
         auto *leftHead = new QVBoxLayout();
@@ -1202,15 +1201,15 @@ private:
         header->addLayout(leftHead, 1);
         // Sprachauswahl
         auto *langRow = new QHBoxLayout();
-        auto *langLbl = new QLabel("Sprache:"); langLbl->setObjectName("sub");
+        langLbl = new QLabel(i18n("langLabel")); langLbl->setObjectName("sub");
         langCombo = new QComboBox();
-        langCombo->addItem("Deutsch", "de");
-        langCombo->addItem("English", "en");
-        langCombo->addItem("Français", "fr");
-        langCombo->addItem("Español", "es");
-        langCombo->addItem("Türkçe", "tr");
-        langCombo->addItem("Português", "pt");
-        langCombo->setFixedWidth(120);
+        langCombo->addItem("DE", "de");
+        langCombo->addItem("EN", "en");
+        langCombo->addItem("FR", "fr");
+        langCombo->addItem("ES", "es");
+        langCombo->addItem("TR", "tr");
+        langCombo->addItem("PT", "pt");
+        langCombo->setFixedWidth(90);
         connect(langCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int i) {
             m_lang = langCombo->itemData(i).toString();
             m_settings.setValue("lang", m_lang);
@@ -1219,10 +1218,11 @@ private:
         langRow->addWidget(langLbl);
         langRow->addWidget(langCombo);
         header->addLayout(langRow, 0);
-        themeBtn = new QPushButton(m_dark ? "☀ Hell" : "🌙 Dunkel");
+        themeBtn = new QPushButton(i18n(m_dark ? "themeLight" : "themeDark"));
         themeBtn->setObjectName("ghost");
         themeBtn->setFixedWidth(110);
         connect(themeBtn, &QPushButton::clicked, this, &MainWindow::toggleTheme);
+        header->addWidget(themeBtn, 0, Qt::AlignTop);
         header->addWidget(themeBtn, 0, Qt::AlignTop);
         v->addLayout(header);
         v->addSpacing(4);
@@ -1232,18 +1232,19 @@ private:
         auto *hl = new QHBoxLayout();
         drop = new DropLine(this);
         drop->setMinimumHeight(44);
-        browseBtn = new QPushButton("Durchsuchen"); browseBtn->setObjectName("ghost");
+        if (drop) drop->setPlaceholderText(i18n("dropHint"));
+        browseBtn = new QPushButton(i18n("browse")); browseBtn->setObjectName("ghost");
         connect(browseBtn, &QPushButton::clicked, this, &MainWindow::browse);
         connect(drop, &DropLine::fileDropped, this, &MainWindow::onFile);
         hl->addWidget(drop, 3); hl->addWidget(browseBtn, 1);
         cv->addLayout(hl);
-        metaLbl = new QLabel("Noch keine Datei ausgewählt."); metaLbl->setObjectName("h");
+        metaLbl = new QLabel(i18n("noFile")); metaLbl->setObjectName("h");
         cv->addWidget(metaLbl);
         fileLbl = new QLabel(""); fileLbl->setObjectName("sub");
         cv->addWidget(fileLbl);
         v->addWidget(card);
 
-        dep_h = new QLabel("Abhängigkeiten"); dep_h->setObjectName("h");
+        dep_h = new QLabel(i18n("deps")); dep_h->setObjectName("h");
         v->addWidget(dep_h);
         depView = new QTextEdit(); depView->setReadOnly(true); depView->setMinimumHeight(150);
         v->addWidget(depView);
@@ -1253,9 +1254,9 @@ private:
         progress = new QProgressBar(); progress->setVisible(false);
         bv->addWidget(progress);
         auto *bl = new QHBoxLayout();
-        btnBuild = new QPushButton("Paket bauen"); btnBuild->setEnabled(false);
+        btnBuild = new QPushButton(i18n("build")); btnBuild->setEnabled(false);
         connect(btnBuild, &QPushButton::clicked, this, [this] { runConvert(true); });
-        btnInstall = new QPushButton("Paket installieren"); btnInstall->setEnabled(false);
+        btnInstall = new QPushButton(i18n("install")); btnInstall->setEnabled(false);
         connect(btnInstall, &QPushButton::clicked, this, &MainWindow::installPkg);
         bl->addWidget(btnBuild, 2);
         bl->addWidget(btnInstall, 1);
@@ -1265,16 +1266,16 @@ private:
         // Liste der installierten Pakete (persistent ueber QSettings)
         auto *icard = new QFrame(); icard->setObjectName("card");
         auto *iv = new QVBoxLayout(icard);
-        inst_h = new QLabel("Installierte Pakete (zum Deinstallieren wählen)"); inst_h->setObjectName("h");
+        inst_h = new QLabel(i18n("installed")); inst_h->setObjectName("h");
         iv->addWidget(inst_h);
         instList = new QListWidget();
         instList->setMinimumHeight(90);
         iv->addWidget(instList);
-        uninstallBtn = new QPushButton("Ausgewähltes Paket deinstallieren"); uninstallBtn->setObjectName("ghost");
+        uninstallBtn = new QPushButton(i18n("uninstall")); uninstallBtn->setObjectName("ghost");
         connect(uninstallBtn, &QPushButton::clicked, this, [this] {
             QListWidgetItem *it = instList->currentItem();
             if (it) removePkg(it->text());
-            else status->setText("❌ Bitte zuerst ein Paket in der Liste auswählen.");
+            else status->setText(i18n("msgChooseFirst"));
         });
         iv->addWidget(uninstallBtn);
         v->addWidget(icard);
@@ -1313,7 +1314,7 @@ private:
     }
 
     DropLine *drop = nullptr;
-    QLabel *metaLbl = nullptr, *status = nullptr, *fileLbl = nullptr;
+    QLabel *metaLbl = nullptr, *status = nullptr, *fileLbl = nullptr, *langLbl = nullptr;
     QLabel *titleLbl = nullptr, *subLbl = nullptr, *dep_h = nullptr, *inst_h = nullptr;
     QTextEdit *depView = nullptr;
     QProgressBar *progress = nullptr;
