@@ -31,26 +31,25 @@ solo fuentes oficiales de Arch.
 - **Registro copiable**, historial de instalación persistente
 - **Alternador Claro/Oscuro** (por defecto: claro)
 
-## ¿Por qué pkg_convert?
+## Diseño
 
-pkg_convert sigue un enfoque propio para formatos de paquetes
-externos, pensado para quienes quieren convertir directamente en Arch
-sin depender de ayuda del AUR en ese paso.
-
-1. **Una herramienta para ambos formatos.** En vez de combinar
-   opciones de un solo formato, pkg_convert trabaja con **`.deb` y
-   `.rpm`** desde la misma GUI y con estructura de paquete coherente.
-2. **Base de datos local de Arch en vez de cachés externas grandes.**
-   Usa `pkgfile` contra tu sync DB local — sin descargas masivas ni
-   servicios de actualización aparte.
-3. **Dependencias por soname real.** Se detectan con `readelf` +
-   `pkgfile`, no por tablas de nombres fijas de otras distribuciones.
-4. **C++/Qt6 nativo, sin intérprete en runtime.** Un solo binario,
-   sin Python/Bash durante la ejecución.
-5. **GUI Qt6 integrada** con multilenguaje, claro/oscuro, historial
-   de instalaciones y registro copiable.
-6. **Sin helper del AUR para instalar.** Build y test desde fuente
-   con `makepkg -si`.
+- **Ambos formatos externos:** `.deb` y `.rpm` se gestionan en la
+  misma GUI.
+- **Búsqueda en Arch:** Las bibliotecas se resuelven con `readelf` +
+  `pkgfile` contra tu sync DB local de Arch.
+- **Binarios nativos:** Los ejecutables se colocan en `/usr/bin/` para
+  que estén en el `PATH` de Arch; los datos/desktops permanecen
+  intactos.
+- **Interacción con repos desde la GUI:** Las dependencias pueden
+  obtenerse automáticamente con `pacman -S --asdeps`; la instalación y
+  desinstalación están disponibles desde la interfaz.
+- **Sin dependencia de intérprete en runtime:** Un solo binario
+  nativo, sin Python/Bash durante la ejecución.
+- **Multilenguaje:** Alemán, inglés, francés, español, turco,
+  portugués; claro/oscuro; historial de instalaciones; registro
+  copiable.
+- **Sin helper del AUR:** Build y test desde fuente con
+  `makepkg -si`.
 
 ### Limitaciones honestas
 

@@ -31,28 +31,24 @@ offiziellen Arch-Quellen.
 - **Kopierbarer Log**, persistente Installations-Historie
 - **Hell/Dunkel**-Umschalter (Standard: hell)
 
-## Gestaltungsziele
+## Gestaltung
 
-pkg_convert verfolgt einen eigenen Ansatz für fremde Paketformate
-und richtet sich an Anwender, die direkt unter Arch arbeiten wollen,
-ohne AUR-Hilfsmittel für den Konvertierungsschritt selbst.
-
-1. **Ein Tool für beide Fremdformate.** Statt verschiedene
-   Ein-Format-Lösungen zu kombinieren, beherrscht pkg_convert
-   **`.deb` und `.rpm`** in derselben GUI mit konsistentem
-   Paketlayout.
-2. **Lokale Arch-Datenbank statt großer Fremd-Caches.** Es wird
-   `pkgfile` genutzt, das deine vorhandene Arch-Sync-DB abfragt —
-   kein Mega-Cache, kein separater Aktualisierungsdienst.
-3. **Abhängigkeiten über echte Soname-Lookups.** Required Libraries
-   werden per `readelf` + `pkgfile` ermittelt, nicht über feste
-   Namens-Tabellen fremder Distributionen.
-4. **Kompiliertes C++/Qt6 ohne Laufzeit-Interpreter-Abhängigkeit.**
-   Ein einzelnes natives Binary, kein Python/Bash zur Laufzeit.
-5. **Integrierte Qt6-GUI** mit Mehrsprachigkeit, Hell/Dunkel,
-   Installations-Historie und kopierbarem Log.
-6. **Installation ohne AUR-Hilfsmittel.** Build und Test laufen über
-   normalen Quellcode + `makepkg -si`.
+- **Beide Fremdformate:** `.deb` und `.rpm` werden in derselben GUI
+  verarbeitet.
+- **Arch-Lookup:** Bibliotheken werden über `readelf` + `pkgfile`
+  gegen die lokale Arch-Sync-DB aufgelöst.
+- **Native Binaries:** Ausführbare Dateien landen über `/usr/bin/` im
+  Arch-`PATH`; Daten/Desktops bleiben unberührt.
+- **GUI-Repo-Interaktion:** Abhängigkeiten können automatisch über
+  `pacman -S --asdeps` bezogen werden; Installation/Deinstallation
+  sind direkt in der Oberfläche verfügbar.
+- **Keine Laufzeit-Interpreter-Abhängigkeit:** Ein einzelnes natives
+  Binary, ohne Python/Bash zur Laufzeit.
+- **Mehrsprachig:** Deutsch, Englisch, Französisch, Spanisch,
+  Türkisch, Portugiesisch; Hell/Dunkel; Installations-Historie;
+  kopierbarer Log.
+- **Ohne AUR-Hilfsmittel:** Build und Test laufen über normalen
+  Quellcode + `makepkg -si`.
 
 ### Ehrliche Einschränkungen
 

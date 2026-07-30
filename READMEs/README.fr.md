@@ -31,28 +31,25 @@ les sources officielles d'Arch.
 - **Journal copiable**, historique d'installation persistant
 - **Basculateur Clair/Sombre** (par défaut : clair)
 
-## Pourquoi pkg_convert ?
+## Conception
 
-pkg_convert suit une approche propre aux formats de paquets externes,
-destinée aux utilisateurs qui veulent convertir directement sous Arch
-sans dépendre d’outils AUR pour l’étape de conversion.
-
-1. **Un outil pour les deux formats étrangers.** Au lieu de combiner
-   plusieurs outils mono-format, pkg_convert gère **`.deb` et
-   `.rpm`** depuis la même interface avec une structure de paquet
-   cohérente.
-2. **Base de données Arch locale plutôt que gros caches externes.** Il
-   utilise `pkgfile` sur votre sync DB locale existante — pas de
-   téléchargement géant, pas de service de mise à jour séparé.
-3. **Dépendances par lookup de soname réel.** Les bibliothèques sont
-   identifiées avec `readelf` + `pkgfile`, pas par des tables de noms
-   fixes venant d’autres distributions.
-4. **C++/Qt6 natif, sans interpréteur au runtime.** Un seul binaire
-   natif, pas de Python/Bash nécessaire à l’exécution.
-5. **Interface Qt6 intégrée** avec multilingue, clair/sombre,
-   historique d’installation et journal copiable.
-6. **PAS besoin d’helper AUR.** Build et test depuis le source avec
-   `makepkg -si`.
+- **Deux formats externes :** `.deb` et `.rpm` sont pris en charge
+  dans la même interface.
+- **Résolution Arch :** Les bibliothèques sont résolues via `readelf`
+  + `pkgfile` contre votre sync DB locale.
+- **Binaires natifs :** Les exécutables sont placés sous `/usr/bin/`
+  pour le `PATH` d'Arch ; données et fichiers desktop restent
+  inchangés.
+- **Interaction avec les dépôts depuis l'interface :** Les dépendances
+  peuvent être installées automatiquement via `pacman -S --asdeps` ;
+  installation/désinstallation sont disponibles dans l'interface.
+- **Pas d'interpréteur au runtime :** Un seul binaire natif, sans
+  Python/Bash nécessaire à l'exécution.
+- **Multilingue :** allemand, anglais, français, espagnol, turc,
+  portugais ; clair/sombre ; historique d'installation ; journal
+  copiable.
+- **Pas d'helper AUR nécessaire :** Build et test depuis le source
+  avec `makepkg -si`.
 
 ### Limites honnêtes
 

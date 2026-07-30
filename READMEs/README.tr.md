@@ -30,26 +30,20 @@ Arch kaynaklarını kullanarak.
 - **Kopyalanabilir günlük**, kalıcı kurulum geçmişi
 - **Açık/Koyu** değiştirici (varsayılan: açık)
 
-## debtap / rpmtoarch yerine neden pkg_convert?
+## Tasarım
 
-Başka dönüştürücüler de var (debtap, rpmtoarch). pkg_convert,
-kendi çalışma prensibiyle şunları hedefler: Arch üzerinde doğrudan
-çalışmak, dönüştürme adımında AUR yardımcılarına bağlı kalmamak.
-
-1. **İki farklı format için tek araç.** Birden fazla tek-format
-   çözümü birleşturmek yerine pkg_convert **`.deb` ve `.rpm`**'i tek
-   arayüzde, tutarlı paket düzeniyle işler.
-2. **Büyük harici cache yerine yerel Arch veritabanı.** `pkgfile`
-   kullanır, mevcut Arch sync DB'ye sorgu yapar — büyük indirme yok,
-   ayrı bir güncelleme hizmeti yok.
-3. **Gerçek soname lookups ile bağımlılık tespiti.** Kütüphaneler
-   `readelf` + `pkgfile` ile bulunur, başka dağıtımların sabit
-   isim tablolarına bağlı değildir.
-4. **C++/Qt6 yerel, runtime yorumlayıcı yok.** Tek bir yerel ELF,
-   çalışma zamanında Python/Bash gerekmez.
-5. **Entegre Qt6 arayüzü** çok dilli, açık/koyu, kurulum geçmişi ve
-   kopyalanabilir günlük ile.
-6. **AUR helper gerekmez.** `makepkg -si` ile kaynak üzerinden kurulum.
+- **İki farklı dış format:** `.deb` ve `.rpm` aynı arayüzde ele alınır.
+- **Arch çözümleme:** Kütüphaneler `readelf` + `pkgfile` ile mevcut
+  Arch sync DB üzerinden çözümlenir.
+- **Yerel ikili dosyalar:** Çalıştırılabilirler `/usr/bin/` altına
+  alınır, veri/desktop dosyalarına dokunulmaz.
+- **Depo etkileşimi:** Bağımlılıklar `pacman -S --asdeps` ile
+  otomatik kurulabilir; kurulum/kaldırma arayüzden erişilebilir.
+- **Runtime yorumlayıcı yok:** Tek yerel ELF; çalışma zamanında
+  Python/Bash gerekmez.
+- **Çok dilli:** Almanca, İngilizce, Fransızca, İspanyolca, Türkçe,
+  Portekizce; açık/koyu; kurulum geçmişi; kopyalanabilir günlük.
+- **AUR helper gerekmez:** `makepkg -si` ile kaynak üzerinden kurulum.
 
 ### Dürüst sınırlamalar
 

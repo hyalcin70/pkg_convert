@@ -40,9 +40,9 @@ sem depender de helpers do AUR nessa etapa.
 1. **Uma ferramenta para ambos os formatos externos.** Em vez de
    combinar várias opções de formato único, pkg_convert trabalha com
    **`.deb` e `.rpm`** na mesma GUI e com layout de pacote coerente.
-2. **Banco de dados local do Arch no lugar de caches externos grandes.**
-   Usa `pkgfile` contra seu sync DB local — sem downloads massivos,
-   sem serviço de atualização separado.
+2. **Banco de dados local do Arch:** As bibliotecas são resolvidas
+     com `readelf` + `pkgfile` contra a sync DB local — sem downloads
+     grandes nem serviço de atualização separado.
 3. **Dependências por soname real.** Identificadas com `readelf` +
    `pkgfile`, não por tabelas de nomes fixas de outras distribuições.
 4. **C++/Qt6 nativo, sem intérprete em runtime.** Um único binário,

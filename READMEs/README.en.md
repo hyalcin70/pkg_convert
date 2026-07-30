@@ -30,27 +30,23 @@ This tool converts them without AUR — using only official Arch sources.
 - **Copyable log**, persistent installation history
 - **Light/Dark** toggle (default: light)
 
-## Design choices
+## Design
 
-pkg_convert follows its own approach for foreign package formats,
-targeting users who want to convert directly on Arch without relying
-on AUR helpers for the conversion step itself.
-
-1. **One tool for both foreign formats.** Instead of combining
-   multiple single-format tools, pkg_convert covers **`.deb` and
-   `.rpm`** in the same GUI with consistent package layout.
-2. **Local Arch database instead of large foreign caches.** It uses
-   `pkgfile` against your existing Arch sync DB — no huge download,
-   no separate update daemon.
-3. **Dependencies via real soname lookups.** Required libraries are
-   identified with `readelf` + `pkgfile`, not fixed name tables from
-   other distributions.
-4. **Compiled C++/Qt6 without runtime interpreter dependency.**
-   A single native binary, no Python/Bash needed at runtime.
-5. **Integrated Qt6 GUI** with multilingual support, light/dark,
-   installation history, and copyable log.
-6. **No AUR helper required for install.** Build and test run from
-   plain source via `makepkg -si`.
+- **Both foreign formats:** `.deb` and `.rpm` are handled in the same
+  GUI.
+- **Arch lookup:** Libraries are resolved via `readelf` + `pkgfile`
+  against your local Arch sync DB.
+- **Native binaries:** Executables are placed under `/usr/bin/` so
+  they are in Arch's `PATH`; data/desktop files stay unchanged.
+- **GUI repo interaction:** Dependencies can be fetched automatically
+  via `pacman -S --asdeps`; install/uninstall are available from the
+  interface.
+- **No runtime interpreter dependency:** A single native binary,
+  without Python/Bash at runtime.
+- **Multilingual:** German, English, French, Spanish, Turkish,
+  Portuguese; light/dark; installation history; copyable log.
+- **No AUR helper required:** Build and test run from plain source via
+  `makepkg -si`.
 
 ### Honest limitations
 

@@ -359,6 +359,7 @@ private slots:
         hint.setIcon(QMessageBox::Warning);
         auto *okBtn = hint.addButton(QMessageBox::Ok);
         auto *cancelBtn = hint.addButton(QMessageBox::Cancel);
+        Q_UNUSED(okBtn);
         hint.exec();
         if (hint.clickedButton() == cancelBtn) {
             progress->setVisible(false);
@@ -477,7 +478,7 @@ private slots:
 
         // PKGBUILD schreiben
         QStringList mapped, unknown, aurDeps;
-        // debtap-Methode: echte Binaries scannen (readelf NEEDED) und jede
+        // Echte Binaries scannen (readelf NEEDED) und jede
         // Library via pkgfile zum ECHTEN Arch-Repo-Paketnamen aufloesen.
         // Keine geratene Namenstabelle mehr.
         depsFromBinaries(src, mapped, unknown, aurDeps);
@@ -893,7 +894,7 @@ private:
             }
         }
 
-        // Build the final .pkg.tar.zst — debtap nutzt ultrakompression
+        // Build the final .pkg.tar.zst — ultrakompression fuer .tar.zst
         const QString finalPkg = buildOut + "/" + QString("%1-%2-%3-%4.pkg.tar.zst").arg(name, ver, pkgrel, arch);
         QProcess buildProc;
         buildProc.start("bash", QStringList() << "-c"
@@ -995,7 +996,7 @@ private:
             {"noarch", "any"}, {"all", "any"}, {"any", "any"}};
         return m.value(a, a);
     }
-    // debtap-Methode: alle ELF-Binaries im Staging scannen, benoetigte
+    // ELF-Binaries im Staging scannen, benoetigte
     // Libraries (readelf NEEDED) sammeln und via pkgfile zum echten
     // Arch-Repo-Paket aufloesen. core/extra/multilib bevorzugt (kein AUR).
     void depsFromBinaries(const QString &stagingDir, QStringList &mapped, QStringList &unknown, QStringList &aurDeps) {
