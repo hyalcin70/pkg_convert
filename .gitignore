@@ -4,6 +4,7 @@ src/
 _build/
 *.pkg.tar.zst
 *.tar.zst
+Archiv.tar.gz
 *.o
 Makefile
 .qmake.stash
