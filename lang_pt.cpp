@@ -86,5 +86,14 @@ QMap<QString, QString> lang_pt() {
     m.insert("missingToolsHint", "Estas ferramentas sao necessarias para a conversao.\nSem elas nao e possivel extrair .deb/.rpm nem resolver dependencias corretamente.");
     m.insert("installMissing", "Instalar em falta (sudo)");
     m.insert("skip", "Continuar mesmo assim");
+        m.insert("autoVerify", "Verificar o pacote num fake root após compilar");
+    m.insert("verifyTitle", "Verificação em fake root");
+    m.insert("verifyRunning", "Verificando em fake root (instala o pacote e suas dependências)…");
+    m.insert("verifyOk", "✅ Verificação aprovada: %1 e %2 pacotes instalados no fake root, %3 arquivos presentes.");
+    m.insert("verifyFail", "❌ Verificação falhou:");
+    m.insert("verifyNeedSync", "A base de sincronização do pacman está ausente (/var/lib/pacman/sync) — execute antes «sudo pacman -Sy».");
+    m.insert("verifyTmpFail", "nenhum diretório temporário disponível");
+    m.insert("verifyNotRegistered", "O pacote não foi registado no fake root.");
+    m.insert("verifyMissingFiles", "%1 arquivo(s) esperado(s) estão ausentes no fake root.");
     return m;
 }

@@ -67,6 +67,10 @@ history.
 - **Copyable log**, persistent installation history
 - **Light/Dark** toggle (default: light), language selection (DE/EN/FR/ES/TR/PT)
 
+- **Fake root verification**: after building, the package is optionally installed into a temporary fake root, verifying registration and file list (checkbox).
+
+- **Fake root verification**: after building, the package is optionally installed into a temporary fake root, verifying registration and file list (checkbox).
+
 ## Why pkg_convert?
 
 Some programs are only available as `.deb` or `.rpm`, not in the

@@ -86,5 +86,14 @@ QMap<QString, QString> lang_tr() {
     m.insert("missingToolsHint", "Bu araclar donusturme icin gereklidir.\nOnlar olmadan .deb/.rpm cikartilamaz veya bagimliliklar cozulmez.");
     m.insert("installMissing", "Eksikleri kur (sudo)");
     m.insert("skip", "Yine de devam et");
+        m.insert("autoVerify", "Derlemeden sonra paketi sanal kökte doğrula");
+    m.insert("verifyTitle", "Sanal kök doğrulaması");
+    m.insert("verifyRunning", "Sanal kökte doğrulanıyor (paket ve bağımlılıkları kuruluyor)…");
+    m.insert("verifyOk", "✅ Doğrulama başarılı: %1 ve %2 paket sanal kökte kuruldu, %3 dosya mevcut.");
+    m.insert("verifyFail", "❌ Doğrulama başarısız:");
+    m.insert("verifyNeedSync", "Pacman eşitleme veritabanı eksik (/var/lib/pacman/sync) — önce „sudo pacman -Sy“ çalıştırın.");
+    m.insert("verifyTmpFail", "geçici dizin kullanılamıyor");
+    m.insert("verifyNotRegistered", "Paket sanal kökte kaydedilmedi.");
+    m.insert("verifyMissingFiles", "Beklenen %1 dosya sanal kökte eksik.");
     return m;
 }

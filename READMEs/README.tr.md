@@ -60,6 +60,8 @@ Arch kaynaklarını kullanarak.
 - **Kopyalanabilir günlük**, kalıcı kurulum geçmişi
 - **Açık/Koyu** değiştirici (varsayılan: açık)
 
+- **Sanal kök doğrulaması**: derlemeden sonra paket isteğe bağlı olarak geçici bir sanal kökte kurularak kayıt ve dosya listesi doğrulanır (onay kutusu).
+
 ## Tasarım
 
 - **İki farklı dış format:** `.deb` ve `.rpm` aynı arayüzde ele alınır.

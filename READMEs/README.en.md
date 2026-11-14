@@ -58,6 +58,10 @@ This tool converts them without AUR — using only official Arch sources.
 - **Copyable log**, persistent installation history
 - **Light/Dark** toggle (default: light)
 
+- **Fake root verification**: after building, the package is optionally installed into a temporary fake root, verifying registration and file list (checkbox).
+
+- **Fake root verification**: after building, the package is optionally installed into a temporary fake root, verifying registration and file list (checkbox).
+
 ## Design
 
 - **Both foreign formats:** `.deb` and `.rpm` are handled in the same

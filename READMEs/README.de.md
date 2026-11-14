@@ -61,6 +61,10 @@ offiziellen Arch-Quellen.
 - **Kopierbarer Log**, persistente Installations-Historie
 - **Hell/Dunkel**-Umschalter (Standard: hell)
 
+- **Fake-Root-Prüfung**: Nach dem Bau wird das Paket optional in einen temporären Fake-Root installiert und Registrierung sowie Dateiliste verifiziert (Checkbox).
+
+- **Fake-Root-Prüfung**: Nach dem Bau wird das Paket optional in einen temporären Fake-Root installiert und Registrierung sowie Dateiliste verifiziert (Checkbox).
+
 ## Gestaltung
 
 - **Beide Fremdformate:** `.deb` und `.rpm` werden in derselben GUI

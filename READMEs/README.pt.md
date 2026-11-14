@@ -61,6 +61,8 @@ fontes oficiais do Arch.
 - **Log copiável**, histórico de instalação persistente
 - **Alternador Claro/Escuro** (padrão: claro)
 
+- **Verificação em fake root**: após compilar, o pacote é opcionalmente instalado num fake root temporário para verificar o registo e a lista de ficheiros (caixa de seleção).
+
 ## Por que pkg_convert ?
 
 pkg_convert segue uma abordagem própria para formatos de pacotes

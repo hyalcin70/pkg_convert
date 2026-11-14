@@ -87,5 +87,14 @@ QMap<QString, QString> lang_de() {
     m.insert("missingToolsHint", "Diese Werkzeuge werden für die Konvertierung benötigt.\nOhne sie können .deb/.rpm nicht korrekt entpackt oder Abhängigkeiten nicht aufgelöst werden.");
     m.insert("installMissing", "Fehlende installieren (sudo)");
     m.insert("skip", "Trotzdem fortfahren");
+        m.insert("autoVerify", "Nach dem Bau im Fake-Root prüfen");
+    m.insert("verifyTitle", "Fake-Root-Prüfung");
+    m.insert("verifyRunning", "Prüfe im Fake-Root (installiert Paket + Abhängigkeiten)…");
+    m.insert("verifyOk", "✅ Prüfung bestanden: %1 samt %2 Paketen im Fake-Root installiert, %3 Dateien vorhanden.");
+    m.insert("verifyFail", "❌ Prüfung fehlgeschlagen:");
+    m.insert("verifyNeedSync", "Die Pacman-Sync-DB fehlt (/var/lib/pacman/sync) — bitte zuerst „sudo pacman -Sy“ ausführen.");
+    m.insert("verifyTmpFail", "kein temporäres Verzeichnis verfügbar");
+    m.insert("verifyNotRegistered", "Das Paket wurde im Fake-Root nicht registriert.");
+    m.insert("verifyMissingFiles", "%1 erwartete Datei(en) fehlen im Fake-Root.");
     return m;
 }

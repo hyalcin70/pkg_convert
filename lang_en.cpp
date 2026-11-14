@@ -93,5 +93,14 @@ QMap<QString, QString> lang_en() {
     m.insert("missingToolsHint", "These tools are required for conversion.\nWithout them .deb/.rpm cannot be extracted or dependencies resolved correctly.");
     m.insert("installMissing", "Install missing (sudo)");
     m.insert("skip", "Continue anyway");
-return m;
+    m.insert("autoVerify", "Verify the package in a fake root after building");
+    m.insert("verifyTitle", "Fake root verification");
+    m.insert("verifyRunning", "Verifying in fake root (installs package and its dependencies)…");
+    m.insert("verifyOk", "✅ Verification passed: %1 plus %2 packages installed in the fake root, %3 files present.");
+    m.insert("verifyFail", "❌ Verification failed:");
+    m.insert("verifyNeedSync", "The pacman sync DB is missing (/var/lib/pacman/sync) — run «sudo pacman -Sy» first.");
+    m.insert("verifyTmpFail", "no temporary directory available");
+    m.insert("verifyNotRegistered", "The package was not registered in the fake root.");
+    m.insert("verifyMissingFiles", "%1 expected file(s) are missing in the fake root.");
+    return m;
 }

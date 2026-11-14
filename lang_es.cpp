@@ -94,5 +94,14 @@ QMap<QString, QString> lang_es() {
     m.insert("installMissing", "Instalar faltantes (sudo)");
     m.insert("skip", "Continuar de todos modos");
 
+        m.insert("autoVerify", "Verificar el paquete en un fake root tras compilar");
+    m.insert("verifyTitle", "Verificación en fake root");
+    m.insert("verifyRunning", "Verificando en fake root (instala el paquete y sus dependencias)…");
+    m.insert("verifyOk", "✅ Verificación superada: %1 y %2 paquetes instalados en el fake root, %3 archivos presentes.");
+    m.insert("verifyFail", "❌ Verificación fallida:");
+    m.insert("verifyNeedSync", "Falta la base de datos de sincronización de pacman (/var/lib/pacman/sync): ejecuta antes «sudo pacman -Sy».");
+    m.insert("verifyTmpFail", "no hay directorio temporal disponible");
+    m.insert("verifyNotRegistered", "El paquete no se registró en el fake root.");
+    m.insert("verifyMissingFiles", "Faltan %1 archivo(s) esperado(s) en el fake root.");
     return m;
 }

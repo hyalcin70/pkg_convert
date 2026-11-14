@@ -60,6 +60,10 @@ solo fuentes oficiales de Arch.
 - **Registro copiable**, historial de instalación persistente
 - **Alternador Claro/Oscuro** (por defecto: claro)
 
+- **Verificación en fake root**: tras compilar, el paquete se instala opcionalmente en un fake root temporal para verificar el registro y la lista de archivos (casilla).
+
+- **Verificación en fake root**: tras compilar, el paquete se instala opcionalmente en un fake root temporal para verificar el registro y la lista de archivos (casilla).
+
 ## Diseño
 
 - **Ambos formatos externos:** `.deb` y `.rpm` se gestionan en la

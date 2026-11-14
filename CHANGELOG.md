@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.0-4 (15. November 2026)
+
+### Neu
+- **Fake-Root-Prüfung nach dem Bau**: Das fertige Paket wird (optional, per Checkbox)
+  in einen temporären Fake-Root installiert; Registrierung und Dateiliste werden
+  automatisch verifiziert. Hilft sofort zu sehen, ob das Paket sauber installierbar ist.
+
 ## 1.0.0-3 (14. November 2026)
 
 ### Geändert

@@ -61,6 +61,10 @@ les sources officielles d'Arch.
 - **Journal copiable**, historique d'installation persistant
 - **Basculateur Clair/Sombre** (par défaut : clair)
 
+- **Vérification en faux root** : après la construction, le paquet est éventuellement installé dans un faux root temporaire pour vérifier l'enregistrement et la liste des fichiers (case à cocher).
+
+- **Vérification en faux root** : après la construction, le paquet est éventuellement installé dans un faux root temporaire pour vérifier l'enregistrement et la liste des fichiers (case à cocher).
+
 ## Conception
 
 - **Deux formats externes :** `.deb` et `.rpm` sont pris en charge

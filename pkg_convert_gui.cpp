@@ -10,6 +10,7 @@
 #include <QPushButton>
 #include <QTextEdit>
 #include <QProgressBar>
+#include <QCheckBox>
 
 // Sprach-Tabellen (pro Sprache eine eigene Datei lang_XX.cpp)
 QMap<QString, QString> lang_de();
@@ -207,6 +208,7 @@ private slots:
         if (btnInstall) btnInstall->setText(i18n("install"));
         if (inst_h)    inst_h->setText(i18n("installed"));
         if (uninstallBtn) uninstallBtn->setText(i18n("uninstall"));
+        if (verifyChk) verifyChk->setText(i18n("autoVerify"));
         if (themeBtn)  themeBtn->setText(m_dark ? i18n("themeLight") : i18n("themeDark"));
         if (langLbl)   langLbl->setText(i18n("langLabel"));
         if (langCombo) {
@@ -609,6 +611,8 @@ private slots:
         // an src/staging (games-Verschiebung etc.).
         writePackageMetadata(buildOut, name, ver, pkgrel, arch, desc, meta, isDeb, mapped);
 
+        QString builtPkg;
+        bool buildOk = false;
         if (build) {
             // Paket wurde bereits von writePackageMetadata gebaut.
             const QString built = buildOut + "/" + QString("%1-%2-%3-%4.pkg.tar.zst").arg(name, ver, pkgrel, arch);
@@ -617,6 +621,8 @@ private slots:
                 status->setText(i18n("msgPkgBuilt"));
                 m_lastPkg = built;
                 m_lastName = name;
+                builtPkg = built;
+                buildOk = true;
                 btnInstall->setEnabled(true);
             } else {
                 result += i18n("msgBuildFail") + "\nPaketmetadaten konnten nicht geschrieben werden.\n";
@@ -646,9 +652,100 @@ private slots:
             status->setText(i18n("msgPkgbuildDone"));
         }
 
+        // Optionale Pruefung: Paket in einen temporaeren Fake-Root installieren
+        // und Registrierung + Dateiliste verifizieren.
+        if (buildOk && verifyChk && verifyChk->isChecked() && QFile::exists(builtPkg)) {
+            status->setText(i18n("verifyRunning"));
+            result += "\n── " + i18n("verifyTitle") + " ──\n";
+            result += verifyInFakeRoot(builtPkg, name);
+            status->setText(i18n("msgPkgBuilt"));
+        }
+
         depView->setPlainText(result);
         progress->setVisible(false);
         btnBuild->setEnabled(true);
+    }
+
+    // Baut das fertige Paket in einen temporaeren Fake-Root und prueft,
+    // ob es sauber installierbar ist (Metadaten, Abhaengigkeiten, Dateiliste).
+    QString verifyInFakeRoot(const QString &pkgPath, const QString &pkgName) {
+        // Downloads via pkexec/root laufen nur auf Dateisystemen, die das
+        // zulassen (/var/tmp hat sich bewaehrt); Fallback auf System-Temp.
+        const QString base = QFileInfo(QStringLiteral("/var/tmp")).isWritable()
+                                 ? QStringLiteral("/var/tmp")
+                                 : QDir::tempPath();
+        QTemporaryDir tmp(base + QStringLiteral("/pkg_convert-verify-XXXXXX"));
+        if (!tmp.isValid())
+            return i18n("verifyFail") + " (" + i18n("verifyTmpFail") + ")\n";
+
+        const QString root  = tmp.filePath("root");
+        const QString db    = root + "/var/lib/pacman";
+        const QString cache = root + "/cache";
+        QDir().mkpath(db);
+        QDir().mkpath(cache);
+
+        // Sync-DB als Basis fuer die Abhaengigkeits-Aufloesung.
+        const QString hostSync = "/var/lib/pacman/sync";
+        if (!QDir(hostSync).exists())
+            return i18n("verifyFail") + "\n" + i18n("verifyNeedSync") + "\n";
+        copyDir(hostSync, db + "/sync");
+
+        // pacman laeuft ueber pkexec als root und schreibt in diese Pfade;
+        // Verzeichnisse daher fuer alle schreibbar machen (sonst "Keine Berechtigung").
+        QProcess::execute("chmod", QStringList() << "-R" << "777" << root);
+
+        // Paket samt Abhaengigkeiten in den Fake-Root installieren.
+        // Root-Rechte noetig -> pkexec (Polkit-Dialog), wie bei Install/Deinstall.
+        QProcess inst;
+        inst.start("pkexec", QStringList()
+                   << "pacman" << "-U" << "--noconfirm" << "--noprogressbar"
+                   << "-r" << root << "--dbpath" << db << "--cachedir" << cache
+                   << pkgPath);
+        inst.waitForFinished(-1);
+        const int rc = inst.exitCode();
+        const QString out = QString::fromUtf8(inst.readAllStandardOutput())
+                          + QString::fromUtf8(inst.readAllStandardError());
+
+        // Registrierung pruefen (unabhaengig vom Exit-Code, da z.B. Hooks scheitern koennen).
+        QProcess chk;
+        chk.start("pacman", QStringList() << "-Q" << "-r" << root << "--dbpath" << db << pkgName);
+        chk.waitForFinished(60000);
+        const bool registered = (chk.exitCode() == 0);
+
+        // Anzahl installierter Pakete im Fake-Root (Paket + Abhaengigkeiten).
+        QProcess cnt;
+        cnt.start("pacman", QStringList() << "-Qq" << "-r" << root << "--dbpath" << db);
+        cnt.waitForFinished(60000);
+        const int pkgCount = QString::fromUtf8(cnt.readAllStandardOutput())
+                             .split('\n', Qt::SkipEmptyParts).size();
+
+        // Dateiliste des Pakets gegen den Fake-Root pruefen (Stichprobe).
+        QProcess list;
+        list.start("bsdtar", QStringList() << "-tf" << pkgPath);
+        list.waitForFinished(60000);
+        const QStringList entries =
+            QString::fromUtf8(list.readAllStandardOutput()).split('\n', Qt::SkipEmptyParts);
+        int present = 0, missing = 0, checked = 0;
+        for (const QString &e : entries) {
+            if (e.endsWith('/')) continue;                    // Verzeichnisse ueberspringen
+            if (e.startsWith(".PKGINFO") || e.startsWith(".MTREE")) continue;
+            ++checked;
+            if (checked > 60) break;                          // Stichprobe genuegt
+            if (QFile::exists(root + "/" + e)) ++present; else ++missing;
+        }
+
+        if (registered && missing == 0)
+            return i18n("verifyOk").arg(pkgName).arg(pkgCount).arg(present) + "\n";
+
+        QString detail = i18n("verifyFail") + "\n";
+        if (!registered) detail += "• " + i18n("verifyNotRegistered") + "\n";
+        if (missing > 0)   detail += "• " + i18n("verifyMissingFiles").arg(missing) + "\n";
+        if (rc != 0)       detail += "• pacman exit=" + QString::number(rc) + "\n";
+        if (!out.isEmpty()) {
+            const QStringList lines = out.split('\n', Qt::SkipEmptyParts);
+            detail += lines.mid(qMax(0, lines.size() - 12)).join("\n") + "\n";
+        }
+        return detail;
     }
 
 private:
@@ -1390,6 +1487,13 @@ private:
         bl->addWidget(btnBuild, 2);
         bl->addWidget(btnInstall, 1);
         bv->addLayout(bl);
+        verifyChk = new QCheckBox(i18n("autoVerify"));
+        verifyChk->setObjectName("ghost");
+        verifyChk->setChecked(m_settings.value("autoVerify", true).toBool());
+        connect(verifyChk, &QCheckBox::toggled, this, [this](bool on) {
+            m_settings.setValue("autoVerify", on);
+        });
+        bv->addWidget(verifyChk);
         v->addWidget(bcard);
 
         // Liste der installierten Pakete (persistent ueber QSettings)
@@ -1451,6 +1555,7 @@ private:
     QPushButton *browseBtn = nullptr, *uninstallBtn = nullptr;
     QComboBox *langCombo = nullptr;
     QListWidget *instList = nullptr;  // Liste der installierten Pakete (persistent)
+    QCheckBox *verifyChk = nullptr;   // Auto-Pruefung im Fake-Root nach dem Bau
     QString m_path;
     QString m_lastPkg;  // Pfad zum zuletzt gebauten Paket (fuer Installieren)
     QString m_lastName; // pkgname des zuletzt gebauten Pakets
