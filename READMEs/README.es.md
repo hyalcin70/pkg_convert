@@ -1,5 +1,7 @@
 # Paket Converter
 
+![SattNEK Logo](../created_by_sattnek.png)
+
 Una herramienta nativa de C++/Qt6 que convierte paquetes `.deb` y
 `.rpm` en paquetes **Arch Linux** instalables (`.pkg.tar.zst`) — con
 detección real de dependencias, instalación automática de bibliotecas

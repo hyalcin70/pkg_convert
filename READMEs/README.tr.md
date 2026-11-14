@@ -1,5 +1,7 @@
 # Paket Converter
 
+![SattNEK Logo](../created_by_sattnek.png)
+
 Yerel C++/Qt6 aracıdır; `.deb` ve `.rpm` paketlerini kurulabilir
 **Arch Linux** paketlerine (`.pkg.tar.zst`) çevirir — gerçek
 bağımlılık tespiti, kütüphanelerin repo'dan otomatik kurulumu ve
