@@ -23,7 +23,12 @@ solo fuentes oficiales de Arch.
 
 - **deb/rpm → Arch** : extrae, detecta bibliotecas necesarias vía
   `readelf` + `pkgfile` (soname exacto, sin tablas adivinadas)
+  y evalúa los metadatos `Depends`/`Requires` extranjeros (también
+  bibliotecas cargadas con dlopen, como X11, Wayland o Vulkan)
 - **Instalación auto** de dependencias vía `pacman -S --asdeps`
+- **Mejor proveedor:** Si varios paquetes incluyen la misma biblioteca,
+  una puntuación por nombre (subcadena + coincidencia de tokens, repos
+  oficiales primero) evita elegir un paquete arbitrario
 - **Ruta del binario** : Los ejecutables de los programas/juegos se mueven a `/usr/bin/` para que estén en el `PATH` de Arch.
 - **Aviso** para paquetes de solo datos (sin ejecutable)
 - **Ventana de pista** al instalar si faltan paquetes de datos
@@ -36,7 +41,8 @@ solo fuentes oficiales de Arch.
 - **Ambos formatos externos:** `.deb` y `.rpm` se gestionan en la
   misma GUI.
 - **Búsqueda en Arch:** Las bibliotecas se resuelven con `readelf` +
-  `pkgfile` contra tu sync DB local de Arch.
+  `pkgfile` contra tu sync DB local de Arch, más los metadatos
+  `Depends`/`Requires` extranjeros.
 - **Binarios nativos:** Los ejecutables se colocan en `/usr/bin/` para
   que estén en el `PATH` de Arch; los datos/desktops permanecen
   intactos.
@@ -53,9 +59,13 @@ solo fuentes oficiales de Arch.
 
 ### Limitaciones honestas
 
-- Aún sin script `.INSTALL` para refresco automático de caché de
-  iconos; los iconos del menú pueden requerir `gtk-update-icon-cache`
-  + `update-desktop-database` manual.
+- Aún sin script `.INSTALL`: las cachés de iconos y escritorio no se
+  refrescan automáticamente; una app convertida puede aparecer en el menú
+  solo tras `gtk-update-icon-cache` + `update-desktop-database` y/o un
+  refresco del menú KDE (`kbuildsycoca6 --noincremental` o reiniciar
+  sesión).
+- Los nombres de paquetes extranjeros sin entrada en la tabla se
+  reportan como no mapeados en lugar de adivinarse.
 - `makepkg` quita símbolos por defecto; funcionalmente igual a una
   copia 1:1, solo más pequeño.
 - `pkgname` lleva sufijo de versión, ej. `program-1.99.16`.
@@ -77,7 +87,7 @@ Después **Paket Converter** aparece en el menú KDE
 
 1. **Examinar** → seleccionar un archivo `.deb` o `.rpm`
 2. **Construir paquete** (o «Paquete + Fuentes»)
-3. **Instalar paquete** → introducir contraseña, listo
+3. **Instalar paquete** → confirmar el diálogo de Polkit, listo
 
 ## Notas
 
@@ -89,4 +99,4 @@ Después **Paket Converter** aparece en el menú KDE
 ## Dependencias
 
 `qt6-base` (proporciona `qmake6`), `pacman`, `file`, `binutils`,
-`cpio`, `libarchive`
+`cpio`, `libarchive`, `pkgfile`, `polkit`

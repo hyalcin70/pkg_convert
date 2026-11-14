@@ -23,7 +23,13 @@ les sources officielles d'Arch.
 
 - **deb/rpm → Arch** : extrait, détecte les bibliothèques requises via
   `readelf` + `pkgfile` (soname exact, pas de tables devinées)
+  et évalue les métadonnées `Depends`/`Requires` étrangères (les
+  bibliothèques chargées par dlopen, comme X11, Wayland ou Vulkan,
+  sont aussi détectées)
 - **Installation auto** des dépendances via `pacman -S --asdeps`
+- **Meilleur fournisseur :** Si plusieurs paquets fournissent la même
+  bibliothèque, un score de nom (sous-chaîne + correspondance de jetons,
+  dépôts officiels d'abord) évite de choisir un pack arbitraire
 - **Chemin binaire** : Les fichiers exécutables des programmes/jeux sont déplacés vers `/usr/bin/` pour qu'ils soient dans le `PATH` d'Arch.
 - **Avertissement** pour les paquets de données purs (sans exécutable)
 - **Popup d'indice** à l'installation si des paquets de données
@@ -36,7 +42,8 @@ les sources officielles d'Arch.
 - **Deux formats externes :** `.deb` et `.rpm` sont pris en charge
   dans la même interface.
 - **Résolution Arch :** Les bibliothèques sont résolues via `readelf`
-  + `pkgfile` contre votre sync DB locale.
+  + `pkgfile` contre votre sync DB locale, plus les métadonnées
+  `Depends`/`Requires` étrangères.
 - **Binaires natifs :** Les exécutables sont placés sous `/usr/bin/`
   pour le `PATH` d'Arch ; données et fichiers desktop restent
   inchangés.
@@ -53,9 +60,13 @@ les sources officielles d'Arch.
 
 ### Limites honnêtes
 
-- Pas encore de script `.INSTALL` pour le rafraîchissement automatique
-  du cache d’icônes ; les icônes du menu peuvent nécessiter un
-  `gtk-update-icon-cache` + `update-desktop-database` manuel.
+- Toujours pas de script `.INSTALL` : les caches d'icônes et de bureau
+  ne sont pas rafraîchis automatiquement ; une application convertie peut
+  n'apparaître dans le menu qu'après `gtk-update-icon-cache` +
+  `update-desktop-database` et/ou un rafraîchissement du menu KDE
+  (`kbuildsycoca6 --noincremental` ou reconnexion).
+- Les noms de paquets étrangers sans entrée dans la table de
+  correspondance sont signalés comme non mappés au lieu d'être devinés.
 - `makepkg` strip les binaires par défaut ; fonctionnellement identique
   à une copie 1:1 d’autres outils, seulement plus petit.
 - `pkgname` porte un suffixe de version, ex. `program-1.99.16`.
@@ -77,7 +88,7 @@ Ensuite **Paket Converter** apparaît dans le menu KDE
 
 1. **Parcourir** → sélectionner un fichier `.deb` ou `.rpm`
 2. **Construire le paquet** (ou « Paquet + Sources »)
-3. **Installer le paquet** → saisir le mot de passe, terminé
+3. **Installer le paquet** → confirmer la boîte de dialogue Polkit, terminé
 
 ## Notes
 
@@ -90,4 +101,4 @@ Ensuite **Paket Converter** apparaît dans le menu KDE
 ## Dépendances
 
 `qt6-base` (fournit `qmake6`), `pacman`, `file`, `binutils`, `cpio`,
-`libarchive`
+`libarchive`, `pkgfile`, `polkit`

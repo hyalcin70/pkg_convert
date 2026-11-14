@@ -29,8 +29,13 @@ repos, and a persistent installation history.
 ## Features (short)
 
 - **deb/rpm → Arch**: extracts, detects required libraries via
-  `readelf` + `pkgfile` (exact soname)
+  `readelf` + `pkgfile` (exact soname) and evaluates foreign
+  `Depends`/`Requires` metadata (dlopen-loaded libs like X11, Wayland or
+  Vulkan are found too)
 - **Auto-install** of repo dependencies via `pacman -S --asdeps`
+- **Best provider**: if several packages ship the same library, a name
+  score (substring + token match, official repos first) wins over an
+  arbitrary bundle
 - **Binary path**: Executables from programs/games are moved to `/usr/bin/` so they are in Arch's `PATH`.
 - **Warning** for pure data packages (no executable program)
 - **Hint popup** on install if additional data packages
@@ -49,8 +54,8 @@ using only official Arch sources.
 2. **No extra download step.** It uses `pkgfile` against your local
    Arch sync DB — no large foreign package cache needed.
 3. **Dependencies via real soname lookups.** Required libraries are
-   identified with `readelf` + `pkgfile`, not fixed name tables from
-   other distributions.
+   identified with `readelf` + `pkgfile` plus foreign `Depends`/`Requires`
+   metadata, not fixed name tables from other distributions.
 4. **Native C++/Qt6, no runtime interpreter dependency.** A single
    native binary, no Python/Bash needed at runtime.
 5. **Integrated Qt6 GUI** with 6 languages (DE/EN/FR/ES/TR/PT),
@@ -60,9 +65,12 @@ using only official Arch sources.
 
 ### Honest limitations
 
-- No `.INSTALL` script for automatic icon-cache refresh; menu icons
-  may only appear after manual `gtk-update-icon-cache` +
-  `update-desktop-database`.
+- No `.INSTALL` script: icon and desktop caches are not refreshed
+  automatically; a converted app may only appear in the menu after
+  `gtk-update-icon-cache` + `update-desktop-database` and/or a KDE menu
+  refresh (`kbuildsycoca6 --noincremental` or re-login).
+- Foreign package names without a mapping-table entry are reported as
+  unmapped instead of being guessed.
 - `makepkg` strips binaries by default; functionally the same as a
   1:1 copy from other tools, just smaller.
 - `pkgname` carries a version suffix, e.g. `program-1.99.16`.

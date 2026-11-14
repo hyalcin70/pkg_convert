@@ -23,7 +23,12 @@ offiziellen Arch-Quellen.
 
 - **deb/rpm → Arch**: extrahiert, erkennt benötigte Bibliotheken über
   `readelf` + `pkgfile` (exakte soname, keine geratenen Tabellen)
+  und wertet fremde `Depends`/`Requires`-Metadaten aus (auch per
+  `dlopen` geladene Bibliotheken wie X11, Wayland oder Vulkan)
 - **Auto-Install** der Repo-Abhängigkeiten via `pacman -S --asdeps`
+- **Bester Anbieter**: Liefern mehrere Pakete dieselbe Bibliothek,
+  gewinnt der namensbeste Treffer (Teilstring- und Token-Abgleich,
+  offizielle Repos zuerst) statt eines beliebigen Bündlers
 - **Binary-Pfad**: Ausführbare Dateien aus den Programmen/Spielen werden nach `/usr/bin/` verschoben, damit sie unter Arch im `PATH` liegen.
 - **Warnung** bei reinen Datenpaketen (ohne ausführbares Programm)
 - **Hinweis-Popup** beim Installieren, falls zusätzliche Datenpakete
@@ -36,7 +41,8 @@ offiziellen Arch-Quellen.
 - **Beide Fremdformate:** `.deb` und `.rpm` werden in derselben GUI
   verarbeitet.
 - **Arch-Lookup:** Bibliotheken werden über `readelf` + `pkgfile`
-  gegen die lokale Arch-Sync-DB aufgelöst.
+  gegen die lokale Arch-Sync-DB aufgelöst; zusätzlich fließen fremde
+  `Depends`/`Requires`-Metadaten ein.
 - **Native Binaries:** Ausführbare Dateien landen über `/usr/bin/` im
   Arch-`PATH`; Daten/Desktops bleiben unberührt.
 - **GUI-Repo-Interaktion:** Abhängigkeiten können automatisch über
@@ -52,9 +58,13 @@ offiziellen Arch-Quellen.
 
 ### Ehrliche Einschränkungen
 
-- Kein `.INSTALL`-Skript für automatische Icon-Cache-Aktualisierung;
-  Menü-Icons erscheinen ggf. erst nach manuellem `gtk-update-icon-cache`
-  + `update-desktop-database`.
+- Kein `.INSTALL`-Skript: Icon- und Desktop-Caches werden nicht
+  automatisch aktualisiert; eine konvertierte App erscheint ggf. erst im
+  Menü, nachdem `gtk-update-icon-cache` + `update-desktop-database`
+  ausgeführt wurden und/oder der KDE-Menücache neu gebaut wurde
+  (`kbuildsycoca6 --noincremental` bzw. Neuanmeldung).
+- Fremde Paketnamen ohne Tabelleneintrag werden als unmapped gemeldet,
+  statt geraten zu werden.
 - `makepkg` strippt Binaries standardmäßig; funktional identisch zur
   1:1-Kopie anderer Werkzeuge, nur kleiner.
 - `pkgname` trägt einen Versions-Suffix, z.B. `program-1.99.16`.
@@ -76,7 +86,7 @@ Danach erscheint **Paket Converter** im KDE-Menü
 
 1. **Durchsuchen** → eine `.deb`- oder `.rpm`-Datei auswählen
 2. **Paket bauen** (oder „Paket + Quellen")
-3. **Paket installieren** → Passwort eingeben, fertig
+3. **Paket installieren** → Polkit-Dialog bestätigen, fertig
 
 ## Hinweise
 
@@ -89,4 +99,4 @@ Danach erscheint **Paket Converter** im KDE-Menü
 ## Abhängigkeiten
 
 `qt6-base` (bietet `qmake6` zum Bauen), `pacman`, `file`,
-`binutils`, `cpio`, `libarchive`
+`binutils`, `cpio`, `libarchive`, `pkgfile`, `polkit`

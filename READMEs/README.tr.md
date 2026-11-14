@@ -22,7 +22,13 @@ Arch kaynaklarını kullanarak.
 
 - **deb/rpm → Arch** : çıkarır, gereken kütüphaneleri `readelf` +
   `pkgfile` ile bulur (tam soname, tahmin edilen tablolar yok)
+  ve yabancı `Depends`/`Requires` üstverilerini değerlendirir
+  (dlopen ile yüklenen X11, Wayland veya Vulkan gibi kütüphaneler de
+  bulunur)
 - **Otomatik kurulum** : repo bağımlılıkları `pacman -S --asdeps` ile
+- **En iyi sağlayıcı:** Aynı kütüphane birden fazla pakette varsa, ad
+  skoru (alt dizge + jeton eşleşmesi, önce resmi depolar) keyfi bir
+  takımın yerine doğru olanı seçer
 - **Binary yolu** : Programların/oyunların çalıştırılabilir dosyaları `/usr/bin/` üzerine taşınır, böylece Arch'ın `PATH` içinde yer alır.
 - **Uyarı** : yalnızca veri paketlerinde (çalıştırılabilir yok)
 - **İpucu penceresi** : kurulumda eksik veri paketleri
@@ -34,7 +40,8 @@ Arch kaynaklarını kullanarak.
 
 - **İki farklı dış format:** `.deb` ve `.rpm` aynı arayüzde ele alınır.
 - **Arch çözümleme:** Kütüphaneler `readelf` + `pkgfile` ile mevcut
-  Arch sync DB üzerinden çözümlenir.
+  Arch sync DB üzerinden çözümlenir; yabancı `Depends`/`Requires`
+  üstverileri de değerlendirilir.
 - **Yerel ikili dosyalar:** Çalıştırılabilirler `/usr/bin/` altına
   alınır, veri/desktop dosyalarına dokunulmaz.
 - **Depo etkileşimi:** Bağımlılıklar `pacman -S --asdeps` ile
@@ -47,9 +54,13 @@ Arch kaynaklarını kullanarak.
 
 ### Dürüst sınırlamalar
 
-- Henüz ikon önbelleği için `.INSTALL` betiği yok; menü ikonları
-  `gtk-update-icon-cache` + `update-desktop-database` ile el ile
-  güncellenebilir.
+- Henüz `.INSTALL` betiği yok: ikon ve masaüstü önbellekleri otomatik
+  yenilenmez; dönüştürülen bir uygulama `gtk-update-icon-cache` +
+  `update-desktop-database` ve/veya KDE menü yenilemesi
+  (`kbuildsycoca6 --noincremental` veya yeniden oturum açma) sonrasında
+  menüde görünebilir.
+- Eşleme tablosunda kaydı olmayan yabancı paket adları, tahmin etmek
+  yerine eşlenmemiş olarak bildirilir.
 - `makepkg` varsayılan olarak sembolleri çıkarır; işlevsel olarak
   diğer araçların 1:1 kopyasıyla aynıdır, daha küçüktür.
 - `pkgname` sürüm son eki taşır, örn. `program-1.99.16`.
@@ -71,7 +82,7 @@ Ardından **Paket Converter** KDE menüsünde görünür
 
 1. **Gözat** → bir `.deb` veya `.rpm` dosyası seç
 2. **Paket oluştur** (veya "Paket + Kaynaklar")
-3. **Paketi kur** → parolayı gir, tamam
+3. **Paketi kur** → Polkit ile onayla, tamam
 
 ## Notlar
 
@@ -83,4 +94,4 @@ Ardından **Paket Converter** KDE menüsünde görünür
 ## Bağımlılıklar
 
 `qt6-base` (`qmake6` sağlar), `pacman`, `file`, `binutils`, `cpio`,
-`libarchive`
+`libarchive`, `pkgfile`, `polkit`

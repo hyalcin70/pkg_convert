@@ -23,7 +23,13 @@ fontes oficiais do Arch.
 
 - **deb/rpm → Arch** : extrai, detecta bibliotecas necessárias via
   `readelf` + `pkgfile` (soname exato, sem tabelas adivinhadas)
+  e avalia metadados `Depends`/`Requires` estrangeiros (bibliotecas
+  carregadas via dlopen, como X11, Wayland ou Vulkan, também entram)
 - **Instalação auto** de dependências via `pacman -S --asdeps`
+- **Melhor fornecedor:** Se vários pacotes incluírem a mesma
+  biblioteca, uma pontuação por nome (subcadeia + correspondência de
+  tokens, repositórios oficiais primeiro) evita escolher um conjunto
+  arbitrário
 - **Caminho do binário** : Os executáveis dos programas/jogos são movidos para `/usr/bin/` para ficarem no `PATH` do Arch.
 - **Aviso** para pacotes de dados puros (sem executável)
 - **Popup de dica** na instalação se faltarem pacotes de dados
@@ -54,9 +60,13 @@ sem depender de helpers do AUR nessa etapa.
 
 ### Limitações honestas
 
-- Ainda sem script `.INSTALL` para atualização automática do cache de
-  ícones; os ícones do menu podem exigir `gtk-update-icon-cache` +
-  `update-desktop-database` manual.
+- Ainda sem script `.INSTALL`: os caches de ícones e desktop não são
+  atualizados automaticamente; um app convertido pode só aparecer no menu
+  após `gtk-update-icon-cache` + `update-desktop-database` e/ou uma
+  atualização do menu KDE (`kbuildsycoca6 --noincremental` ou novo
+  login).
+- Nomes de pacotes estrangeiros sem entrada na tabela de mapeamento são
+  relatados como não mapeados em vez de serem adivinhados.
 - `makepkg` remove símbolos por padrão; funcionalmente igual a uma
   cópia 1:1, só que menor.
 - `pkgname` carrega um sufixo de versão, ex. `program-1.99.16`.
@@ -78,7 +88,7 @@ Depois **Paket Converter** aparece no menu KDE
 
 1. **Navegar** → selecionar um arquivo `.deb` ou `.rpm`
 2. **Construir pacote** (ou "Pacote + Fontes")
-3. **Instalar pacote** → inserir senha, pronto
+3. **Instalar pacote** → confirmar o diálogo do Polkit, pronto
 
 ## Notas
 
@@ -90,4 +100,4 @@ Depois **Paket Converter** aparece no menu KDE
 ## Dependências
 
 `qt6-base` (fornece `qmake6`), `pacman`, `file`, `binutils`, `cpio`,
-`libarchive`
+`libarchive`, `pkgfile`, `polkit`
