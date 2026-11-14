@@ -2,6 +2,8 @@
 
 ![SattNEK Logo](../created_by_sattnek.png)
 
+**Licencia:** GPL-3.0 con la cláusula Commons — uso no comercial libre; el uso comercial solo con autorización previa.
+
 ## ¿Qué es pkg_convert?
 
 **pkg_convert** significa **Package Converter** (convertidor de paquetes):

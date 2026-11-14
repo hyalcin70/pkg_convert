@@ -2,6 +2,8 @@
 
 ![SattNEK Logo](../created_by_sattnek.png)
 
+**License:** GPL-3.0 with the Commons Clause — free for non-commercial use; commercial use only with permission.
+
 ## What is pkg_convert?
 
 **pkg_convert** stands for **Package Converter**: a native C++/Qt6 tool

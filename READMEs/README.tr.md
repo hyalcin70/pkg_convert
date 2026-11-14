@@ -2,6 +2,8 @@
 
 ![SattNEK Logo](../created_by_sattnek.png)
 
+**Lisans:** GPL-3.0 + Commons Clause — ticari olmayan kullanım özgür; ticari kullanım yalnızca önceden izinle.
+
 ## pkg_convert nedir?
 
 **pkg_convert**, **Package Converter** (paket dönüştürücü) anlamına gelir:

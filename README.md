@@ -6,6 +6,8 @@
 > break, or behave unexpectedly. Use at your own risk and report issues on
 > the issue tracker.
 
+**License:** GPL-3.0 with the Commons Clause — free for non-commercial use; commercial use only with permission.
+
 ## What is pkg_convert?
 
 **pkg_convert** stands for **Package Converter**: a native C++/Qt6 tool
