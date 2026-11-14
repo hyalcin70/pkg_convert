@@ -4,7 +4,7 @@
 
 **Lizenz:** GPL-3.0 mit Commons Clause — freie nicht-kommerzielle Nutzung; kommerzielle Nutzung nur mit Genehmigung.
 
-**Urheberrecht:** © 2026 Hakan Yalçın. Jede Nutzung außerhalb dieser Lizenz — insbesondere kommerzielle Nutzung, Verkauf, das Entfernen von Urheberrechts- oder Lizenzhinweisen sowie eine Fremdbezeichnung — ist ausdrücklich untersagt. Verstöße gegen diese Bedingungen werden strafrechtlich verfolgt.
+**Urheberrecht:** © 2026 Hakan Yalçın. Jede Nutzung außerhalb dieser Lizenz — insbesondere kommerzielle Nutzung, Verkauf, das Entfernen von Urheberrechts- oder Lizenzhinweisen sowie eine Fremdbezeichnung — ist ausdrücklich untersagt.
 
 ## Was ist pkg_convert?
 
