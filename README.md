@@ -1,5 +1,7 @@
 # Paket Converter
 
+![SattNEK Logo](created_by_sattnek.png)
+
 > 🧪 **Beta status.** This project is still in **beta**. Features may change,
 > break, or behave unexpectedly. Use at your own risk and report issues on
 > the issue tracker.
