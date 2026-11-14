@@ -4,6 +4,8 @@
 
 **Licence :** GPL-3.0 avec la clause Commons — usage non commercial libre ; tout usage commercial nécessite une autorisation préalable.
 
+**Droit d'auteur :** © 2026 Hakan Yalçın. Tout usage en dehors de cette licence — notamment un usage commercial, la vente, la suppression des mentions de droit d'auteur ou de licence, ou le fait de se l'approprier — est strictement interdit.
+
 ## Qu'est-ce que pkg_convert ?
 
 **pkg_convert** signifie **Package Converter** (convertisseur de paquets) :

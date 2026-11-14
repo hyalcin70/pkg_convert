@@ -4,6 +4,8 @@
 
 **Lisans:** GPL-3.0 + Commons Clause — ticari olmayan kullanım özgür; ticari kullanım yalnızca önceden izinle.
 
+**Telif hakkı:** © 2026 Hakan Yalçın. Bu lisansın dışında herhangi bir kullanım — özellikle ticari kullanım, satış, telif veya lisans bildirimlerinin kaldırılması ya da yazılımı kendinize mal etme — kesinlikle yasaktır.
+
 ## pkg_convert nedir?
 
 **pkg_convert**, **Package Converter** (paket dönüştürücü) anlamına gelir:
