@@ -1,7 +1,7 @@
 pkgbase = pkg_convert
 	pkgdesc = Converts .deb/.rpm packages into installable Arch-Linux packages (native Qt6 GUI)
 	pkgver = 1.0.0
-	pkgrel = 2
+	pkgrel = 3
 	url = https://github.com/hyalcin70/pkg_convert
 	arch = x86_64
 	license = custom:GPL-3.0-with-Commons-Clause

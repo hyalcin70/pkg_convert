@@ -1,7 +1,7 @@
 # Maintainer: Hakan Yalçın
 pkgname=pkg_convert
 pkgver=1.0.0
-pkgrel=2
+pkgrel=3
 pkgdesc="Converts .deb/.rpm packages into installable Arch-Linux packages (native Qt6 GUI)"
 arch=('x86_64')
 url="https://github.com/hyalcin70/pkg_convert"
