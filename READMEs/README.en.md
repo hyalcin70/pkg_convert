@@ -4,7 +4,7 @@
 
 **License:** GPL-3.0 with the Commons Clause — free for non-commercial use; commercial use only with permission.
 
-**Copyright:** © 2026 Hakan Yalçın. Any use outside this license — especially commercial use, selling, removing copyright or license notices, or claiming the software as your own — is strictly prohibited.
+**Copyright:** © 2026 Hakan Yalçın. Any use outside this license — especially commercial use, selling, removing copyright or license notices, or claiming the software as your own — is strictly prohibited. Violations of these terms will be prosecuted under criminal law.
 
 ## What is pkg_convert?
 
