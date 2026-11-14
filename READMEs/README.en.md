@@ -19,7 +19,9 @@ installation of libraries, and a persistent installation history.
 > Fedora, openSUSE, …) will **not** be answered — the tool produces
 > `.pkg.tar.zst` packages, which only work on Arch-based systems.
 
-## 🆕 What's new (1.0.0-2)
+## 🆕 What's new (1.0.0-4)
+
+- **Fake root verification after building**: the finished package is optionally installed into a temporary fake root (checkbox); registration and file list are verified automatically.
 
 - Foreign `Depends`/`Requires` metadata is now evaluated in addition to
   the readelf NEEDED scan — dlopen-loaded libraries (X11, Wayland,

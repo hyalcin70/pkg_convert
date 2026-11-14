@@ -21,7 +21,9 @@ les dépôts et un historique d'installation persistant.
 > **pas** traités — l'outil produit des paquets `.pkg.tar.zst`, qui ne
 > fonctionnent que sur les systèmes basés sur Arch.
 
-## 🆕 Nouveautés (1.0.0-2)
+## 🆕 Nouveautés (1.0.0-4)
+
+- **Vérification en faux root après la construction** : le paquet terminé est éventuellement installé dans un faux root temporaire (case à cocher) ; l'enregistrement et la liste des fichiers sont vérifiés automatiquement.
 
 - Les métadonnées `Depends`/`Requires` étrangères sont désormais évaluées
   en plus du scan readelf NEEDED — les bibliothèques chargées par

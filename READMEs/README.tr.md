@@ -20,7 +20,9 @@ geçmişi ile.
 > istekler veya sorunlar **yanıtlanmaz** — araç yalnızca Arch tabanlı
 > sistemlerde çalışan `.pkg.tar.zst` paketleri üretir.
 
-## 🆕 Yenilikler (1.0.0-2)
+## 🆕 Yenilikler (1.0.0-4)
+
+- **Derlemeden sonra sanal kök doğrulaması**: bitmiş paket isteğe bağlı olarak geçici bir sanal kökte kurulur (onay kutusu); kayıt ve dosya listesi otomatik doğrulanır.
 
 - Yabancı `Depends`/`Requires` üstverileri artık readelf NEEDED taramasına
   ek olarak değerlendiriliyor — dlopen ile yüklenen kütüphaneler (X11,

@@ -21,7 +21,9 @@ um histórico de instalação persistente.
 > serão respondidos — a ferramenta gera pacotes `.pkg.tar.zst`, que
 > só funcionam em sistemas baseados em Arch.
 
-## 🆕 Novidades (1.0.0-2)
+## 🆕 Novidades (1.0.0-4)
+
+- **Verificação em fake root após compilar**: o pacote final é opcionalmente instalado num fake root temporário (caixa de seleção); o registo e a lista de ficheiros são verificados automaticamente.
 
 - Metadados `Depends`/`Requires` estrangeiros agora são avaliados além da
   varredura readelf NEEDED — bibliotecas carregadas via dlopen (X11,

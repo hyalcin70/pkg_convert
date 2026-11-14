@@ -21,7 +21,9 @@ Bibliotheken und persistenter Installationshistorie.
 > **nicht** beantwortet — das Werkzeug erzeugt `.pkg.tar.zst`-Pakete,
 > die nur auf Arch-basierten Systemen funktionieren.
 
-## 🆕 Neu in 1.0.0-2
+## 🆕 Neu in 1.0.0-4
+
+- **Fake-Root-Prüfung nach dem Bau**: Das fertige Paket wird (optional, per Checkbox) in einen temporären Fake-Root installiert; Registrierung und Dateiliste werden automatisch verifiziert.
 
 - Fremde `Depends`/`Requires`-Metadaten werden zusätzlich zum
   `readelf`-NEEDED-Scan ausgewertet — auch per `dlopen` geladene
