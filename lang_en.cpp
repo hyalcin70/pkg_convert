@@ -89,5 +89,9 @@ QMap<QString, QString> lang_en() {
     m.insert("msgBuildAborted", "❌ Build aborted.");
     
     m.insert("warnNoBinary", "❌ No executable package found.");
+    m.insert("missingToolsTitle", "Missing System Tools");
+    m.insert("missingToolsHint", "These tools are required for conversion.\nWithout them .deb/.rpm cannot be extracted or dependencies resolved correctly.");
+    m.insert("installMissing", "Install missing (sudo)");
+    m.insert("skip", "Continue anyway");
 return m;
 }

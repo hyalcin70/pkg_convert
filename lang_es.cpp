@@ -82,5 +82,17 @@ QMap<QString, QString> lang_es() {
     m.insert("noRepoDeps", "(Ninguna dependencia de repositorio que instalar – fue el paquete "
         "construido con la VERSION ACTUAL del programa?)");
 
+    m.insert("warnIntroTitle", "Aviso de conversion");
+    m.insert("warnIntro", "La conversion automatica puede fallar – por ejemplo si las dependencias estan incompletas, "
+        "faltan scripts, o no se reconocen diferencias del sistema.");
+    m.insert("warnContinue", "Continuar de todos modos?");
+    m.insert("msgBuildAborted", "❌ Construccion cancelada.");
+
+    m.insert("warnNoBinary", "❌ No se encontro paquete ejecutable.");
+    m.insert("missingToolsTitle", "Herramientas del sistema faltantes");
+    m.insert("missingToolsHint", "Estas herramientas son necesarias para la conversion.\nSin ellas no se pueden extraer .deb/.rpm ni resolver dependencias correctamente.");
+    m.insert("installMissing", "Instalar faltantes (sudo)");
+    m.insert("skip", "Continuar de todos modos");
+
     return m;
 }

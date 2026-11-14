@@ -83,5 +83,9 @@ QMap<QString, QString> lang_de() {
     m.insert("noRepoDeps", "(Keine Repo-Abhängigkeiten zu installieren – wurde das Paket mit "
         "der AKTUELLEN Programmversion gebaut?)");
     m.insert("warnNoBinary", "❌ Kein ausführbares Paket gefunden.");
+    m.insert("missingToolsTitle", "Fehlende Systemwerkzeuge");
+    m.insert("missingToolsHint", "Diese Werkzeuge werden für die Konvertierung benötigt.\nOhne sie können .deb/.rpm nicht korrekt entpackt oder Abhängigkeiten nicht aufgelöst werden.");
+    m.insert("installMissing", "Fehlende installieren (sudo)");
+    m.insert("skip", "Trotzdem fortfahren");
     return m;
 }

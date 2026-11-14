@@ -10,3 +10,6 @@ Makefile
 *.moc
 moc_predefs.h
 pkg_convert_gui
+
+# Hermes agent state
+.hermes/

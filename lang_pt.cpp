@@ -82,5 +82,9 @@ QMap<QString, QString> lang_pt() {
     m.insert("noRepoDeps", "(Nenhuma dependencia de repositorio para instalar – o pacote foi "
         "construido com a VERSAO ATUAL do programa?)");
     m.insert("warnNoBinary", "❌ Nenhum executavel encontrado.");
+    m.insert("missingToolsTitle", "Ferramentas do Sistema em Falta");
+    m.insert("missingToolsHint", "Estas ferramentas sao necessarias para a conversao.\nSem elas nao e possivel extrair .deb/.rpm nem resolver dependencias corretamente.");
+    m.insert("installMissing", "Instalar em falta (sudo)");
+    m.insert("skip", "Continuar mesmo assim");
     return m;
 }

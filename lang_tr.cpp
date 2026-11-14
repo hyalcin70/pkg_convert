@@ -82,5 +82,9 @@ QMap<QString, QString> lang_tr() {
     m.insert("noRepoDeps", "(Kurulacak repo bagimliligi yok – paket programin GUNCEL surumuyle "
         "olusturuldu mu?)");
     m.insert("warnNoBinary", "❌ Calistirilabilir paket bulunamadi.");
+    m.insert("missingToolsTitle", "Eksik Sistem Araclari");
+    m.insert("missingToolsHint", "Bu araclar donusturme icin gereklidir.\nOnlar olmadan .deb/.rpm cikartilamaz veya bagimliliklar cozulmez.");
+    m.insert("installMissing", "Eksikleri kur (sudo)");
+    m.insert("skip", "Yine de devam et");
     return m;
 }

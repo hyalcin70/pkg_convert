@@ -76,6 +76,54 @@ public:
         // Sprache aus Settings laden (Standard: Deutsch)
         m_lang = m_settings.value("lang", "de").toString();
         applyLang();
+        // Startup-Check für benötigte Tools
+        checkRequiredTools();
+    }
+
+private:
+    void checkRequiredTools() {
+        struct Tool { QString cmd; QString pkg; QString hint; };
+        const QVector<Tool> tools = {
+            {"ar", "binutils", "für .deb-Entpackung (ar)"},
+            {"cpio", "cpio", "für RPM-Entpackung (cpio)"},
+            {"rpm2cpio", "rpm-tools", "für RPM-Entpackung (rpm2cpio)"},
+            {"pkgfile", "pkgfile", "für Dependency-Resolver (pkgfile DB: 'sudo pkgfile -u')"},
+            {"bsdtar", "libarchive", "für .MTREE & Entpackung"},
+            {"zstd", "zstd", "für .pkg.tar.zst Kompression"},
+            {"readelf", "binutils", "für ELF-Dependency-Scan (NEEDED)"},
+            {"file", "file", "für ELF-Erkennung"},
+        };
+        QStringList missing;
+        for (const auto &t : tools) {
+            QProcess chk;
+            chk.start("bash", QStringList() << "-c" << QString("command -v %1").arg(t.cmd));
+            chk.waitForFinished(2000);
+            if (chk.exitCode() != 0) {
+                missing << QString("%1 (%2) – %3").arg(t.cmd, t.pkg, t.hint);
+            }
+        }
+        if (!missing.isEmpty()) {
+            QString msg = i18n("missingToolsTitle") + "\n\n";
+            for (const auto &m : missing) msg += "• " + m + "\n";
+            msg += "\n" + i18n("missingToolsHint");
+            QMessageBox box(this);
+            box.setWindowTitle(i18n("missingToolsTitle"));
+            box.setText(msg);
+            box.setIcon(QMessageBox::Warning);
+            auto *installBtn = box.addButton(i18n("installMissing"), QMessageBox::ActionRole);
+            auto *skipBtn = box.addButton(i18n("skip"), QMessageBox::RejectRole);
+            box.setDefaultButton(installBtn);
+            box.exec();
+            if (box.clickedButton() == installBtn) {
+                QStringList pkgs;
+                for (const auto &m : missing) {
+                    QString pkg = m.section('(', 1, 1).section(')', 0, 0);
+                    if (!pkg.isEmpty() && !pkgs.contains(pkg)) pkgs << pkg;
+                }
+                QString cmd = "pkexec bash -c 'pacman -Sy --needed --noconfirm " + pkgs.join(" ") + " && pkgfile -u'";
+                QProcess::startDetached("bash", QStringList() << "-c" << cmd);
+            }
+        }
     }
 
     QString i18n(const QString &key) const {
@@ -193,20 +241,16 @@ private slots:
             status->setText(i18n("msgInstAborted"));
             return;
         }
-        // Passwort über eigenen Dialog abfragen (sudo -S liest es von stdin).
-        // Kein Polkit-Agent nötig – funktioniert in jeder Session.
-        bool ok = false;
-        const QString pw = QInputDialog::getText(
-            this, i18n("sudoInstall"), i18n("sudoInstallBody") + m_lastName + "):",
-            QLineEdit::Password, "", &ok);
-        if (!ok || pw.isEmpty()) {
-            status->setText(i18n("msgInstAbortedPw"));
-            return;
-        }
+        // pkexec zeigt einen grafischen Polkit-Dialog an. Das ist robuster
+        // als "sudo -S": PAM-Konfigurationen mit Fingerabdruck/Askpass
+        // fressen das Passwort sonst aus stdin.
+        // Ein einziger Aufruf: erst das Paket, dann die Repo-Abhaengigkeiten
+        // (--asdeps) – damit der Auth-Dialog nur einmal erscheint.
+        QString cmd = QString("pacman -U --noconfirm '%1'").arg(m_lastPkg);
+        if (!m_lastDeps.isEmpty())
+            cmd += " && pacman -S --asdeps --needed --noconfirm " + m_lastDeps.join(" ");
         QProcess sudo;
-        sudo.start("sudo", QStringList() << "-S" << "pacman" << "-U" << "--noconfirm" << m_lastPkg);
-        sudo.write(pw.toUtf8() + "\n");   // Passwort als erste Zeile auf stdin
-        sudo.closeWriteChannel();
+        sudo.start("pkexec", QStringList() << "bash" << "-c" << cmd);
         sudo.waitForFinished(-1);
         const int instExit = sudo.exitCode();
         const QByteArray err = sudo.readAllStandardError();
@@ -218,11 +262,6 @@ private slots:
         // damit das Paket lauffaehig ist. Ergebnis wird VERIFIZIERT und gemeldet.
         QString depsMsg;
         if (!m_lastDeps.isEmpty()) {
-            QProcess deps;
-            deps.start("sudo", QStringList() << "-S" << "pacman" << "-S" << "--asdeps" << "--needed" << "--noconfirm" << m_lastDeps);
-            deps.write(pw.toUtf8() + "\n");
-            deps.closeWriteChannel();
-            deps.waitForFinished(-1);
             // Verifizieren: sind alle Deps jetzt wirklich installiert?
             QStringList missing;
             for (const QString &d : m_lastDeps) {
@@ -235,7 +274,7 @@ private slots:
             else
                 depsMsg = QString("\n" + i18n("depsFailed") + "%1\nFehler: %2")
                               .arg(missing.join(", "),
-                                   QString::fromUtf8(deps.readAllStandardError()).trimmed().right(300));
+                                   QString::fromUtf8(err).trimmed().right(300));
         } else {
             depsMsg = QString("\n" + i18n("noRepoDeps"));
         }
@@ -285,19 +324,9 @@ private slots:
             status->setText(i18n("msgRmAborted"));
             return;
         }
-        // Passwort über eigenen Dialog (sudo -S liest von stdin)
-        bool ok = false;
-        const QString pw = QInputDialog::getText(
-            this, i18n("sudoUninstall"), i18n("sudoUninstallBody") + name + "):",
-            QLineEdit::Password, "", &ok);
-        if (!ok || pw.isEmpty()) {
-            status->setText(i18n("msgRmAbortedPw"));
-            return;
-        }
+        // pkexec siehe installPkg(): grafischer Polkit-Dialog statt sudo -S.
         QProcess sudo;
-        sudo.start("sudo", QStringList() << "-S" << "pacman" << "-R" << "--noconfirm" << name);
-        sudo.write(pw.toUtf8() + "\n");
-        sudo.closeWriteChannel();
+        sudo.start("pkexec", QStringList() << "pacman" << "-R" << "--noconfirm" << name);
         sudo.waitForFinished(-1);
         const QByteArray err = sudo.readAllStandardError();
         // Erfolg: nach Deinstallation darf pacman -Q den Namen NICHT mehr finden
@@ -476,13 +505,14 @@ private slots:
 
         // PKGBUILD schreiben
         QStringList mapped, unknown, aurDeps;
+        QSet<QString> seen;
+        const QSet<QString> shipped = collectShippedLibs(src);
         // debtap-Methode: echte Binaries scannen (readelf NEEDED) und jede
         // Library via pkgfile zum ECHTEN Arch-Repo-Paketnamen aufloesen.
         // Keine geratene Namenstabelle mehr.
-        depsFromBinaries(src, mapped, unknown, aurDeps);
-        // Fallback/Ergaenzung: Metadaten-Mapping (falls Binaries nichts liefern)
-        if (mapped.isEmpty() && aurDeps.isEmpty())
-            mapDeps(meta, isDeb, mapped, unknown, aurDeps);
+        depsFromBinaries(src, shipped, mapped, unknown, aurDeps, seen);
+        // Zusaetzlich Metadaten-Depends/Requires auswerten (dlopen-Libs).
+        depsFromRequires(meta, isDeb, shipped, mapped, unknown, aurDeps, seen);
         // Deps fuer spaetere Installation merken
         m_lastDeps = mapped;
         m_lastAurDeps = aurDeps;
@@ -577,7 +607,7 @@ private slots:
         // Paketmetadaten für pacman schreiben, damit das Ergebnis ein
         // vollwertiges .pkg.tar.zst wird. Erst jetzt, nach allen Bearbeitungen
         // an src/staging (games-Verschiebung etc.).
-        writePackageMetadata(buildOut, name, ver, pkgrel, arch, desc, meta, isDeb);
+        writePackageMetadata(buildOut, name, ver, pkgrel, arch, desc, meta, isDeb, mapped);
 
         if (build) {
             // Paket wurde bereits von writePackageMetadata gebaut.
@@ -732,7 +762,9 @@ private:
                               const QString &arch,
                               const QString &desc,
                               const QMap<QString, QString> &meta,
-                              bool isDeb) {
+                              bool isDeb,
+                              const QStringList &deps) {
+        Q_UNUSED(isDeb);   // Deps kommen bereits als Arch-Namen herein
         const QString pkgroot = buildOut + "/pkg";
         QDir().mkpath(pkgroot);
 
@@ -841,16 +873,12 @@ private:
         pkginfo += QString("packager = pkg_convert\n");
         pkginfo += QString("arch = %1\n").arg(arch);
         pkginfo += QString("license = %1\n").arg(meta.value("License", "custom"));
-        QStringList deps;
-        if (isDeb) {
-            deps = meta.value("Depends", "").split(',', Qt::SkipEmptyParts);
-        } else {
-            deps = meta.value("Requires", "").split('\n', Qt::SkipEmptyParts);
-        }
+        // Nur die echten Arch-Abhaengigkeiten eintragen. Fremde Sonames /
+        // Paketnamen (z.B. "libxkbcommon.so.0()(64bit)") kann pacman nicht
+        // auflösen und würde die Installation scheitern lassen.
         for (const QString &d : deps) {
-            QString dep = d.trimmed();
+            const QString dep = d.trimmed();
             if (dep.isEmpty()) continue;
-            if (isDeb) dep = mapDebDepToArch(dep);
             pkginfo += QString("depend = %1\n").arg(dep);
         }
 
@@ -994,10 +1022,109 @@ private:
             {"noarch", "any"}, {"all", "any"}, {"any", "any"}};
         return m.value(a, a);
     }
+    // Normalisiert einen Namen fuer den Abgleich: .so-Suffix und fuehrendes
+    // "lib" entfernen, Kleinbuchstaben, nur alphanumerische Zeichen.
+    static QString normDepName(QString s) {
+        const int i = s.indexOf(".so");
+        if (i >= 0) s = s.left(i);
+        if (s.startsWith("lib") && s.length() > 4) s = s.mid(3);
+        s = s.toLower();
+        s.remove(QRegularExpression("[^a-z0-9]"));
+        return s;
+    }
+
+    // Bewertet, wie gut ein Paketname zu einer Library-Soname passt.
+    // Exakte Uebereinstimmung zaehlt am meisten, Teilstrings weniger.
+    // Dadurch gewinnt z.B. vulkan-icd-loader gegen brave-bin.
+    // Zerlegt einen Namen in Token (fuer Familien-Abgleich wie
+    // qt6-core -> qt6-base, sdl2-2.0 -> sdl2).
+    static QStringList depTokens(QString s) {
+        const int i = s.indexOf(".so");
+        if (i >= 0) s = s.left(i);
+        if (s.startsWith("lib") && s.length() > 4) s = s.mid(3);
+        s.replace(QRegularExpression("([a-z0-9])([A-Z])"), "\\1 \\2");
+        s = s.toLower();
+        return s.split(QRegularExpression("[^a-z0-9]+"), Qt::SkipEmptyParts);
+    }
+
+    static int depNameScore(const QString &pkg, const QString &lib) {
+        const QString p = normDepName(pkg), l = normDepName(lib);
+        if (p.isEmpty() || l.isEmpty()) return 0;
+        int sc = 0;
+        if (p == l) sc += 1000;
+        else if (p.contains(l)) sc += 500;
+        else if (l.contains(p)) sc += 300;
+        const QStringList pt = depTokens(pkg), lt = depTokens(lib);
+        int overlap = 0;
+        for (const QString &t : lt)
+            if (pt.contains(t)) ++overlap;
+        sc += overlap * 100;
+        return sc;
+    }
+
+    // Mitgelieferte .so-Dateien (Basename) ermitteln, damit sie nicht als
+    // externe Abhaengigkeit gelten.
+    static QSet<QString> collectShippedLibs(const QString &dir) {
+        QSet<QString> shipped;
+        QProcess own;
+        own.start("bash", QStringList() << "-c" << QString(
+            "cd '%1' && find . -type f -name '*.so*' -printf '%f\\n' | sort -u").arg(dir));
+        own.waitForFinished(15000);
+        for (const QString &s : QString::fromUtf8(own.readAllStandardOutput()).split('\n', Qt::SkipEmptyParts))
+            shipped.insert(s);
+        return shipped;
+    }
+
+    // Eine Library-Soname ueber pkgfile zum Arch-Repo-Paket aufloesen.
+    // Zwischen mehreren Kandidaten gewinnt der namensbeste Treffer; bei
+    // Gleichstand zaehlt die Repo-Prioritaet (core/extra vor multilib
+    // vor Rest). lib32-Pakete sind fuer 64-bit-Binaries falsch.
+    void resolveLibrary(const QString &lib, const QSet<QString> &shipped,
+                        QStringList &mapped, QStringList &aurDeps, QSet<QString> &seen) {
+        if (lib.isEmpty() || shipped.contains(lib)) return;
+        QProcess pf;
+        pf.start("pkgfile", QStringList() << lib);
+        pf.waitForFinished(20000);
+        const QStringList hits = QString::fromUtf8(pf.readAllStandardOutput())
+                                     .split('\n', Qt::SkipEmptyParts);
+        if (hits.isEmpty()) {
+            // Kein Repo-Paket enthaelt die EXAKTE Soname-Version
+            // (z.B. librecode.so.0 vs. Arch librecode.so.3).
+            // Ein Paket mit anderer Version wuerde das Binary NICHT
+            // reparieren -> ehrlich als nicht erfuellbar melden.
+            if (!aurDeps.contains(lib)) aurDeps << lib;
+            return;
+        }
+        QString best;
+        int bestScore = -1;
+        int bestRepo = 99;
+        for (const QString &h : hits) {
+            const QString repo = h.section('/', 0, 0);
+            const QString cand = h.section('/', 1, 1).section('\t', 0, 0).trimmed();
+            if (cand.startsWith("lib32-")) continue;
+            const int sc = depNameScore(cand, lib);
+            const int rp = (repo == "core") ? 0 : (repo == "extra") ? 1
+                         : (repo == "multilib") ? 2 : 3;
+            if (sc > bestScore || (sc == bestScore && rp < bestRepo)) {
+                best = cand; bestScore = sc; bestRepo = rp;
+            }
+        }
+        if (best.isEmpty()) {
+            // kein Repo-Paket liefert diese Library -> nur via AUR/manuell
+            if (!aurDeps.contains(lib)) aurDeps << lib;
+            return;
+        }
+        // Basispakete nicht als depends auffuehren
+        if (best == "glibc" || best == "gcc-libs") return;
+        if (!seen.contains(best)) { mapped << best; seen.insert(best); }
+    }
+
     // debtap-Methode: alle ELF-Binaries im Staging scannen, benoetigte
     // Libraries (readelf NEEDED) sammeln und via pkgfile zum echten
     // Arch-Repo-Paket aufloesen. core/extra/multilib bevorzugt (kein AUR).
-    void depsFromBinaries(const QString &stagingDir, QStringList &mapped, QStringList &unknown, QStringList &aurDeps) {
+    void depsFromBinaries(const QString &stagingDir, const QSet<QString> &shipped,
+                          QStringList &mapped, QStringList &unknown, QStringList &aurDeps,
+                          QSet<QString> &seen) {
         // 1) Alle NEEDED-Libraries aller ELF-Dateien einsammeln
         // (sed statt grep -oP: keine Backslash-Escape-Fallen in C++-Strings)
         QProcess scan;
@@ -1009,58 +1136,9 @@ private:
         scan.waitForFinished(60000);
         const QStringList libs = QString::fromUtf8(scan.readAllStandardOutput())
                                      .split('\n', Qt::SkipEmptyParts);
-        // Eigene mitgelieferte Libs nicht als Abhaengigkeit werten
-        QSet<QString> shipped;
-        {
-            QProcess own;
-            own.start("bash", QStringList() << "-c" << QString(
-                "cd %1 && find . -type f -name '*.so*' -printf '%f\\n' | sort -u").arg(stagingDir));
-            own.waitForFinished(15000);
-            for (const QString &s : QString::fromUtf8(own.readAllStandardOutput())
-                                        .split('\n', Qt::SkipEmptyParts))
-                shipped.insert(s);
-        }
-        QSet<QString> seen;
+        // Eigene mitgelieferte Libs wurden bereits vom Aufrufer ermittelt.
         for (const QString &lib : libs) {
-            if (shipped.contains(lib)) continue;                 // liefern wir selbst mit
-            // 2) pkgfile: welches Repo-Paket enthaelt diese Library?
-            QProcess pf;
-            pf.start("pkgfile", QStringList() << lib);
-            pf.waitForFinished(20000);
-            QStringList hits = QString::fromUtf8(pf.readAllStandardOutput())
-                                         .split('\n', Qt::SkipEmptyParts);
-            if (hits.isEmpty()) {
-                // Kein Repo-Paket enthaelt die EXAKTE Soname-Version
-                // (z.B. librecode.so.0 vs. Arch librecode.so.3).
-                // Ein Paket mit anderer Version wuerde das Binary NICHT
-                // reparieren -> ehrlich als nicht erfuellbar melden.
-                if (!aurDeps.contains(lib)) aurDeps << lib;
-                continue;
-            }
-            QString pkg;
-            // offizielle Repos bevorzugen: erst core/extra, dann multilib.
-            // lib32-Pakete sind fuer 64-bit-Binaries falsch -> ueberspringen.
-            for (const QString &h : hits) {
-                const QString repo = h.section('/', 0, 0);
-                const QString cand = h.section('/', 1, 1).section('\t', 0, 0).trimmed();
-                if (cand.startsWith("lib32-")) continue;
-                if (repo == "core" || repo == "extra") { pkg = cand; break; }
-                if (pkg.isEmpty() && repo == "multilib") pkg = cand;
-            }
-            if (pkg.isEmpty()) {
-                for (const QString &h : hits) {
-                    const QString cand = h.section('/', 1, 1).section('\t', 0, 0).trimmed();
-                    if (!cand.startsWith("lib32-")) { pkg = cand; break; }
-                }
-            }
-            if (!pkg.isEmpty()) {
-                // Basispakete nicht als depends auffuehren
-                if (pkg == "glibc" || pkg == "gcc-libs") continue;
-                if (!seen.contains(pkg)) { mapped << pkg; seen.insert(pkg); }
-            } else {
-                // kein Repo-Paket liefert diese Library -> nur via AUR/manuell
-                if (!aurDeps.contains(lib)) aurDeps << lib;
-            }
+            resolveLibrary(lib, shipped, mapped, aurDeps, seen);
         }
         Q_UNUSED(unknown);
     }
@@ -1172,6 +1250,58 @@ private:
                 }
             } else { if (!unknown.contains(name)) unknown << name; }
         }
+    }
+
+    // Zusaetzlich zur readelf-Analyse: die Fremd-Depends/Requires aus den
+    // Paketmetadaten auswerten. Gerade bei Programmen, die Bibliotheken erst
+    // zur Laufzeit per dlopen laden (X11, Wayland, Vulkan, ...), stehen diese
+    // NICHT im readelf-NEEDED des Hauptbinaries und wurden vorher ignoriert.
+    void depsFromRequires(const QMap<QString, QString> &meta, bool isDeb,
+                          const QSet<QString> &shipped,
+                          QStringList &mapped, QStringList &unknown, QStringList &aurDeps,
+                          QSet<QString> &seen) {
+        const QString raw = meta.value(isDeb ? "Depends" : "Requires", "");
+        if (raw.isEmpty()) return;
+        const QStringList items = isDeb ? raw.split(',', Qt::SkipEmptyParts)
+                                        : raw.split('\n', Qt::SkipEmptyParts);
+        QStringList foreignNames;
+        for (QString item : items) {
+            item = item.trimmed();
+            if (item.isEmpty()) continue;
+            if (!isDeb && (item.startsWith("rpmlib") || item.startsWith("rtld(") || item.startsWith("/")))
+                continue;
+            // RPM-Arch-Tag "(...)(64bit)" entfernen
+            item.remove(QRegularExpression("\\(\\)\\([^)]*\\)"));
+            QString inner = item.trimmed();
+            if (inner.startsWith('(') && inner.endsWith(')'))
+                inner = inner.mid(1, inner.length() - 2).trimmed();
+            // Alternativen "(a or b)" / "a | b" einzeln behandeln
+            const QStringList alts = inner.split(QRegularExpression("\\s+or\\s+|\\|"), Qt::SkipEmptyParts);
+            for (QString alt : alts) {
+                alt = alt.trimmed();
+                if (alt.isEmpty()) continue;
+                // Versions-/Arch-Klammern weg: alles ab <>=![(
+                const int cut = alt.indexOf(QRegularExpression("[<>=!\\[(]"));
+                if (cut >= 0) alt = alt.left(cut).trimmed();
+                alt = alt.section(' ', 0, 0).trimmed();
+                if (isDeb && alt.contains(':')) alt = alt.section(':', 0, 0).trimmed(); // "pkg:anyhf"
+                if (alt.isEmpty()) continue;
+                if (alt.contains(".so")) {
+                    resolveLibrary(alt, shipped, mapped, aurDeps, seen);
+                } else if (!alt.startsWith("rpmlib")) {
+                    foreignNames << alt;
+                }
+            }
+        }
+        if (foreignNames.isEmpty()) return;
+        // Fremdpaketnamen ueber die bestehenden Mapping-Tabellen pruefen
+        // (inkl. Pruefung, ob das Zielpaket wirklich in den Repos existiert).
+        QMap<QString, QString> synth = meta;
+        synth.insert(isDeb ? "Depends" : "Requires",
+                     foreignNames.join(isDeb ? QString(", ") : QString("\n")));
+        mapDeps(synth, isDeb, mapped, unknown, aurDeps);
+        mapped.removeDuplicates();
+        unknown.removeDuplicates();
     }
     void copyDir(const QString &src, const QString &dst) {
         QDir d(src);
