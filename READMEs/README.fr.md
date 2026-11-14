@@ -12,6 +12,21 @@ depuis les dépôts et un historique d'installation persistant.
 > **pas** traités — l'outil produit des paquets `.pkg.tar.zst`, qui ne
 > fonctionnent que sur les systèmes basés sur Arch.
 
+## 🆕 Nouveautés (1.0.0-2)
+
+- Les métadonnées `Depends`/`Requires` étrangères sont désormais évaluées
+  en plus du scan readelf NEEDED — les bibliothèques chargées par
+  dlopen (X11, Wayland, Vulkan) deviennent de vraies dépendances.
+- Sélection du fournisseur par score de nom (sous-chaîne +
+  correspondance de jetons, dépôts officiels d'abord) : plus de
+  dépendances erronées comme `nsight-compute` à la place de `qt6-base`.
+- `.PKGINFO` ne contient que de vrais paquets Arch → `pacman -U`
+  fonctionne de façon fiable.
+- Détection des bibliothèques fournies corrigée : les paquets autonomes
+  ne listent plus leurs propres libs comme dépendances.
+- Installation/désinstallation via `pkexec` (boîte de dialogue Polkit) ;
+  nouvelles dépendances runtime : `pkgfile`, `polkit`.
+
 ## Pourquoi ?
 
 Certains programmes (jeux, outils spécialisés) ne sont disponibles

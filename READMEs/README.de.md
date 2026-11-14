@@ -12,6 +12,22 @@ Bibliotheken und persistenter Installationshistorie.
 > **nicht** beantwortet — das Werkzeug erzeugt `.pkg.tar.zst`-Pakete,
 > die nur auf Arch-basierten Systemen funktionieren.
 
+## 🆕 Neu in 1.0.0-2
+
+- Fremde `Depends`/`Requires`-Metadaten werden zusätzlich zum
+  `readelf`-NEEDED-Scan ausgewertet — auch per `dlopen` geladene
+  Bibliotheken (X11, Wayland, Vulkan) werden als echte Abhängigkeiten
+  aufgelöst.
+- Anbieter-Auswahl über Namens-Score (Teilstring + Token-Abgleich,
+  offizielle Repos zuerst): keine falschen Deps mehr durch Bundle wie
+  `nsight-compute` statt `qt6-base`.
+- `.PKGINFO` enthält nur echte Arch-Pakete → `pacman -U` funktioniert
+  zuverlässig.
+- Erkennung mitgelieferter Bibliotheken repariert: eigenständige Pakete
+  listen ihre eigenen Libs nicht mehr als Abhängigkeiten.
+- Installation/Deinstallation läuft über `pkexec` (Polkit-Dialog);
+  neue Laufzeit-Abhängigkeiten: `pkgfile`, `polkit`.
+
 ## Warum?
 
 Manche Programme (Spiele, Spezialwerkzeuge) gibt es nur als `.deb`

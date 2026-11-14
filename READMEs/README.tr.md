@@ -11,6 +11,21 @@ kalıcı kurulum geçmişi ile.
 > istekler veya sorunlar **yanıtlanmaz** — araç yalnızca Arch tabanlı
 > sistemlerde çalışan `.pkg.tar.zst` paketleri üretir.
 
+## 🆕 Yenilikler (1.0.0-2)
+
+- Yabancı `Depends`/`Requires` üstverileri artık readelf NEEDED taramasına
+  ek olarak değerlendiriliyor — dlopen ile yüklenen kütüphaneler (X11,
+  Wayland, Vulkan) gerçek bağımlılıklara dönüşüyor.
+- Sağlayıcı seçimi ad skoruyla (alt dizge + jeton eşleşmesi, önce resmi
+  depolar): `qt6-base` yerine `nsight-compute` gibi hatalı bağımlılıklar
+  bitti.
+- `.PKGINFO` yalnızca gerçek Arch paketleri içeriyor → `pacman -U`
+  güvenilir çalışıyor.
+- Gömülü kütüphane algılaması düzeltildi: kendi kendine yeten paketler
+  kendi kütüphanelerini bağımlılık olarak listelemiyor.
+- Kur/kaldır artık `pkexec` (Polkit iletişim kutusu) kullanıyor; yeni
+  çalışma zamanı bağımlılıkları: `pkgfile`, `polkit`.
+
 ## Neden?
 
 Bazı programlar (oyunlar, özel araçlar) yalnızca `.deb`

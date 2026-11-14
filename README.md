@@ -15,6 +15,21 @@ repos, and a persistent installation history.
 > Fedora, openSUSE, …) will **not** be answered — the tool produces
 > `.pkg.tar.zst` packages, which only work on Arch-based systems.
 
+## 🆕 What's new (1.0.0-2)
+
+- Foreign `Depends`/`Requires` metadata is now evaluated in addition to
+  the readelf NEEDED scan — dlopen-loaded libraries (X11, Wayland,
+  Vulkan) become real dependencies.
+- Provider selection by name score (substring + token match, official
+  repos first): no more wrong deps from bundles like `nsight-compute`
+  instead of `qt6-base`.
+- `.PKGINFO` carries only real Arch packages → `pacman -U` works
+  reliably.
+- Shipped-library detection fixed: self-contained packages no longer
+  list their own libraries as dependencies.
+- Install/uninstall now uses `pkexec` (Polkit dialog); new runtime
+  dependencies: `pkgfile`, `polkit`.
+
 ## 🌐 Language
 
 - 🇬🇧 English — [README.en.md](READMEs/README.en.md)
