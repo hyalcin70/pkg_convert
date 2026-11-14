@@ -2,10 +2,13 @@
 
 ![SattNEK Logo](../created_by_sattnek.png)
 
-Yerel C++/Qt6 aracıdır; `.deb` ve `.rpm` paketlerini kurulabilir
-**Arch Linux** paketlerine (`.pkg.tar.zst`) çevirir — gerçek
-bağımlılık tespiti, kütüphanelerin repo'dan otomatik kurulumu ve
-kalıcı kurulum geçmişi ile.
+## pkg_convert nedir?
+
+**pkg_convert**, **Package Converter** (paket dönüştürücü) anlamına gelir:
+`.deb` ve `.rpm` paketlerini kurulabilir **Arch Linux** paketlerine
+(`.pkg.tar.zst`) çeviren yerel bir C++/Qt6 aracıdır — gerçek bağımlılık
+tespiti, kütüphanelerin repo'dan otomatik kurulumu ve kalıcı kurulum
+geçmişi ile.
 
 > ⚠️ **Yalnızca Arch tabanlı dağıtımlar.** Bu proje yalnızca **Arch
 > Linux tabanlı** dağıtımlar (Arch, Manjaro, EndeavourOS, …) içindir.

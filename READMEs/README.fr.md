@@ -2,10 +2,13 @@
 
 ![SattNEK Logo](../created_by_sattnek.png)
 
-Un outil natif C++/Qt6 qui convertit les paquets `.deb` et `.rpm` en
+## Qu'est-ce que pkg_convert ?
+
+**pkg_convert** signifie **Package Converter** (convertisseur de paquets) :
+un outil natif C++/Qt6 qui convertit les paquets `.deb` et `.rpm` en
 paquets **Arch Linux** installables (`.pkg.tar.zst`) — avec détection
-réelle des dépendances, installation automatique des bibliothèques
-depuis les dépôts et un historique d'installation persistant.
+réelle des dépendances, installation automatique des bibliothèques depuis
+les dépôts et un historique d'installation persistant.
 
 > ⚠️ **Uniquement pour les distributions basées sur Arch.** Ce projet est
 > exclusivement destiné aux distributions **basées sur Arch Linux**
