@@ -635,6 +635,10 @@ private slots:
 
         result += i18n("pkgbuildLabel") + buildOut + "/PKGBUILD\n";
 
+        // Desktop-Icon-Automatik: .desktop-Dateien mit "Icon=<Name>" auf einen im
+        // Paket vorhandenen absoluten Bildpfad verweisen (deb wie rpm).
+        resolveDesktopIcons(src);
+
         // Paketmetadaten für pacman schreiben, damit das Ergebnis ein
         // vollwertiges .pkg.tar.zst wird. Erst jetzt, nach allen Bearbeitungen
         // an src/staging (games-Verschiebung etc.).
@@ -1295,7 +1299,105 @@ private:
         if (!seen.contains(best)) { mapped << best; seen.insert(best); }
     }
 
-    // debtap-Methode: alle ELF-Binaries im Staging scannen, benoetigte
+    // Icon-Automatik (deb + rpm, DE-unabhaengig): .desktop-Dateien enthalten oft nur
+        // "Icon=<Name>", aber das Paket liefert keine Icon-Theme-Dateien. Wir suchen
+        // ein passendes Bild im Paket und setzen Icon= auf dessen absoluten Pfad
+        // (XDG-konform, KDE/GNOME zeigen dann das richtige Logo).
+        QString findIconImage(const QString &stagingDir, const QString &iconName,
+                                  const QString &desktopText) {
+                // Gefundene Bilder liegen im Staging-Verzeichnis, im Paket installiert
+                // aber an der Zielstelle (z.B. /opt/...). Staging-Pfade muessen also auf
+                // Wurzel-Pfade abgebildet werden.
+                auto installPath = [stagingDir](const QString &p) {
+            if (!p.startsWith(stagingDir)) return p;
+            QString rel = p.mid(stagingDir.length());
+            while (rel.startsWith('/')) rel.remove(0, 1);
+            return QStringLiteral("/") + rel;
+        };
+
+                auto extHit = [](const QString &base, const QStringList &files) {
+                QString best; qint64 bestScore = -1;
+                QDirIterator it(base, files, QDir::Files | QDir::System,
+                                QDirIterator::Subdirectories);
+                while (it.hasNext()) {
+                    it.next();
+                    const QString p = it.filePath();
+                    qint64 sc = it.fileInfo().size();
+                    if (p.contains("/pixmaps/"))      sc += 1000000000;
+                    else if (p.contains("/icons/"))   sc += 500000000;
+                    else if (p.contains("/opt/"))     sc += 100000000;
+                    if (sc > bestScore) { bestScore = sc; best = p; }
+                }
+                return best;
+            };
+
+            // 1) Exakter Name (name.png/-.svg/-.xpm) irgendwo im Paket
+            QString hit = extHit(stagingDir, QStringList()
+                                 << iconName + ".png" << iconName + ".svg" << iconName + ".xpm");
+            if (!hit.isEmpty()) return installPath(hit);
+
+            // 2) Fallback: groesstes Bild im Verzeichnis des Exec-Binaries (Symlink-
+            //    Zielerfolg im Paket, z.B. /usr/bin/app -> /opt/.../app)
+            const int e = desktopText.indexOf("\nExec=");
+            if (e < 0) return QString();
+            const int le = desktopText.indexOf('\n', e + 1);
+            QString bin = desktopText.mid(e + 6, (le > 0 ? le : desktopText.size()) - (e + 6))
+                              .trimmed().section(' ', 0, 0).remove('"');
+            if (!bin.startsWith('/')) return QString();
+
+            QString cur = stagingDir + bin;
+                    for (int i = 0; i < 4; ++i) {
+                        const QFileInfo fi(cur);
+                        if (!fi.isSymLink()) break;
+                        const QString t = QFile::symLinkTarget(cur);
+                        if (t.isEmpty()) break;
+                        // Das Paket-Staging ist die autoritative Quelle: bevorzugt den
+                        // Zielpfad innerhalb des Pakets (im Paket installiert unter /opt/...),
+                        // nur als letzter Ausweg den evtl. zufaellig existierenden Host-Pfad.
+                        QString cand;
+                        if (t.startsWith(stagingDir)) cand = t;
+                        else if (t.startsWith('/') && QFileInfo(stagingDir + t).exists())
+                            cand = stagingDir + t;
+                        else if (QFileInfo(t).exists())
+                            cand = t;
+                        if (cand.isEmpty()) break;
+                        cur = cand;
+                    }
+            const QFileInfo cf(cur);
+            const QString dir = cf.isFile() ? cf.absolutePath() : cf.absoluteFilePath();
+            return installPath(extHit(dir, QStringList() << "*.png" << "*.svg" << "*.xpm"));
+        }
+
+        void resolveDesktopIcons(const QString &stagingDir) {
+            const QString apps = stagingDir + "/usr/share/applications";
+            if (!QDir(apps).exists()) return;
+            QDirIterator it(apps, QStringList() << "*.desktop", QDir::Files | QDir::System,
+                            QDirIterator::Subdirectories);
+            while (it.hasNext()) {
+                it.next();
+                QFile f(it.filePath());
+                if (!f.open(QIODevice::ReadOnly)) continue;
+                const QString text = QString::fromUtf8(f.readAll());
+                f.close();
+                const int i = text.indexOf("\nIcon=");
+                if (i < 0) continue;
+                const int le = text.indexOf('\n', i + 1);
+                const QString val = text.mid(i + 6, (le > 0 ? le : text.size()) - (i + 6))
+                                        .trimmed().remove('"');
+                if (val.isEmpty() || val.startsWith('/')) continue;
+                const QString img = findIconImage(stagingDir, val, text);
+                if (img.isEmpty()) continue;
+                QStringList lines = text.split('\n');
+                for (int k = 0; k < lines.size(); ++k) {
+                    if (lines[k].startsWith("Icon=")) { lines[k] = "Icon=" + img; break; }
+                }
+                QFile out(it.filePath());
+                if (out.open(QIODevice::WriteOnly | QIODevice::Truncate))
+                    out.write(lines.join('\n').toUtf8());
+            }
+        }
+
+        // debtap-Methode: alle ELF-Dateien im Staging scannen, benoetigte
     // Libraries (readelf NEEDED) sammeln und via pkgfile zum echten
     // Arch-Repo-Paket aufloesen. core/extra/multilib bevorzugt (kein AUR).
     void depsFromBinaries(const QString &stagingDir, const QSet<QString> &shipped,

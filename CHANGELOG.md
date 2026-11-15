@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.0-11 (November 15, 2026)
+
+### Added
+- **Desktop icon automation** (works for both `.deb` and `.rpm`): `.desktop` entries with a
+  bare `Icon=<name>` are now pointed to an image actually shipped in the package
+  (e.g. `/opt/google/chrome/product_logo_256.png`), so converted apps show their real logo
+  in the KDE/GNOME menu instead of a generic placeholder.
+
 ## 1.0.0-10 (November 15, 2026)
 
 ### Fixed
