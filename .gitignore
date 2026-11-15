@@ -5,6 +5,7 @@ _build/
 *.pkg.tar.zst
 *.tar.zst
 Archiv.tar.gz
+*.AppImage
 *.o
 Makefile
 .qmake.stash
