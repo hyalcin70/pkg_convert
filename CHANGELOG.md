@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.0-10 (November 15, 2026)
+
+### Fixed
+- `libcurl-nss.so.4` from Fedora RPM metadata is no longer reported as an unresolved
+  dependency: Chrome does not link curl at all (verified with `readelf`), and Arch
+  covers it with the normal `curl` package.
+
 ## 1.0.0-9 (November 15, 2026)
 
 ### Fixed

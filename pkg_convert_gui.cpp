@@ -1247,14 +1247,15 @@ private:
     void resolveLibrary(const QString &lib, const QSet<QString> &shipped,
                         QStringList &mapped, QStringList &aurDeps, QSet<QString> &seen) {
         if (lib.isEmpty() || shipped.contains(lib)) return;
-        // Bekannte Fremd-Sonames ohne Repo-Pendant: direkt auf das AUR-Paket
-        // hinweisen, statt nur "manuell pruefen" zu melden.
-        static const QMap<QString, QString> foreignAurs = {
-            {"libcurl-nss.so.4", "libcurl-nss"},
+        // Fremd-Sonames, die Arch mit einem anderen Paket abdeckt: kein Warnhinweis
+        // noetig. Beispiel: Fedoras NSS-Curl hat auf Arch kein Repo-Pendant,
+        // Chrome linkt curl uebrigens gar nicht (reine RPM-Metadaten).
+        static const QMap<QString, QString> coveredForeign = {
+            {"libcurl-nss.so.4", "curl"},
         };
-        const auto fa = foreignAurs.constFind(lib);
-        if (fa != foreignAurs.constEnd()) {
-            if (!aurDeps.contains(fa.value())) aurDeps << fa.value();
+        const auto cf = coveredForeign.constFind(lib);
+        if (cf != coveredForeign.constEnd()) {
+            if (!seen.contains(cf.value())) { mapped << cf.value(); seen.insert(cf.value()); }
             return;
         }
         QProcess pf;
