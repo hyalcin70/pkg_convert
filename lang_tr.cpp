@@ -95,5 +95,6 @@ QMap<QString, QString> lang_tr() {
     m.insert("verifyTmpFail", "geçici dizin kullanılamıyor");
     m.insert("verifyNotRegistered", "Paket sanal kökte kaydedilmedi.");
     m.insert("verifyMissingFiles", "Beklenen %1 dosya sanal kökte eksik.");
+    m.insert("verifyLowDisk", "Doğrulama için yeterli boş disk alanı yok (2 GB'dan az boş).");
     return m;
 }

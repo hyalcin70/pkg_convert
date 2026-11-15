@@ -36,6 +36,7 @@ QMap<QString, QString> lang_pt();
 #include <QDir>
 #include <QFile>
 #include <QSettings>
+#include <QStorageInfo>
 #include <filesystem>
 
 #include <QCryptographicHash>
@@ -305,11 +306,20 @@ private slots:
         if (instExit == 0 && chk.exitCode() == 0) {
             status->setText(i18n("msgInstalled") + m_lastName + depsMsg);
             addInstalled(m_lastName);  // zur persistenten Historie hinzufuegen
+            refreshDesktopCaches();    // Menue-Eintrag sofort sichtbar machen
         }
         else if (instExit != 0)
             status->setText(i18n("msgInstallFail") + instMsg + depsMsg);
         else
             status->setText(i18n("msgInstallPartial") + m_lastName + " installiert?)" + depsMsg);
+    }
+    // Desktop-/Icon-Caches aktualisieren, damit neu installierte Programme sofort
+    // im KDE-Menue erscheinen (KDE braucht dafuer "kbuildsycoca6 --noincremental").
+    void refreshDesktopCaches() {
+        if (QFile::exists("/usr/bin/kbuildsycoca6"))
+            QProcess::execute("/usr/bin/kbuildsycoca6", QStringList() << "--noincremental");
+        if (QFile::exists("/usr/bin/update-desktop-database"))
+            QProcess::execute("/usr/bin/update-desktop-database", QStringList());
     }
     // Hilfsfunktion: Namen zur persistenten Installations-Historie hinzufuegen
     void addInstalled(const QString &name) {
@@ -697,11 +707,33 @@ private slots:
         if (!tmp.isValid())
             return i18n("verifyFail") + " (" + i18n("verifyTmpFail") + ")\n";
 
+        // Speicherplatz-Probe: Chrome-Abhaengigkeiten fuellen den Fake-Root mit
+        // ~1-2 GB schnell; ohne Platz bricht pacman ohne klare Meldung ab.
+        QStorageInfo si(base);
+        if (si.isValid() && si.bytesAvailable() > 0 &&
+            si.bytesAvailable() < qint64(2) * 1024 * 1024 * 1024)
+            return i18n("verifyFail") + "\n• " + i18n("verifyLowDisk") + "\n";
+
         const QString root  = tmp.filePath("root");
         const QString db    = root + "/var/lib/pacman";
         const QString cache = root + "/cache";
         QDir().mkpath(db);
         QDir().mkpath(cache);
+
+        // Minimale pacman.conf INS Temp-Verzeichnis: Signaturpruefung aus
+        // (lokale Pakete sind nicht signiert), Repos ueber Host-Mirrorlist.
+        const QString cfgPath = tmp.filePath("pacman.conf");
+        {
+            QFile cf(cfgPath);
+            if (cf.open(QIODevice::WriteOnly)) {
+                cf.write("[options]\nArchitecture = auto\n"
+                         "SigLevel = Never\nLocalFileSigLevel = Never\nFileSigLevel = Never\n\n"
+                         "[core]\nInclude = /etc/pacman.d/mirrorlist\n\n"
+                         "[extra]\nInclude = /etc/pacman.d/mirrorlist\n\n"
+                         "[multilib]\nInclude = /etc/pacman.d/mirrorlist\n");
+                cf.close();
+            }
+        }
 
         // Sync-DB als Basis fuer die Abhaengigkeits-Aufloesung.
         const QString hostSync = "/var/lib/pacman/sync";
@@ -718,6 +750,7 @@ private slots:
         QProcess inst;
         inst.start("pkexec", QStringList()
                    << "pacman" << "-U" << "--noconfirm" << "--noprogressbar"
+                   << "--config" << cfgPath
                    << "-r" << root << "--dbpath" << db << "--cachedir" << cache
                    << pkgPath);
         inst.waitForFinished(-1);
@@ -1214,6 +1247,16 @@ private:
     void resolveLibrary(const QString &lib, const QSet<QString> &shipped,
                         QStringList &mapped, QStringList &aurDeps, QSet<QString> &seen) {
         if (lib.isEmpty() || shipped.contains(lib)) return;
+        // Bekannte Fremd-Sonames ohne Repo-Pendant: direkt auf das AUR-Paket
+        // hinweisen, statt nur "manuell pruefen" zu melden.
+        static const QMap<QString, QString> foreignAurs = {
+            {"libcurl-nss.so.4", "libcurl-nss"},
+        };
+        const auto fa = foreignAurs.constFind(lib);
+        if (fa != foreignAurs.constEnd()) {
+            if (!aurDeps.contains(fa.value())) aurDeps << fa.value();
+            return;
+        }
         QProcess pf;
         pf.start("pkgfile", QStringList() << lib);
         pf.waitForFinished(20000);

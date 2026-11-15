@@ -103,5 +103,6 @@ QMap<QString, QString> lang_fr() {
     m.insert("verifyTmpFail", "aucun répertoire temporaire disponible");
     m.insert("verifyNotRegistered", "Le paquet n'a pas été enregistré dans le faux root.");
     m.insert("verifyMissingFiles", "%1 fichier(s) attendu(s) manquent dans le faux root.");
+    m.insert("verifyLowDisk", "Pas assez d'espace disque libre pour la vérification (moins de 2 Go libres).");
     return m;
 }

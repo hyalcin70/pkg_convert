@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.0.0-9 (November 15, 2026)
+
+### Fixed
+- Desktop entries of installed packages now appear immediately in the KDE menu:
+  after a successful install pkg_convert refreshes the menu cache (`kbuildsycoca6`).
+- Fake-root verification uses its own minimal pacman.conf (signatures disabled,
+  repositories via host mirrorlist) and reports low disk space clearly instead of
+  failing silently with "package not registered".
+- Foreign sonames without a repository counterpart are named concretely:
+  `libcurl-nss.so.4` now shows up as AUR package `libcurl-nss` instead of a generic
+  "check manually" note.
+
 ## 1.0.0-8 (November 15, 2026)
 
 ### Fixed
