@@ -36,6 +36,7 @@ QMap<QString, QString> lang_pt();
 #include <QDir>
 #include <QFile>
 #include <QSettings>
+#include <filesystem>
 
 #include <QCryptographicHash>
 #include <algorithm>
@@ -1422,6 +1423,17 @@ private:
         QDir d(src);
         for (const QFileInfo &fi : d.entryInfoList(QDir::AllEntries | QDir::NoDotAndDotDot)) {
             const QString target = dst + "/" + fi.fileName();
+            if (fi.isSymLink()) {
+                // Symlinks 1:1 uebernehmen (Zieltext bleibt erhalten, auch bei
+                // relativen Links). Ohne das gehen Startlinks wie
+                // /usr/bin/google-chrome-stable -> /opt/google/chrome/google-chrome
+                // verloren und der Befehl ist nach der Installation nicht auffindbar.
+                std::error_code ec;
+                const std::filesystem::path raw =
+                    std::filesystem::read_symlink(fi.filePath().toStdString(), ec);
+                if (!ec) std::filesystem::create_symlink(raw, target.toStdString(), ec);
+                continue;
+            }
             if (fi.isDir()) { QDir().mkpath(target); copyDir(fi.filePath(), target); }
             else QFile::copy(fi.filePath(), target);
         }

@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.0-7 (November 15, 2026)
+
+### Fixed
+- Symlinks are now preserved during conversion: packages like Google Chrome ship their
+  launcher as a symlink (`/usr/bin/google-chrome-stable -> /opt/google/chrome/google-chrome`)
+  and previously lost it, so the command was not found after installation.
+
 ## 1.0.0-6 (November 15, 2026)
 
 ### Fixed
