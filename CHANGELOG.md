@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.0-13 (November 15, 2026)
+
+### Fixed
+- Loading a new file now clears the previous result/dependency list immediately,
+  instead of showing stale entries from the previously built package.
+
 ## 1.0.0-12 (November 15, 2026)
 
 ### Fixed

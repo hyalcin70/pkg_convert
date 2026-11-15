@@ -388,6 +388,11 @@ private slots:
         m_lastPkg.clear();
         m_lastDeps.clear();
         m_lastAurDeps.clear();
+        // Alte Ergebnis-/Abhaengigkeitsliste verwerfen: sie gehoert zum
+        // VORHERIGEN Paket und wuerde sonst als aktuell angezeigt.
+        depView->clear();
+        btnInstall->setEnabled(false);
+        progress->setVisible(false);
         status->setText(i18n("fileLabel") + QFileInfo(path).fileName());
 
         // Vorab-Metadaten lesen

@@ -1,7 +1,7 @@
 # Maintainer: Hakan Yalçın
 pkgname=pkg_convert
 pkgver=1.0.0
-pkgrel=12
+pkgrel=13
 pkgdesc="Converts .deb/.rpm packages into installable Arch-Linux packages (native Qt6 GUI)"
 arch=('x86_64')
 url="https://github.com/hyalcin70/pkg_convert"
@@ -23,7 +23,7 @@ source=("pkg_convert_gui.cpp"
         "lang_tr.cpp"
         "lang_pt.cpp")
 sha256sums=(
-    'f82539b480344db158eb2db62379eaef3dd253e666bec5bbe4a3d2449e46e372'
+    '415f05320a0fdb0ed3bfa05d0b521f426bc22f1ff7458c5193e9dcc338a75542'
     'f4eab89ccafa55fbf3a72bcaed4ce5b262200b92403c6a4595dee7bbb2873358'
     'bd8f98bdc2ee2748520d4df9099678898aabed9d800d691eba307479bc274b1c'
     '1c35318b13f7f32e5921bd4e0de0669202e8ec618075312e1eb60de41bcf294d'
