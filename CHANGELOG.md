@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.0-12 (November 15, 2026)
+
+### Fixed
+- The RPM capability `rtld(GNU_HASH)` no longer shows up as a bogus additional package
+  named `rtld` in the summary; it is filtered together with other RPM pseudo-dependencies.
+
 ## 1.0.0-11 (November 15, 2026)
 
 ### Added

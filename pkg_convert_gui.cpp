@@ -615,8 +615,9 @@ private slots:
                 it = it.section(' ', 0, 0).trimmed(); // "pkg (>=..)" -> "pkg"
                 if (it.isEmpty()) continue;
                 // RPM-interne Pseudo-Deps (rpmlib, rtld(GNU_HASH), ...)
-                // sind KEIN echtes Paket -> ignorieren
-                if (it.startsWith("rpmlib") || it.startsWith("rtld(")
+                // sind KEIN echtes Paket -> ignorieren. Wichtig: nach dem
+                // Entfernen der Klammer steht nur noch "rtld" da.
+                if (it.startsWith("rpmlib") || it.startsWith("rtld(") || it == "rtld"
                     || it.startsWith("/") || (it.contains("(") && !it.contains(')'))) continue;
                 // Library-artige Deps ueberspringen (die kommen ueber readelf)
                 bool looksLib = false;
