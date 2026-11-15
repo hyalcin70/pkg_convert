@@ -1,7 +1,5 @@
 # Paket Converter
 
-![SattNEK Logo](../created_by_sattnek.png)
-
 **Licença:** GPL-3.0 com a cláusula Commons — uso não comercial livre; uso comercial apenas com autorização prévia.
 
 **Direitos autorais:** © 2026 Hakan Yalçın. Qualquer uso fora desta licença — especialmente uso comercial, venda, remoção de avisos de direitos autorais ou de licença, ou apropriar-se do software — é estritamente proibido.
@@ -131,3 +129,5 @@ Depois **Paket Converter** aparece no menu KDE
 
 `qt6-base` (fornece `qmake6`), `pacman`, `file`, `binutils`, `cpio`,
 `libarchive`, `pkgfile`, `polkit`
+
+![SattNEK Logo](../created_by_sattnek.png)
