@@ -24,7 +24,9 @@ history.
 > Fedora, openSUSE, …) will **not** be answered — the tool produces
 > `.pkg.tar.zst` packages, which only work on Arch-based systems.
 
-## 🆕 What's new (1.0.0-4)
+## 🆕 What's new (1.0.0-5)
+
+- **Turkish translation overhaul**: all texts now use proper Turkish characters (ğ ü ö ç ş ı İ).
 
 - **Fake root verification after building**: the finished package is optionally installed into a temporary fake root (checkbox); registration and file list are verified automatically.
 

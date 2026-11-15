@@ -21,7 +21,9 @@ Bibliotheken und persistenter Installationshistorie.
 > **nicht** beantwortet — das Werkzeug erzeugt `.pkg.tar.zst`-Pakete,
 > die nur auf Arch-basierten Systemen funktionieren.
 
-## 🆕 Neu in 1.0.0-4
+## 🆕 Neu in 1.0.0-5
+
+- **Türkisch-Überarbeitung**: Alle Texte verwenden jetzt die korrekten türkischen Sonderzeichen (ğ ü ö ç ş ı İ).
 
 - **Fake-Root-Prüfung nach dem Bau**: Das fertige Paket wird (optional, per Checkbox) in einen temporären Fake-Root installiert; Registrierung und Dateiliste werden automatisch verifiziert.
 

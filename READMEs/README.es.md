@@ -21,7 +21,9 @@ repos y un historial de instalación persistente.
 > serán respondidos — la herramienta genera paquetes `.pkg.tar.zst`,
 > que solo funcionan en sistemas basados en Arch.
 
-## 🆕 Novedades (1.0.0-4)
+## 🆕 Novedades (1.0.0-5)
+
+- **Revisión de la traducción al turco**: todos los textos usan ahora los caracteres turcos correctos (ğ ü ö ç ş ı İ).
 
 - **Verificación en fake root tras compilar**: el paquete terminado se instala opcionalmente en un fake root temporal (casilla); el registro y la lista de archivos se verifican automáticamente.
 

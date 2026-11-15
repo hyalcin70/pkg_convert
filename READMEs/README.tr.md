@@ -20,7 +20,9 @@ geçmişi ile.
 > istekler veya sorunlar **yanıtlanmaz** — araç yalnızca Arch tabanlı
 > sistemlerde çalışan `.pkg.tar.zst` paketleri üretir.
 
-## 🆕 Yenilikler (1.0.0-4)
+## 🆕 Yenilikler (1.0.0-5)
+
+- **Türkçe çevirinin düzeltilmesi**: tüm metinler artık doğru Türkçe karakterleri kullanıyor (ğ ü ö ç ş ı İ).
 
 - **Derlemeden sonra sanal kök doğrulaması**: bitmiş paket isteğe bağlı olarak geçici bir sanal kökte kurulur (onay kutusu); kayıt ve dosya listesi otomatik doğrulanır.
 

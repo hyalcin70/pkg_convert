@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.0-5 (15. November 2026)
+
+### Behoben
+- Türkische Übersetzung überarbeitet: durchgehend korrekte türkische Sonderzeichen
+  (ğ ü ö ç ş ı İ) statt ASCII-Transliteration; einzelne Formulierungen verbessert.
+
 ## 1.0.0-4 (15. November 2026)
 
 ### Neu

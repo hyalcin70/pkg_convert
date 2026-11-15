@@ -21,7 +21,9 @@ les dépôts et un historique d'installation persistant.
 > **pas** traités — l'outil produit des paquets `.pkg.tar.zst`, qui ne
 > fonctionnent que sur les systèmes basés sur Arch.
 
-## 🆕 Nouveautés (1.0.0-4)
+## 🆕 Nouveautés (1.0.0-5)
+
+- **Révision de la traduction turque** : tous les textes utilisent désormais les caractères turcs corrects (ğ ü ö ç ş ı İ).
 
 - **Vérification en faux root après la construction** : le paquet terminé est éventuellement installé dans un faux root temporaire (case à cocher) ; l'enregistrement et la liste des fichiers sont vérifiés automatiquement.
 
