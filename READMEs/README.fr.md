@@ -19,7 +19,9 @@ les dépôts et un historique d'installation persistant.
 > **pas** traités — l'outil produit des paquets `.pkg.tar.zst`, qui ne
 > fonctionnent que sur les systèmes basés sur Arch.
 
-## 🆕 Nouveautés (1.0.0-12)
+## 🆕 Nouveautés (1.0.0-13)
+
+- **Correctif** : le chargement d'un nouveau fichier vide désormais immédiatement la liste de résultats/dépendances (au lieu d'afficher d'anciennes entrées).
 
 - **Intégration bureau et stabilité** : les liens symboliques sont conservés dans les paquets, les logos apparaissent directement dans le menu (automatisme des icônes), le cache du menu est rafraîchi après l'installation, vérification en faux root plus robuste, libellés de thème allemands corrigés.
 

@@ -19,7 +19,9 @@ repos y un historial de instalación persistente.
 > serán respondidos — la herramienta genera paquetes `.pkg.tar.zst`,
 > que solo funcionan en sistemas basados en Arch.
 
-## 🆕 Novedades (1.0.0-12)
+## 🆕 Novedades (1.0.0-13)
+
+- **Corrección**: al cargar un archivo nuevo se vacía inmediatamente la lista de resultados/dependencias (en lugar de mostrar entradas antiguas).
 
 - **Integración de escritorio y estabilidad**: los enlaces simbólicos se conservan en los paquetes, los logotipos aparecen directamente en el menú (automatización de iconos), la caché del menú se actualiza tras la instalación, verificación en fake root más robusta, etiquetas de tema alemanas corregidas.
 
