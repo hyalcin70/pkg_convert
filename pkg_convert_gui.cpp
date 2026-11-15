@@ -890,11 +890,15 @@ private:
             // das spart Speicher im fertigen Paket, weil große .so-Dateien
             // nicht doppelt vorkommen.
             const bool canHardlink = (src.startsWith(pkgroot) || pkgroot.startsWith(src));
-            QDirIterator it(src, QDirIterator::Subdirectories);
+            // System-Filter: kaputte Symlinks muessen gelistet werden, sonst
+            // fehlen Launcher wie /usr/bin/google-chrome-stable im Paket.
+            QDirIterator it(src, QDir::AllEntries | QDir::NoDotAndDotDot | QDir::System,
+                            QDirIterator::Subdirectories);
             while (it.hasNext()) {
                 it.next();
                 const QFileInfo fi = it.fileInfo();
                 if (fi.isDir()) continue;
+                if (!fi.isSymLink() && !fi.isFile()) continue;  // FIFO/Geraete ueberspringen
                 QString relPath = it.filePath().mid(src.length() + 1);
                 if (relPath.startsWith("./")) relPath.remove(0, 2);
                 if (relPath.isEmpty()) continue;
@@ -904,11 +908,23 @@ private:
                     QFile::remove(destPath);
                 }
                 bool ok = false;
-                if (canHardlink) {
-                    ok = QFile::link(it.filePath(), destPath);
-                }
-                if (!ok) {
-                    ok = QFile::copy(it.filePath(), destPath);
+                if (fi.isSymLink()) {
+                    // Symlink 1:1 neu erzeugen statt zu kopieren (Kopie scheitert
+                    // an nicht existierenden absoluten Zielen).
+                    std::error_code ec;
+                    const std::filesystem::path raw =
+                        std::filesystem::read_symlink(it.filePath().toStdString(), ec);
+                    if (!ec) {
+                        std::filesystem::create_symlink(raw, destPath.toStdString(), ec);
+                        ok = !ec;
+                    }
+                } else {
+                    if (canHardlink) {
+                        ok = QFile::link(it.filePath(), destPath);
+                    }
+                    if (!ok) {
+                        ok = QFile::copy(it.filePath(), destPath);
+                    }
                 }
                 if (!ok) {
                     status->setText(i18n("linkCopyError") + destPath);
@@ -1421,7 +1437,9 @@ private:
     }
     void copyDir(const QString &src, const QString &dst) {
         QDir d(src);
-        for (const QFileInfo &fi : d.entryInfoList(QDir::AllEntries | QDir::NoDotAndDotDot)) {
+        // System-Filter noetig: ohne ihn listet Qt kaputte Symlinks gar nicht erst
+        // (z.B. /usr/bin/google-chrome-stable -> /opt/... waehrend der Konvertierung).
+        for (const QFileInfo &fi : d.entryInfoList(QDir::AllEntries | QDir::NoDotAndDotDot | QDir::System)) {
             const QString target = dst + "/" + fi.fileName();
             if (fi.isSymLink()) {
                 // Symlinks 1:1 uebernehmen (Zieltext bleibt erhalten, auch bei

@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.0-8 (November 15, 2026)
+
+### Fixed
+- Broken symlinks were skipped during conversion because Qt only lists them with the
+  `System` filter: launcher links like `/usr/bin/google-chrome-stable ->
+  /opt/google/chrome/google-chrome` vanished, so the command was missing after install.
+  Both build stages now preserve and recreate all symlinks.
+
 ## 1.0.0-7 (November 15, 2026)
 
 ### Fixed
