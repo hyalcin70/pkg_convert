@@ -17,7 +17,9 @@ installation of libraries, and a persistent installation history.
 > Fedora, openSUSE, …) will **not** be answered — the tool produces
 > `.pkg.tar.zst` packages, which only work on Arch-based systems.
 
-## 🆕 What's new (1.0.0-5)
+## 🆕 What's new (1.0.0-12)
+
+- **Desktop integration & stability**: symlinks are kept in packages, app logos appear directly in the menu (icon automation), the menu cache refreshes after installation, more robust fake root verification, fixed German theme labels.
 
 - **Turkish translation overhaul**: all texts now use proper Turkish characters (ğ ü ö ç ş ı İ).
 

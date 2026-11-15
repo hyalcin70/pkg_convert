@@ -18,7 +18,9 @@ geçmişi ile.
 > istekler veya sorunlar **yanıtlanmaz** — araç yalnızca Arch tabanlı
 > sistemlerde çalışan `.pkg.tar.zst` paketleri üretir.
 
-## 🆕 Yenilikler (1.0.0-5)
+## 🆕 Yenilikler (1.0.0-12)
+
+- **Masaüstü entegrasyonu ve kararlılık**: sembolik bağlantılar paketlerde korunur, uygulama logoları doğrudan menüde görünür (ikon otomasyonu), kurulum sonrası menü önbelleği yenilenir, sanal kök doğrulaması daha sağlam, Almanca tema etiketleri düzeltildi.
 
 - **Türkçe çevirinin düzeltilmesi**: tüm metinler artık doğru Türkçe karakterleri kullanıyor (ğ ü ö ç ş ı İ).
 

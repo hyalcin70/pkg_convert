@@ -19,7 +19,9 @@ Bibliotheken und persistenter Installationshistorie.
 > **nicht** beantwortet — das Werkzeug erzeugt `.pkg.tar.zst`-Pakete,
 > die nur auf Arch-basierten Systemen funktionieren.
 
-## 🆕 Neu in 1.0.0-5
+## 🆕 Neu in 1.0.0-12
+
+- **Desktop-Integration & Stabilität**: Symlinks bleiben im Paket erhalten, App-Logos erscheinen direkt im Menü (Icon-Automatik), der Menü-Cache wird nach der Installation aktualisiert, Fake-Root-Prüfung robuster, deutsche Theme-Beschriftungen korrigiert.
 
 - **Türkisch-Überarbeitung**: Alle Texte verwenden jetzt die korrekten türkischen Sonderzeichen (ğ ü ö ç ş ı İ).
 

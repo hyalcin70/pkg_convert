@@ -19,7 +19,9 @@ um histórico de instalação persistente.
 > serão respondidos — a ferramenta gera pacotes `.pkg.tar.zst`, que
 > só funcionam em sistemas baseados em Arch.
 
-## 🆕 Novidades (1.0.0-5)
+## 🆕 Novidades (1.0.0-12)
+
+- **Integração de desktop e estabilidade**: os links simbólicos são preservados nos pacotes, os logótipos aparecem diretamente no menu (automação de ícones), a cache do menu é atualizada após a instalação, verificação em fake root mais robusta, etiquetas de tema alemãs corrigidas.
 
 - **Revisão da tradução turca**: todos os textos passam a usar os caracteres turcos corretos (ğ ü ö ç ş ı İ).
 

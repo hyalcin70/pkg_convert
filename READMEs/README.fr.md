@@ -19,7 +19,9 @@ les dépôts et un historique d'installation persistant.
 > **pas** traités — l'outil produit des paquets `.pkg.tar.zst`, qui ne
 > fonctionnent que sur les systèmes basés sur Arch.
 
-## 🆕 Nouveautés (1.0.0-5)
+## 🆕 Nouveautés (1.0.0-12)
+
+- **Intégration bureau et stabilité** : les liens symboliques sont conservés dans les paquets, les logos apparaissent directement dans le menu (automatisme des icônes), le cache du menu est rafraîchi après l'installation, vérification en faux root plus robuste, libellés de thème allemands corrigés.
 
 - **Révision de la traduction turque** : tous les textes utilisent désormais les caractères turcs corrects (ğ ü ö ç ş ı İ).
 
