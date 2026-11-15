@@ -1,50 +1,47 @@
 # Changelog
 
-## 1.0.0-5 (15. November 2026)
+## 1.0.0-5 (November 15, 2026)
 
-### Behoben
-- Türkische Übersetzung überarbeitet: durchgehend korrekte türkische Sonderzeichen
-  (ğ ü ö ç ş ı İ) statt ASCII-Transliteration; einzelne Formulierungen verbessert.
+### Fixed
+- Turkish translation overhauled: proper Turkish characters throughout
+  (ğ ü ö ç ş ı İ) instead of ASCII transliteration; a few phrasings improved.
 
-## 1.0.0-4 (15. November 2026)
+## 1.0.0-4 (November 15, 2026)
 
-### Neu
-- **Fake-Root-Prüfung nach dem Bau**: Das fertige Paket wird (optional, per Checkbox)
-  in einen temporären Fake-Root installiert; Registrierung und Dateiliste werden
-  automatisch verifiziert. Hilft sofort zu sehen, ob das Paket sauber installierbar ist.
+### Added
+- **Fake root verification after building**: the finished package is optionally
+  installed into a temporary fake root (checkbox); registration and file list are
+  verified automatically — see right away whether the package installs cleanly.
 
-## 1.0.0-3 (14. November 2026)
+## 1.0.0-3 (November 14, 2026)
 
-### Geändert
-- Lizenz: GPL-3.0 mit zusätzlicher Commons Clause — Verkauf und kommerzielle
-  Nutzung nur mit Genehmigung; ausdrücklicher Copyright- und Missbrauchshinweis
-- Laufzeit-Abhängigkeiten `pkgfile` und `polkit` im PKGBUILD deklariert
-- Alle READMEs aktualisiert: Lizenz-, Urheberrechts- und Missbrauchshinweise,
-  Erklärung des Namens (Package Converter), News-Block, SattNEK-Logo
-- Veralteter Strafrechts-Vermerk wieder entfernt
+### Changed
+- License: GPL-3.0 with an additional Commons Clause — selling or commercial use
+  only with permission; explicit copyright and misuse notice.
+- Runtime dependencies `pkgfile` and `polkit` declared in the PKGBUILD.
+- All READMEs updated: license, copyright and misuse notes, name explanation
+  (Package Converter), news block, SattNEK logo.
+- Removed the outdated criminal-prosecution wording again.
 
-## 1.0.0-2 (14. November 2026)
+## 1.0.0-2 (November 14, 2026)
 
-### Behoben
-- `.PKGINFO` enthielt fremde Sonames (z. B. `libxkbcommon.so.0()(64bit)`),
-  die pacman nicht auflösen konnte → jetzt stehen nur echte Arch-Pakete in
-  `depend =`, `pacman -U` funktioniert zuverlässig.
-- Mitgelieferte Bibliotheken wurden wegen eines Escaping-Bugs in
-  `find -printf '%f\\n'` nicht erkannt → eigene Libs werden nicht mehr als
-  Abhängigkeit gelistet.
-- Bei mehreren pkgfile-Treffern wurde der erste Treffer genommen
-  (z. B. `nsight-compute` statt `qt6-base`) → jetzt gewinnt der namensbeste
-  Treffer (Token-Abgleich, offizielle Repos zuerst).
+### Fixed
+- `.PKGINFO` contained foreign sonames (e.g. `libxkbcommon.so.0()(64bit)`) that
+  pacman could not resolve → now only real Arch packages appear in `depend =`,
+  making `pacman -U` reliable.
+- Shipped libraries were not detected due to an escaping bug in
+  `find -printf '%f\\n'` → a package's own libs are no longer listed as dependencies.
+- When pkgfile returned multiple hits, the first one was taken
+  (e.g. `nsight-compute` instead of `qt6-base`) → now the best name match wins
+  (token matching, official repos first).
 
-### Hinzugefügt
-- Fremd-`Depends`/`Requires` aus den Paketmetadaten werden zusätzlich zum
-  `readelf`-NEEDED-Scan ausgewertet — auch per `dlopen` geladene
-  Bibliotheken (X11, Wayland, Vulkan) werden als echte Abhängigkeiten
-  aufgelöst.
-- Provider-Wahl über Namens-Score mit Token-Matching.
-- Laufzeit-Abhängigkeiten `pkgfile` und `polkit`.
+### Added
+- Foreign `Depends`/`Requires` from package metadata is evaluated in addition to
+  the `readelf` NEEDED scan — dlopen-loaded libraries (X11, Wayland, Vulkan)
+  are resolved as real dependencies.
+- Provider selection by name score with token matching.
+- Runtime dependencies `pkgfile` and `polkit`.
 
-### Geändert
-- Installation/Deinstallation läuft über `pkexec` (Polkit-Dialog) statt
-  `sudo -S`.
-- Alle READMEs in 7 Sprachen auf den aktuellen Stand gebracht.
+### Changed
+- Install/uninstall now uses `pkexec` (Polkit dialog) instead of `sudo -S`.
+- Brought all READMEs (7 languages) up to date.
