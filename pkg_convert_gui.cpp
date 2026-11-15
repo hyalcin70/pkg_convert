@@ -163,6 +163,15 @@ private:
             QLabel#h { font-size: 13px; font-weight: 600; color: #b4befe; }
             QLabel#ok { color: #a6e3a1; }
             QLabel#bad { color: #f38ba8; }
+            QListWidget {
+                background: #181825; border: 1px solid #45475a;
+                border-radius: 8px; color: #cdd6f4; padding: 4px;
+            }
+            QListWidget::item:selected { background: #45475a; }
+            QComboBox, QCheckBox {
+                background: #181825; border: 1px solid #45475a;
+                border-radius: 8px; padding: 6px; color: #cdd6f4;
+            }
         )";
         const QString light = R"(
             QMainWindow { background: #f5f6fa; }
@@ -186,6 +195,15 @@ private:
             QLabel#h { font-size: 13px; font-weight: 600; color: #5b5bd6; }
             QLabel#ok { color: #2e9e4f; }
             QLabel#bad { color: #d83a5a; }
+            QListWidget {
+                background: #ffffff; border: 1px solid #c8ccd8;
+                border-radius: 8px; color: #2e2e3a; padding: 4px;
+            }
+            QListWidget::item:selected { background: #dfe3ee; }
+            QComboBox, QCheckBox {
+                background: #ffffff; border: 1px solid #c8ccd8;
+                border-radius: 8px; padding: 6px; color: #2e2e3a;
+            }
         )";
         setStyleSheet(m_dark ? dark : light);
     }

@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.0-6 (November 15, 2026)
+
+### Fixed
+- German theme toggle showed swapped labels ("Light"/"Dark") — now "Hell"/"Dunkel".
+- The installed-packages list now follows the app theme (previously pitch black in
+  light mode on systems with a dark palette, e.g. a fresh CachyOS install).
+- Combo boxes and checkboxes are themed consistently in light and dark mode.
+
 ## 1.0.0-5 (November 15, 2026)
 
 ### Fixed

@@ -15,8 +15,8 @@ QMap<QString, QString> lang_de() {
     m.insert("install", "Paket installieren");
     m.insert("installed", "Installierte Pakete (zum Deinstallieren wählen)");
     m.insert("uninstall", "Ausgewähltes Paket deinstallieren");
-    m.insert("themeLight", "Dark");
-    m.insert("themeDark", "Light");
+    m.insert("themeLight", "Hell");
+    m.insert("themeDark", "Dunkel");
     m.insert("choosePkg", "Paket wählen");
     m.insert("pkgsFilter", "Pakete (*.deb *.rpm)");
     m.insert("errNoDebRpm", "❌ Bitte eine .deb- oder .rpm-Datei wählen.");
