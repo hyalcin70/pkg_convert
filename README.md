@@ -1,8 +1,8 @@
 # Paket Converter
 
-> 🧪 **Beta status.** This project is still in **beta**. Features may change,
-> break, or behave unexpectedly. Use at your own risk and report issues on
-> the issue tracker.
+[English](README.md) | [Deutsch](README.de.md) | [Türkçe](README.tr.md) | [Español](README.es.md) | [Français](README.fr.md)
+
+> **Alpha Status:** This project is currently in active testing (Alpha). No support, assistance, or warranty of any kind is provided.
 
 **License:** GPL-3.0 with the Commons Clause — free for non-commercial use; commercial use only with permission.
 
@@ -47,12 +47,12 @@ history.
 
 ## 🌐 Language
 
-- 🇬🇧 English — [README.en.md](READMEs/README.en.md)
-- 🇩🇪 Deutsch — [README.de.md](READMEs/README.de.md)
-- 🇫🇷 Français — [README.fr.md](READMEs/README.fr.md)
-- 🇪🇸 Español — [README.es.md](READMEs/README.es.md)
-- 🇹🇷 Türkçe — [README.tr.md](READMEs/README.tr.md)
-- 🇵🇹 Português — [README.pt.md](READMEs/README.pt.md)
+- 🇬🇧 English — [README.en.md](README.en.md)
+- 🇩🇪 Deutsch — [README.de.md](README.de.md)
+- 🇫🇷 Français — [README.fr.md](README.fr.md)
+- 🇪🇸 Español — [README.es.md](README.es.md)
+- 🇹🇷 Türkçe — [README.tr.md](README.tr.md)
+- 🇵🇹 Português — [README.pt.md](README.pt.md)
 
 ---
 
